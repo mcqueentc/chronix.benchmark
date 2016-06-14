@@ -1,0 +1,4 @@
+rootProject.name = 'chronix.benchmark'
+include 'client'
+include 'server'
+
