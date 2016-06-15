@@ -11,7 +11,7 @@ version '1.0-SNAPSHOT'
 
 
 
-mainClassName = 'HelloServer'
+mainClassName = 'de.qaware.chronix.server.DropWizardServerApplication'
 
 sourceCompatibility = 1.5
 
@@ -31,3 +31,5 @@ shadowJar {
         attributes 'Main-Class': mainClassName
     }
 }
+
+
