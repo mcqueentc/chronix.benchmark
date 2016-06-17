@@ -42,5 +42,7 @@ public class DropWizardServerApplication extends Application<DropWizardServerCon
         //Register HealthCheck
         final DropWizardServerHealthCheck healthCheck = new DropWizardServerHealthCheck();
         environment.healthChecks().register("template", healthCheck);
+
+
     }
 }
