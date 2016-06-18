@@ -1,8 +1,6 @@
 package de.qaware.chronix.server.util;
 
-import com.google.common.base.Optional;
 import sun.awt.OSInfo;
-
 import java.io.File;
 
 /**
@@ -17,14 +15,12 @@ public class ServerSystemUtil {
      *
      * @return The directory with appending File separator. (Unix: "/", Windows: "\")
      */
-    public static Optional<String> getBenchmarkDockerDirectory() {
-        Optional<String> path = Optional.absent();
+    public static String getBenchmarkDockerDirectory() {
+        String path = null;
         OSInfo.OSType os = sun.awt.OSInfo.getOSType();
         if (os != OSInfo.OSType.UNKNOWN) {
-            path.of(System.getProperty("user.home") + File.separator + benchmarkUtilPath + File.separator);
-
+            path = System.getProperty("user.home") + File.separator + benchmarkUtilPath + File.separator;
         }
-
         return path;
     }
 }

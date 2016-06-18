@@ -18,6 +18,14 @@ sourceCompatibility = 1.5
 
 dependencies {
 
+    //dropwizard
+    compile 'io.dropwizard:dropwizard-core:0.9.2'
+
+    // http://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.21'
+
+    //compile group: 'com.sun.jersey', name: 'jersey-client', version: '1.8'
+
     //Chronix
     compile 'de.qaware.chronix:chronix-api:0.1'
     compile 'de.qaware.chronix:chronix-server-client:0.1.3'

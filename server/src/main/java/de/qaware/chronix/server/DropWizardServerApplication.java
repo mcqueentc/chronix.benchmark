@@ -6,6 +6,8 @@ import de.qaware.chronix.server.benchmark.queryrunner.QueryRunnerResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+
 /**
  * Created by mcqueen666 on 15.06.16.
  */
@@ -43,6 +45,6 @@ public class DropWizardServerApplication extends Application<DropWizardServerCon
         final DropWizardServerHealthCheck healthCheck = new DropWizardServerHealthCheck();
         environment.healthChecks().register("template", healthCheck);
 
-
+        environment.jersey().register(MultiPartFeature.class);
     }
 }
