@@ -58,16 +58,12 @@ public class BenchmarkConfiguratorResource {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                return Response.serverError().entity("Server could not write file.").build();
+                return Response.serverError().entity("Server could not write file <" + filename + ">" ).build();
             }
 
 
-        return Response.ok("Upload successfull!").build();
-
-
+        return Response.ok("Upload file <" + filename + "> successfull!").build();
 
     }
-
-
 
 }

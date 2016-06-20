@@ -1,6 +1,9 @@
+package de.qaware.chronix.client;
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.sun.org.apache.xpath.internal.operations.Mult;
+import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import org.apache.commons.compress.utils.IOUtils;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.media.multipart.*;
@@ -44,18 +47,19 @@ public class HelloClient {
         System.out.println(System.getProperty("user.home"));
         System.out.println(sun.awt.OSInfo.getOSType());
 
+        // Test file upload
+        Uploader uploader = Uploader.getInstance();
+        List<Response> responses = uploader.uploadDockerFiles(System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
 
-        File file = new File("/Users/mcqueen666/Desktop/test.txt");
+        if(!responses.isEmpty()){
+            for(Response response : responses){
+                System.out.println(response.getStatus() +" "+ response.readEntity(String.class));
+            }
+        } else {
+            System.out.println("Nothing uploaded");
+        }
 
-            final Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
-            final FileDataBodyPart filepart = new FileDataBodyPart("file", file);
-            FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
-            final FormDataMultiPart multiPart = (FormDataMultiPart) formDataMultiPart.field("file", file, MediaType.MULTIPART_FORM_DATA_TYPE).bodyPart(filepart);
-            //final FormDataMultiPart multiPart = (FormDataMultiPart) formDataMultiPart.field("file", file.getName()).bodyPart(filepart);
-            final WebTarget target = client.target("http://localhost:9003/configurator/docker/upload/test");
-            final Response response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
 
-        System.out.println("Status: " + response.getStatus() + " " + response.readEntity(String.class));
 
     }
 }
