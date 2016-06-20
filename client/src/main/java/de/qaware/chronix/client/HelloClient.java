@@ -44,12 +44,20 @@ public class HelloClient {
 
 
     public static void main(String[] args){
+        if(args.length < 3){
+            System.out.println("Usage: java -jar client-<version>-all.jar [absoulutPath] [http://<serverAddress>] [portNumber]");
+            return;
+        }
+
+
         System.out.println(System.getProperty("user.home"));
         System.out.println(sun.awt.OSInfo.getOSType());
 
+
         // Test file upload
         Uploader uploader = Uploader.getInstance();
-        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
+        //List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
+        List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
 
         if(!responses.isEmpty()){
             for(Response response : responses){
