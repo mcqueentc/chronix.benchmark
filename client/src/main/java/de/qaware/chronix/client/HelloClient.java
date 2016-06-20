@@ -49,7 +49,7 @@ public class HelloClient {
 
         // Test file upload
         Uploader uploader = Uploader.getInstance();
-        List<Response> responses = uploader.uploadDockerFiles(System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
+        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
 
         if(!responses.isEmpty()){
             for(Response response : responses){
@@ -58,7 +58,6 @@ public class HelloClient {
         } else {
             System.out.println("Nothing uploaded");
         }
-
 
 
     }

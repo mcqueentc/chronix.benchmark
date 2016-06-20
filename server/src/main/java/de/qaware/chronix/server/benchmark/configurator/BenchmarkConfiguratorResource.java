@@ -43,7 +43,15 @@ public class BenchmarkConfiguratorResource {
             return Response.serverError().entity("Server OS Unknown").build();
         }
 
-        String dirPath = path + name + File.separator;
+        // construct directory path from name
+        String[] paths = name.split("-");
+        String reconstructedFilePath = "";
+        for(String p : paths){
+            reconstructedFilePath = reconstructedFilePath + p + File.separator;
+        }
+
+
+        String dirPath = path + reconstructedFilePath;
         new File(dirPath).mkdirs();
             String filename = fileMetaData.getFileName();
             String filePath = dirPath + filename;
@@ -58,11 +66,11 @@ public class BenchmarkConfiguratorResource {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                return Response.serverError().entity("Server could not write file <" + filename + ">" ).build();
+                return Response.serverError().entity("Server could not write file <" + reconstructedFilePath + filename + ">" ).build();
             }
 
 
-        return Response.ok("Upload file <" + filename + "> successfull!").build();
+       return Response.ok("Upload file <" + reconstructedFilePath + filename + "> successfull!").build();
 
     }
 

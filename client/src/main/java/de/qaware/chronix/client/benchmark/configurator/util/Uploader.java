@@ -35,24 +35,26 @@ public class Uploader {
 
 
     /**
-     * Uploads all docker files under given directory path.
-     * NOTE: Subfolders will be ignored. All files necessary for the docker container must be first level under directory path.
+     * Uploads all docker files under given directory path recursively.
      *
+     * @param parentDirectoryName The parent directory names. NOTE: just call with empty string "". Used for subsequent calls only!!!.
      * @param dirPath The path to the docker file to upload as String. Will be used as folder name on the server.
      * @param httpServerAddress The http or ip address as String. (e.g. "http://some.server.com)
      * @param portNumber The port number on which the server is listening as String. (e.g. "66666")
      *
      * @return List of Responses. (check e.g. response.getStatus() +" "+ response.readEntity(String.class)
      */
-    public List<Response> uploadDockerFiles(String dirPath, String httpServerAddress, String portNumber) {
+    public List<Response> uploadDockerFiles(String parentDirectoryName, String dirPath, String httpServerAddress, String portNumber) {
         List<Response> responses = new LinkedList<Response>();
         File directory = new File(dirPath);
         if(directory.exists()){
-            File[] fList = directory.listFiles();
+            File[] fileList = directory.listFiles();
 
-            for(File file : fList){
-                // ignore subfolders at this moment
+            for(File file : fileList){
+                // subfolders ("-" is used to seperate subfolder names as params for server)
                 if (file.isDirectory()) {
+                    responses.addAll(uploadDockerFiles(parentDirectoryName + directory.getName() + "-", file.getPath(),httpServerAddress,portNumber));
+
                     continue;
                 }
 
@@ -65,6 +67,7 @@ public class Uploader {
                         httpServerAddress +":"
                                 + portNumber
                                 + SERVER_UPLOAD_DOCKER_COMMAND_STRING
+                                + parentDirectoryName
                                 + directory.getName());
                 final Response response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
                 //System.out.println("Status: " + response.getStatus() + " " + response.readEntity(String.class));
