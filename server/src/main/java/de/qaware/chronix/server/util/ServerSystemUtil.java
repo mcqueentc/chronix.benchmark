@@ -1,7 +1,12 @@
 package de.qaware.chronix.server.util;
 
 import sun.awt.OSInfo;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by mcqueen666 on 17.06.16.
@@ -9,6 +14,10 @@ import java.io.File;
 public class ServerSystemUtil {
 
     static final String benchmarkUtilPath = "chronixBenchmark" + File.separator + "docker";
+
+    private ServerSystemUtil(){
+        //Avoid instances
+    }
 
     /**
      * Returns the chronix benchmark directory for saving docker files.
@@ -23,4 +32,43 @@ public class ServerSystemUtil {
         }
         return path;
     }
+
+    /**
+     * Executes the command with runtime.exec
+     *
+     * @param command the command string array
+     * @return the result of the command
+     */
+    public static List<String> executeCommand(String[] command) {
+        List<String> result = new LinkedList<String>();
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(command);
+            p.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String curLine;
+            while ((curLine = reader.readLine()) != null) {
+                result.add(curLine);
+            }
+            reader.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * Executes the command with runtime.exec
+     *
+     * @param command the command string
+     * @return the result of the command
+     */
+    public static List<String> executeCommand(String command) {
+        String[] newCommand = {command};
+        return executeCommand(newCommand);
+    }
+
+
+
 }

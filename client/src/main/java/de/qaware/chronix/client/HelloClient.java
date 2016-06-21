@@ -20,7 +20,14 @@ import javax.ws.rs.core.Response;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.text.ParseException;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 import org.glassfish.jersey.client.ClientConfig;
@@ -36,6 +43,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.google.common.base.Optional;
 import sun.awt.OSInfo;
 
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by mcqueen666 on 14.06.16.
  */
@@ -44,20 +55,20 @@ public class HelloClient {
 
 
     public static void main(String[] args){
-        if(args.length < 3){
+        /*if(args.length < 3){
             System.out.println("Usage: java -jar client-<version>-all.jar [absoulutPath] [http://<serverAddress>] [portNumber]");
             return;
         }
 
-
+*/
         System.out.println(System.getProperty("user.home"));
         System.out.println(sun.awt.OSInfo.getOSType());
 
-
+        /*
         // Test file upload
         Uploader uploader = Uploader.getInstance();
-        //List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
-        List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
+        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
+        //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
 
         if(!responses.isEmpty()){
             for(Response response : responses){
@@ -66,6 +77,18 @@ public class HelloClient {
         } else {
             System.out.println("Nothing uploaded");
         }
+        }
+  */
+
+        final Client client = ClientBuilder.newBuilder().build();
+        final WebTarget target = client.target("http://localhost:9003/configurator/docker/start?container=chronix");
+
+        final Response response = target.request().get();
+
+
+
+
+
 
 
     }
