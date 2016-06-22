@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Created by mcqueen666 on 17.06.16.
@@ -54,6 +55,7 @@ public class ServerSystemUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
+            result.add(e.getLocalizedMessage());
         }
         return result;
     }
@@ -69,6 +71,39 @@ public class ServerSystemUtil {
         return executeCommand(newCommand);
     }
 
+    /**
+     * Builds a OS specific command from command string
+     *
+     * @param command the command
+     * @return the os specific command
+     */
+    public static String[] getOsSpecificCommand(String[] command){
+        OSInfo.OSType os = OSInfo.getOSType();
+        String[] specificCommand = null;
+        if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.MACOSX) {
 
+            String[] localCmd = new String[command.length + 2];
+            localCmd[0] = "/bin/sh";
+            localCmd[1] = "-c";
+            for(int i = 0; i < command.length; i++){
+                localCmd[i+2] = command[i];
+            }
+
+            /*String[] localCmd = {
+                    "/bin/sh",
+                    "-c",
+                    command
+            };*/
+            specificCommand = localCmd;
+        } else if (os == OSInfo.OSType.WINDOWS){
+            //String[] localCmd = {command};
+            specificCommand = command;
+
+        } else if (os == OSInfo.OSType.SOLARIS){
+            //TODO
+
+        }
+        return specificCommand;
+    }
 
 }

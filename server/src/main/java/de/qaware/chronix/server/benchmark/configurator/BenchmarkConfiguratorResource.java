@@ -82,35 +82,109 @@ public class BenchmarkConfiguratorResource {
      * Starts the given docker container with given command.
      *
      * @param containerName the docker container name (e.g. folder name if your docker files upload)
-     * @param command the command to start the docker container
+     * @param commandFileName the commandFile in the uploaded docker container direcotory to start the docker container
      * @return the response from the server and the cli output (e.g. statusCode + String[])
      */
     @GET
     @Path("docker/start")
     @Timed
     public Response startDockerContainer(@QueryParam("containerName") String containerName,
-                                         @QueryParam("command") String command){
-       // Map<Boolean, String[]> response = new HashMap<Boolean, String[]>();
+                                         @QueryParam("commandFileName") String commandFileName){
         if(DockerCommandLineUtil.isDockerInstalled()){
             File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
             if(directory.exists()){
-                //TODO further check command for safety reasons
-                if(command.startsWith("docker run")){
-                    List<String> startResult = ServerSystemUtil.executeCommand(command);
-                    if(DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
-                        // all went good
-                        return Response.ok().entity(startResult.toArray()).build();
+                File commandFile = new File(directory.getPath() + File.separator + commandFileName);
+                if (commandFile.exists()){
+                    String command = "";
+                    try {
+                        FileReader fileReader = new FileReader(commandFile);
+                        BufferedReader bufferedReader = new BufferedReader(fileReader);
+                        command = bufferedReader.readLine();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    return Response.serverError().entity(startResult.toArray()).build();
+
+                    //TODO further check command for safety reasons
+                    if(command.contains("docker run")
+                            && !command.contains("|")
+                            && !command.contains(";")){
+                        String[] prepareCommand = {command};
+                        String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
+                        List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
+                        if(DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
+                            // all went good
+                            return Response.ok().entity(startResult.toArray()).build();
+                        }
+                        return Response.serverError().entity(startResult.toArray()).build();
+                    }
+                    String[] response = {"Wrong docker command."};
+                    return Response.serverError().entity(response).build();
                 }
-                String[] response = {"Wrong docker command."};
+                String[] response = {"docker command file missing"};
                 return Response.serverError().entity(response).build();
+
             }
-            String[] response = {"docker files missing"};
+            String[] response = {"docker files missing",
+                                "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName};
             return Response.serverError().entity(response).build();
         }
         String[] response = {"docker not installed or daemon not running"};
         return Response.serverError().entity(response).build();
     }
+
+    @GET
+    @Path("docker/build")
+    @Timed
+    public Response buildDockerContainer(@QueryParam("containerName") String containerName,
+                                         @QueryParam("commandFileName") String commandFileName){
+        if(DockerCommandLineUtil.isDockerInstalled()){
+            File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
+            if(directory.exists()){
+                File commandFile = new File(directory.getPath() + File.separator + commandFileName);
+                if (commandFile.exists()){
+                    String command = "";
+                    try {
+                        FileReader fileReader = new FileReader(commandFile);
+                        BufferedReader bufferedReader = new BufferedReader(fileReader);
+                        command = bufferedReader.readLine();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    //TODO further check command for safety reasons
+                    if(command.contains("docker build")
+                            && !command.contains("|")
+                            && !command.contains(";")){
+                        String[] prepareCommand = {"cd " + directory.getPath(), command};
+                        String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
+                        List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
+                            // all went good
+                            return Response.ok().entity(startResult.toArray()).build();
+                        //String[] response = specificCommand;
+                        //return Response.ok().entity(response).build();
+
+                    }
+                    String[] response = {"Wrong docker command."};
+                    return Response.serverError().entity(response).build();
+                }
+                String[] response = {"docker command file missing"};
+                return Response.serverError().entity(response).build();
+
+            }
+            String[] response = {"docker files missing",
+                    "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName};
+            return Response.serverError().entity(response).build();
+        }
+        String[] response = {"docker not installed or daemon not running"};
+        return Response.serverError().entity(response).build();
+    }
+
+
 
 }

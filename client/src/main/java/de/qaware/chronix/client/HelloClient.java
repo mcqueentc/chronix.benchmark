@@ -61,13 +61,18 @@ public class HelloClient {
         }
 
 */
+/*
         System.out.println(System.getProperty("user.home"));
         System.out.println(sun.awt.OSInfo.getOSType());
-
-        /*
+        File dir = new File(System.getProperty("user.home") + "/Desktop/chronix");
+        if(dir.isDirectory()){
+            System.out.println("getPath() = " + dir.getPath());
+        }
+*/
+/*
         // Test file upload
         Uploader uploader = Uploader.getInstance();
-        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Desktop/chronix","http://localhost","9003");
+        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix","http://localhost","9003");
         //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
 
         if(!responses.isEmpty()){
@@ -77,14 +82,33 @@ public class HelloClient {
         } else {
             System.out.println("Nothing uploaded");
         }
-        }
-  */
+*/
 
+
+        //test build container
+        String commandFileName = "chronix.build";
         final Client client = ClientBuilder.newBuilder().build();
-        final WebTarget target = client.target("http://localhost:9003/configurator/docker/start?container=chronix");
-
+        final WebTarget target = client.target("http://localhost:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
         final Response response = target.request().get();
+        String[] answers = response.readEntity(String[].class);
+        for(String answer : answers){
+            System.out.println(answer);
+        }
 
+
+
+
+/*
+        // test start container
+        String command = "docker run -d -p 8983:8983 chronix";
+        final Client client = ClientBuilder.newBuilder().build();
+        final WebTarget target = client.target("http://localhost:9003/configurator/docker/start?container=chronix&command="+command);
+        final Response response = target.request().get();
+        String[] answers = response.readEntity(String[].class);
+        for(String answer : answers){
+            System.out.println(answer);
+        }
+*/
 
 
 
