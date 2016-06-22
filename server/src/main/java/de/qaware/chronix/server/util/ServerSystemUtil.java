@@ -61,6 +61,23 @@ public class ServerSystemUtil {
     }
 
     /**
+     * Executes the command with runtime.exec without logging
+     *
+     * @param command the command string array
+     */
+    public static void executeCommandSimple(String[] command) {
+        List<String> result = new LinkedList<String>();
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(command);
+            p.waitFor();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Executes the command with runtime.exec
      *
      * @param command the command string

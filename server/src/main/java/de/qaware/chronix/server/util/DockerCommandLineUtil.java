@@ -25,7 +25,8 @@ public class DockerCommandLineUtil {
         OSInfo.OSType os = OSInfo.getOSType();
         if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.LINUX) {
             String[] command = {"which docker"};
-            List<String> result = ServerSystemUtil.executeCommand(ServerSystemUtil.getOsSpecificCommand(command));
+            String[] localizedCommand = ServerSystemUtil.getOsSpecificCommand(command);
+            List<String> result = ServerSystemUtil.executeCommand(localizedCommand);
             if(!result.isEmpty()){
                 return result.get(0).replace("docker", "");
             }
@@ -67,7 +68,7 @@ public class DockerCommandLineUtil {
             String[] localCmd = {
                     "/bin/sh",
                     "-c",
-                    getDockerInstallPath() + " ps | grep " + containerName + " | cut -d ' ' -f1"
+                    getDockerInstallPath() + "docker" + " ps | grep " + containerName + " | cut -d ' ' -f1"
             };
             command = localCmd;
         } else if (os == OSInfo.OSType.WINDOWS){

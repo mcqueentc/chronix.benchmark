@@ -33,9 +33,38 @@ public class BenchmarkConfiguratorResource {
         return "Hello from Configurator Resource!";
     }
 
+    @GET
+    @Path("ping")
+    public Response ping(@QueryParam("nTimes") int nTimes){
+        String[] command = {"/bin/sh","-c","ping -c " + nTimes + " localhost","which docker"};
+        List<String> result = ServerSystemUtil.executeCommand(command);
+
+
+        return Response.ok().entity(result.toArray()).build();
+    }
+
+    @GET
+    @Path("which")
+    public Response which(){
+        //String[] command = {"which docker"};
+        //String[] lcom = ServerSystemUtil.getOsSpecificCommand(command);
+        String[] result = {DockerCommandLineUtil.getDockerInstallPath()};
+
+        return Response.ok().entity(result).build();
+    }
+
+    @GET
+    @Path("docker/running")
+    public Response isRunning(@QueryParam("containerName") String containerName){
+        Boolean isrunning = DockerCommandLineUtil.isDockerContainerRunning(containerName);
+        if(isrunning){
+            return Response.ok().entity("Container "+ containerName + " is running").build();
+        }
+        return Response.serverError().entity("Container "+ containerName + " is not running").build();
+    }
+
 
     @POST
-    @Timed
     @Path("docker/upload/{name}")
     @Consumes({MediaType.MULTIPART_FORM_DATA})
     public Response uploadDockerFiles(@PathParam("name") String name,
@@ -87,44 +116,49 @@ public class BenchmarkConfiguratorResource {
      */
     @GET
     @Path("docker/start")
-    @Timed
     public Response startDockerContainer(@QueryParam("containerName") String containerName,
                                          @QueryParam("commandFileName") String commandFileName){
         if(DockerCommandLineUtil.isDockerInstalled()){
             File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
             if(directory.exists()){
-                File commandFile = new File(directory.getPath() + File.separator + commandFileName);
-                if (commandFile.exists()){
-                    String command = "";
-                    try {
-                        FileReader fileReader = new FileReader(commandFile);
-                        BufferedReader bufferedReader = new BufferedReader(fileReader);
-                        command = bufferedReader.readLine();
+                if(!DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
+                    File commandFile = new File(directory.getPath() + File.separator + commandFileName);
+                    if (commandFile.exists()) {
+                        String command = "";
+                        try {
+                            FileReader fileReader = new FileReader(commandFile);
+                            BufferedReader bufferedReader = new BufferedReader(fileReader);
+                            command = bufferedReader.readLine();
 
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    //TODO further check command for safety reasons
-                    if(command.contains("docker run")
-                            && !command.contains("|")
-                            && !command.contains(";")){
-                        String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath() + command};
-                        String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
-                        List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
-                        if(DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
-                            // all went good
-                            return Response.ok().entity(startResult.toArray()).build();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        return Response.serverError().entity(startResult.toArray()).build();
+
+                        //TODO further check command for safety reasons
+                        if (command.contains("docker run")
+                                && !command.contains("|")
+                                && !command.contains(";")) {
+                            String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath() + command};
+                            String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
+                            List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
+                            if (DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
+                                // all went good
+                                startResult.add("Docker container " + containerName + " is running");
+                                return Response.ok().entity(startResult.toArray()).build();
+                            }
+                            startResult.add("Docker container " + containerName + " is not running");
+                            return Response.serverError().entity(startResult.toArray()).build();
+                        }
+                        String[] response = {"Wrong docker command."};
+                        return Response.serverError().entity(response).build();
                     }
-                    String[] response = {"Wrong docker command."};
+                    String[] response = {"docker command file missing"};
                     return Response.serverError().entity(response).build();
                 }
-                String[] response = {"docker command file missing"};
-                return Response.serverError().entity(response).build();
+                String[] response = {"docker container " + containerName + " already running."};
+                return Response.ok().entity(response).build();
 
             }
             String[] response = {"docker files missing",
@@ -137,7 +171,6 @@ public class BenchmarkConfiguratorResource {
 
     @GET
     @Path("docker/build")
-    @Timed
     public Response buildDockerContainer(@QueryParam("containerName") String containerName,
                                          @QueryParam("commandFileName") String commandFileName){
         if(DockerCommandLineUtil.isDockerInstalled()){
@@ -161,14 +194,15 @@ public class BenchmarkConfiguratorResource {
                     if(command.contains("docker build")
                             && !command.contains("|")
                             && !command.contains(";")){
-                        String[] prepareCommand = {"cd " + directory.getPath(),
-                                                    DockerCommandLineUtil.getDockerInstallPath() + command};
+                        String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath()
+                                                            + command.replace(".", directory.getPath())};
                         String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
-                        List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
+                        //List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
+                        ServerSystemUtil.executeCommandSimple(specificCommand);
                             // all went good
-                            return Response.ok().entity(startResult.toArray()).build();
-                        //String[] response = specificCommand;
-                        //return Response.ok().entity(response).build();
+                            //return Response.ok().entity(startResult.toArray()).build();
+                        String[] response = specificCommand;
+                        return Response.ok().entity(response).build();
 
                     }
                     String[] response = {"Wrong docker command."};
@@ -186,6 +220,21 @@ public class BenchmarkConfiguratorResource {
         return Response.serverError().entity(response).build();
     }
 
+    @GET
+    @Path("docker/stop")
+    public Response stopDockerContainer(@QueryParam("containerName") String containerName) {
+        String containerId = DockerCommandLineUtil.getContainerId(containerName);
+        String[] command = {DockerCommandLineUtil.getDockerInstallPath() + "docker stop " + containerId};
+        String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(command);
+        List<String> stopResult = ServerSystemUtil.executeCommand(specificCommand);
+        if (DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
+            // all went good
+            stopResult.add("Docker container " + containerName + " is still running");
+            return Response.serverError().entity(stopResult.toArray()).build();
+        }
+        stopResult.add("Docker container " + containerName + " stopped");
+        return Response.ok().entity(stopResult.toArray()).build();
+    }
 
 
 }
