@@ -80,7 +80,7 @@ public class ServerSystemUtil {
     public static String[] getOsSpecificCommand(String[] command){
         OSInfo.OSType os = OSInfo.getOSType();
         String[] specificCommand = null;
-        if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.MACOSX) {
+        if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.LINUX) {
 
             String[] localCmd = new String[command.length + 2];
             localCmd[0] = "/bin/sh";

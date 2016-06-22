@@ -15,38 +15,41 @@ public class DockerCommandLineUtil {
         //Avoid instances
     }
 
+
     /**
-     * Checks if Docker is installed on the server
+     * Get the servers docker install path
      *
-     * @return True if Docker is installed
+     * @return the docker install path or empty string if not installed.
      */
-    public static boolean isDockerInstalled(){
+    public static String getDockerInstallPath(){
         OSInfo.OSType os = OSInfo.getOSType();
-        String[] command = null;
-        if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.MACOSX) {
-            String[] localCmd = {
-                    "/bin/sh",
-                    "-c",
-                    "docker --version"
-            };
-            command = localCmd;
+        if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.LINUX) {
+            String[] command = {"which docker"};
+            List<String> result = ServerSystemUtil.executeCommand(ServerSystemUtil.getOsSpecificCommand(command));
+            if(!result.isEmpty()){
+                return result.get(0).replace("docker", "");
+            }
         } else if (os == OSInfo.OSType.WINDOWS){
-            String[] localCmd = {"docker --version"};
-            command = localCmd;
+            //TODO
 
         } else if (os == OSInfo.OSType.SOLARIS){
             //TODO
 
         }
 
-        if(command != null){
-                List<String> result = ServerSystemUtil.executeCommand(command);
-                for(String line : result){
-                    if(line.toLowerCase().contains("docker version")
-                            || line.toLowerCase().contains("docker for solaris version")){
-                        return true;
-                    }
-                }
+        return "";
+    }
+
+
+    /**
+     * Checks if Docker is installed on the server
+     *
+     * @return True if Docker is installed
+     */
+    public static boolean isDockerInstalled(){
+        String result = getDockerInstallPath();
+        if(!result.isEmpty()){
+            return true;
         }
         return false;
     }
@@ -60,11 +63,11 @@ public class DockerCommandLineUtil {
     public static String getContainerId(String containerName) {
         OSInfo.OSType os = OSInfo.getOSType();
         String[] command = null;
-        if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.MACOSX) {
+        if(os == OSInfo.OSType.MACOSX || os == OSInfo.OSType.LINUX) {
             String[] localCmd = {
                     "/bin/sh",
                     "-c",
-                    "docker ps | grep " + containerName + " | cut -d ' ' -f1"
+                    getDockerInstallPath() + " ps | grep " + containerName + " | cut -d ' ' -f1"
             };
             command = localCmd;
         } else if (os == OSInfo.OSType.WINDOWS){

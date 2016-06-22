@@ -111,7 +111,7 @@ public class BenchmarkConfiguratorResource {
                     if(command.contains("docker run")
                             && !command.contains("|")
                             && !command.contains(";")){
-                        String[] prepareCommand = {command};
+                        String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath() + command};
                         String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
                         List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
                         if(DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
@@ -161,7 +161,8 @@ public class BenchmarkConfiguratorResource {
                     if(command.contains("docker build")
                             && !command.contains("|")
                             && !command.contains(";")){
-                        String[] prepareCommand = {"cd " + directory.getPath(), command};
+                        String[] prepareCommand = {"cd " + directory.getPath(),
+                                                    DockerCommandLineUtil.getDockerInstallPath() + command};
                         String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
                         List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
                             // all went good
