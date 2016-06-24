@@ -70,6 +70,9 @@ public class ServerSystemUtil {
         Process p;
         try {
             p = Runtime.getRuntime().exec(command);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while ((reader.readLine()) != null) {
+            }
             p.waitFor();
 
         } catch (Exception e) {
