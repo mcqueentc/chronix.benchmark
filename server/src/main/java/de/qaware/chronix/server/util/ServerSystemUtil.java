@@ -45,12 +45,12 @@ public class ServerSystemUtil {
         Process p;
         try {
             p = Runtime.getRuntime().exec(command);
-            p.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String curLine;
             while ((curLine = reader.readLine()) != null) {
                 result.add(curLine);
             }
+            p.waitFor();
             reader.close();
 
         } catch (Exception e) {

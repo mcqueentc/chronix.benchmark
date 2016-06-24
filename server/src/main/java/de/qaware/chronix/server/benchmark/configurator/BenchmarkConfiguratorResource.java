@@ -197,12 +197,12 @@ public class BenchmarkConfiguratorResource {
                         String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath()
                                                             + command.replace(".", directory.getPath())};
                         String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
-                        //List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
-                        ServerSystemUtil.executeCommandSimple(specificCommand);
+                        List<String> buildResult = ServerSystemUtil.executeCommand(specificCommand);
+                        //ServerSystemUtil.executeCommandSimple(specificCommand);
                             // all went good
-                            //return Response.ok().entity(startResult.toArray()).build();
-                        String[] response = specificCommand;
-                        return Response.ok().entity(response).build();
+                            return Response.ok().entity(buildResult.toArray()).build();
+                        //String[] response = specificCommand;
+                        //return Response.ok().entity(response).build();
 
                     }
                     String[] response = {"Wrong docker command."};
