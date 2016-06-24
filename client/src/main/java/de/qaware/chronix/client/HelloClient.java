@@ -89,11 +89,11 @@ public class HelloClient {
         String commandFileName = "chronix.start";
         final Client client = ClientBuilder.newBuilder().build();
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/docker/running?containerName=chronix");
-        //final WebTarget target = client.target("http://localhost:9003/configurator/docker/start?containerName=chronix&commandFileName="+commandFileName);
-        //final WebTarget target = client.target("http://localhost:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
+        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/start?containerName=chronix&commandFileName="+commandFileName);
+        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/ping?nTimes=4");
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/which");
-        final WebTarget target = client.target("http://localhost:9003/configurator/docker/stop?containerName=chronix");
+        final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/stop?containerName=chronix");
         final Response response = target.request().get();
         String[] answers = response.readEntity(String[].class);
         System.out.println("Server status: " + response.getStatus());
