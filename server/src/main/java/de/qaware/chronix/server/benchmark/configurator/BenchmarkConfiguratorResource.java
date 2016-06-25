@@ -70,11 +70,19 @@ public class BenchmarkConfiguratorResource {
     @GET
     @Path("docker/running")
     public Response isRunning(@QueryParam("containerName") String containerName){
-        Boolean isrunning = DockerCommandLineUtil.isDockerContainerRunning(containerName);
-        if(isrunning){
-            return Response.ok().entity("Container "+ containerName + " is running").build();
+        List<String> result = new LinkedList<String>();
+        if(DockerCommandLineUtil.isDockerInstalled()){
+            Boolean isrunning = DockerCommandLineUtil.isDockerContainerRunning(containerName);
+            if(isrunning){
+                result.add("Container "+ containerName + " is running");
+            } else {
+                result.add("Container "+ containerName + " is not running");
+            }
+
+        } else {
+            result.add("Docker not installed or running.");
         }
-        return Response.serverError().entity("Container "+ containerName + " is not running").build();
+        return Response.ok().entity(result.toArray()).build();
     }
 
 

@@ -72,7 +72,7 @@ public class HelloClient {
 /*
         // Test file upload
         Uploader uploader = Uploader.getInstance();
-        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix","http://localhost","9003");
+        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix","http://192.168.2.168","9003");
         //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
 
         if(!responses.isEmpty()){
@@ -88,13 +88,14 @@ public class HelloClient {
         //test build container
         String commandFileName = "chronix.start";
         final Client client = ClientBuilder.newBuilder().build();
-        //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/docker/running?containerName=chronix");
+        final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/running?containerName=chronix");
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/start?containerName=chronix&commandFileName="+commandFileName);
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/ping?nTimes=4");
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/which");
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/stop?containerName=chronix");
-        final WebTarget target = client.target("http://localhost:9003/configurator/booleanTest?value=yes");
+        //final WebTarget target = client.target("http://localhost:9003/configurator/booleanTest?value=yes");
+        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/remove?imageName=chronix&removeFiles=yes");
         final Response response = target.request().get();
         String[] answers = response.readEntity(String[].class);
         System.out.println("Server status: " + response.getStatus());
