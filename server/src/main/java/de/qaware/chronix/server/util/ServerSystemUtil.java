@@ -4,7 +4,13 @@ import sun.awt.OSInfo;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -124,6 +130,29 @@ public class ServerSystemUtil {
 
         }
         return specificCommand;
+    }
+
+    public static synchronized String deleteDirectory(Path directory){
+        try {
+            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(java.nio.file.Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+
+            });
+            return "Direcotry " + directory.getFileName() + " has been deleted.";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Directory " + directory.getFileName() + " could not be deleted.";
+        }
     }
 
 }

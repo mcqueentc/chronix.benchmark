@@ -259,6 +259,14 @@ public class BenchmarkConfiguratorResource {
         return Response.serverError().entity(result).build();
     }
 
+    /**
+     * Removes all docker containers related to imageName.
+     * If removeFiles is selected, removes the image with imageName and the related files.
+     *
+     * @param imageName the image name
+     * @param removeFiles "yes", "true" or "y" to delete image and all files.
+     * @return the server response with server cli output in entity as String[].
+     */
     @GET
     @Path("docker/remove")
     public Response removeDockerContainer(@QueryParam("imageName") String imageName,
@@ -268,9 +276,7 @@ public class BenchmarkConfiguratorResource {
             result.addAll(DockerCommandLineUtil.stopContainer(imageName));
             List<String> containerIDs = DockerCommandLineUtil.getAllContainerIds(imageName);
             result.addAll(DockerCommandLineUtil.deleteContainer(containerIDs));
-
         }
-
 
         if (removeFiles.getValue() == true) {
             File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + imageName);
@@ -281,26 +287,8 @@ public class BenchmarkConfiguratorResource {
                     result.addAll(ServerSystemUtil.executeCommand(command));
                 }
 
-                try {
-                    Files.walkFileTree(directory.toPath(), new SimpleFileVisitor<java.nio.file.Path>() {
-                        @Override
-                        public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
-                            Files.delete(file);
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                        @Override
-                        public FileVisitResult postVisitDirectory(java.nio.file.Path dir, IOException exc) throws IOException {
-                            Files.delete(dir);
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                    });
-                    result.add("Direcotry " + imageName + " has been deleted.");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    result.add("Directory " + imageName + " could not be deleted.");
-                }
+                // delete directory
+                result.add(ServerSystemUtil.deleteDirectory(directory.toPath()));
 
             } else {
                 result.add("No directory named " + imageName + " found.");
