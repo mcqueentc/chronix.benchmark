@@ -2,20 +2,24 @@ package de.qaware.chronix.server.benchmark.configurator;
 
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Optional;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import de.qaware.chronix.server.util.ChronixBoolean;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
 import org.apache.commons.compress.utils.IOUtils;
 //import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.apache.logging.log4j.core.util.FileUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 //import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.ws.rs.*;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -32,6 +36,16 @@ public class BenchmarkConfiguratorResource {
     public String test() {
         return "Hello from Configurator Resource!";
     }
+
+
+    @GET
+    @Path("booleanTest")
+    public Response test(@QueryParam("value") ChronixBoolean chronixBoolean) {
+        String[] result = {"Result is " + chronixBoolean.getValue()};
+
+        return Response.ok().entity(result).build();
+    }
+
 
     @GET
     @Path("ping")
@@ -223,17 +237,69 @@ public class BenchmarkConfiguratorResource {
     @GET
     @Path("docker/stop")
     public Response stopDockerContainer(@QueryParam("containerName") String containerName) {
-        String containerId = DockerCommandLineUtil.getContainerId(containerName);
-        String[] command = {DockerCommandLineUtil.getDockerInstallPath() + "docker stop " + containerId};
-        String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(command);
-        List<String> stopResult = ServerSystemUtil.executeCommand(specificCommand);
-        if (DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
+        if (DockerCommandLineUtil.isDockerInstalled()) {
+            List<String> stopResult = DockerCommandLineUtil.stopContainer(containerName);
+            if (DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
+                stopResult.add("Docker container " + containerName + " is still running");
+                return Response.serverError().entity(stopResult.toArray()).build();
+            }
             // all went good
-            stopResult.add("Docker container " + containerName + " is still running");
-            return Response.serverError().entity(stopResult.toArray()).build();
+            stopResult.add("Docker container " + containerName + " stopped");
+            return Response.ok().entity(stopResult.toArray()).build();
         }
-        stopResult.add("Docker container " + containerName + " stopped");
-        return Response.ok().entity(stopResult.toArray()).build();
+        String[] result = {"Docker is not installed or running."};
+        return Response.serverError().entity(result).build();
+    }
+
+    @GET
+    @Path("docker/remove")
+    public Response removeDockerContainer(@QueryParam("imageName") String imageName,
+                                      @QueryParam("removeFiles") ChronixBoolean removeFiles) {
+        List<String> result = new LinkedList<String>();
+        if(DockerCommandLineUtil.isDockerInstalled()){
+            result.addAll(DockerCommandLineUtil.stopContainer(imageName));
+            List<String> containerIDs = DockerCommandLineUtil.getAllContainerIds(imageName);
+            result.addAll(DockerCommandLineUtil.deleteContainer(containerIDs));
+
+        }
+
+
+        if (removeFiles.getValue() == true) {
+            File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + imageName);
+            if (directory.exists()) {
+                if(DockerCommandLineUtil.isDockerInstalled()){
+                    String[] commandLine = {"docker rmi -f " + imageName};
+                    String[] command = ServerSystemUtil.getOsSpecificCommand(commandLine);
+                    result.addAll(ServerSystemUtil.executeCommand(command));
+                }
+
+                try {
+                    Files.walkFileTree(directory.toPath(), new SimpleFileVisitor<java.nio.file.Path>() {
+                        @Override
+                        public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
+                            Files.delete(file);
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                        @Override
+                        public FileVisitResult postVisitDirectory(java.nio.file.Path dir, IOException exc) throws IOException {
+                            Files.delete(dir);
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                    });
+                    result.add("Direcotry " + imageName + " has been deleted.");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    result.add("Directory " + imageName + " could not be deleted.");
+                }
+
+            } else {
+                result.add("No directory named " + imageName + " found.");
+            }
+        }
+
+        return Response.ok().entity(result.toArray()).build();
     }
 
 
