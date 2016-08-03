@@ -138,20 +138,21 @@ public class DockerCommandLineUtil {
      * @return the cli output.
      */
     public static List<String> stopContainer(String containerName) {
-        String containerId = DockerCommandLineUtil.getRunningContainerId(containerName);
-        if(!containerId.equals("")){
-            String[] commandLine = {DockerCommandLineUtil.getDockerInstallPath() + "docker stop " + containerId};
-            String[] command = ServerSystemUtil.getOsSpecificCommand(commandLine);
+        if(!containerName.contains("|") || !containerName.contains(";")){
+            String containerId = DockerCommandLineUtil.getRunningContainerId(containerName);
+            if(!containerId.equals("")){
+                String[] commandLine = {DockerCommandLineUtil.getDockerInstallPath() + "docker stop " + containerId};
+                String[] command = ServerSystemUtil.getOsSpecificCommand(commandLine);
 
-            if (command != null) {
-                return ServerSystemUtil.executeCommand(command);
+                if (command != null) {
+                    return ServerSystemUtil.executeCommand(command);
+                }
             }
         }
 
         return new LinkedList<String>();
 
     }
-
 
 
 }

@@ -1,53 +1,14 @@
 package de.qaware.chronix.client;
 
 
-import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Optional;
-import com.sun.org.apache.xpath.internal.operations.Mult;
-import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
-import dockerUtil.DockerRunOptions;
-import org.apache.commons.compress.utils.IOUtils;
-import org.glassfish.jersey.client.ClientResponse;
-import org.glassfish.jersey.media.multipart.*;
-import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+import dockerUtil.*;
 
-import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.io.*;
-import java.nio.channels.FileChannel;
-import java.text.ParseException;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.server.ResourceConfig;
-
-//import com.sun.jersey.api.client.Client;
-//import com.sun.jersey.api.client.ClientResponse;
-//import com.sun.jersey.api.client.WebResource;
-
-import com.google.common.base.Optional;
-import sun.awt.OSInfo;
-
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by mcqueen666 on 14.06.16.
@@ -88,21 +49,32 @@ public class HelloClient {
 
 ///*
         //test build container
-        String commandFileName = "chronix.build";
+        //String commandFileName = "chronix.build";
         final Client client = ClientBuilder.newBuilder().build();
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/running?containerName=chronix");
 
        // final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/ping?nTimes=4");
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/which");
-        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/stop?containerName=chronix");
+        final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/stop?containerName=chronix");
         //final WebTarget target = client.target("http://localhost:9003/configurator/booleanTest?value=yes");
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/remove?imageName=chronix&removeFiles=yes");
-        DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
 
+ /*
+        // start test
+        DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
         final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/start");
         final Response response = target.request().post(Entity.json(chronix));
-        //final Response response = target.request().get();
+ */
+
+/*
+        // build test
+        DockerBuildOptions chronix = new DockerBuildOptions("chronix","-t");
+        final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build");
+        final Response response = target.request().post(Entity.json(chronix));
+*/
+
+        final Response response = target.request().get();
 
         //DockerRunOptions op = response.readEntity(DockerRunOptions.class);
         //String op = response.readEntity(String.class);

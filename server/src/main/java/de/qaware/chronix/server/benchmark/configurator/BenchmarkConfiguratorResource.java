@@ -5,6 +5,7 @@ import com.codahale.metrics.annotation.Timed;
 import de.qaware.chronix.server.util.ChronixBoolean;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
+import dockerUtil.DockerBuildOptions;
 import dockerUtil.DockerRunOptions;
 import org.apache.commons.compress.utils.IOUtils;
 //import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -44,7 +45,7 @@ public class BenchmarkConfiguratorResource {
         DockerRunOptions op = new DockerRunOptions("chronix",8983,8983,"");
         return op;
     }
-
+    //Test json
     @POST
     @Path("postjson")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -53,8 +54,7 @@ public class BenchmarkConfiguratorResource {
         return Response.ok().entity(op.getValidRunCommand()).build();
     }
 
-
-
+    //TEST
     @GET
     @Path("booleanTest")
     public Response test(@QueryParam("value") ChronixBoolean chronixBoolean) {
@@ -62,6 +62,9 @@ public class BenchmarkConfiguratorResource {
 
         return Response.ok().entity(result).build();
     }
+
+
+
 
 
     @GET
@@ -192,48 +195,28 @@ public class BenchmarkConfiguratorResource {
         return Response.serverError().entity(response).build();
     }
 
-    @GET
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("docker/build")
-    public Response buildDockerContainer(@QueryParam("containerName") String containerName,
-                                         @QueryParam("commandFileName") String commandFileName){
+    public Response buildDockerContainer(DockerBuildOptions dockerBuildOptions){
         if(DockerCommandLineUtil.isDockerInstalled()){
+            String containerName = dockerBuildOptions.getContainerName();
             File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
             if(directory.exists()){
-                File commandFile = new File(directory.getPath() + File.separator + commandFileName);
-                if (commandFile.exists()){
-                    String command = "";
-                    try {
-                        FileReader fileReader = new FileReader(commandFile);
-                        BufferedReader bufferedReader = new BufferedReader(fileReader);
-                        command = bufferedReader.readLine();
 
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    String command = dockerBuildOptions.getValidBuildCommand();
 
                     //TODO further check command for safety reasons
-                    if(command.contains("docker build")
-                            && !command.contains("|")
-                            && !command.contains(";")){
+                    if(command != null){
                         String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath()
                                                             + command.replace(".", directory.getPath())};
                         String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
                         List<String> buildResult = ServerSystemUtil.executeCommand(specificCommand);
-                        //ServerSystemUtil.executeCommandSimple(specificCommand);
                             // all went good
                             return Response.ok().entity(buildResult.toArray()).build();
-                        //String[] response = specificCommand;
-                        //return Response.ok().entity(response).build();
-
                     }
                     String[] response = {"Wrong docker command."};
                     return Response.serverError().entity(response).build();
-                }
-                String[] response = {"docker command file missing"};
-                return Response.serverError().entity(response).build();
-
             }
             String[] response = {"docker files missing",
                     "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName};

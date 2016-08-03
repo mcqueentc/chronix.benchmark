@@ -19,32 +19,14 @@ public class DockerRunOptions {
 
 
     public DockerRunOptions(){
-        this.command = "";
-        this.containerName = "";
-        this.hostPort = -1;
-        this.containerPort = -1;
-        this.additionalOptions = "";
-
     }
 
     public DockerRunOptions(String containerName, int hostPort, int containerPort, String additionalOptions){
         this.command = "docker run -d";
         this.hostPort = hostPort;
         this.containerPort = containerPort;
-
-        //TODO do more security checking
-        if(!containerName.contains("|") || !containerName.contains(";")){
-            this.containerName = containerName;
-        } else {
-            this.containerName = "";
-        }
-
-        if(!additionalOptions.contains("|") || !additionalOptions.contains(";")){
-            this.additionalOptions = additionalOptions;
-        } else {
-            this.additionalOptions = "";
-        }
-
+        this.containerName = containerName;
+        this.additionalOptions = additionalOptions;
     }
 
     //GET
@@ -92,13 +74,24 @@ public class DockerRunOptions {
     @JsonIgnore
     public String getValidRunCommand(){
         if(hostPort > 0 && containerPort > 0 && !containerName.isEmpty()){
-            if(additionalOptions.isEmpty()){
-                return command + " -p " + hostPort + ":" + containerPort + " " + containerName;
-            } else {
-                return command + " -p " + hostPort + ":" + containerPort + " " + additionalOptions + " " + containerName;
+            if(isHarmlessString(command) && isHarmlessString(containerName) && isHarmlessString(additionalOptions)){
+                if(additionalOptions.isEmpty()){
+                    return command + " -p " + hostPort + ":" + containerPort + " " + containerName;
+                } else {
+                    return command + " -p " + hostPort + ":" + containerPort + " " + additionalOptions + " " + containerName;
+                }
             }
+        }
 
-        } else
-            return null;
+        return null;
+    }
+
+    @JsonIgnore
+    private boolean isHarmlessString(String string){
+        if(string.contains("|") || string.contains(";")) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
