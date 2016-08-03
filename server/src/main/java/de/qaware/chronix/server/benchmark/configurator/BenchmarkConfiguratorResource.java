@@ -5,9 +5,9 @@ import com.codahale.metrics.annotation.Timed;
 import de.qaware.chronix.server.util.ChronixBoolean;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
+import dockerUtil.DockerRunOptions;
 import org.apache.commons.compress.utils.IOUtils;
 //import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.apache.logging.log4j.core.util.FileUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 //import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -17,8 +17,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -130,38 +128,25 @@ public class BenchmarkConfiguratorResource {
     }
 
     /**
-     * Starts the given docker container with given command.
+     * Starts the docker specified in dockerRunOptoins.
      *
-     * @param containerName the docker container name (e.g. folder name if your docker files upload)
-     * @param commandFileName the commandFile in the uploaded docker container direcotory to start the docker container
+     * @param dockerRunOptions DockerRunOptions JSON
      * @return the response from the server and the cli output (e.g. statusCode + String[])
      */
-    @GET
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("docker/start")
-    public Response startDockerContainer(@QueryParam("containerName") String containerName,
-                                         @QueryParam("commandFileName") String commandFileName){
+    public Response startDockerContainer(DockerRunOptions dockerRunOptions){
         if(DockerCommandLineUtil.isDockerInstalled()){
+            String containerName = dockerRunOptions.getContainerName();
             File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
             if(directory.exists()){
                 if(!DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
-                    File commandFile = new File(directory.getPath() + File.separator + commandFileName);
-                    if (commandFile.exists()) {
-                        String command = "";
-                        try {
-                            FileReader fileReader = new FileReader(commandFile);
-                            BufferedReader bufferedReader = new BufferedReader(fileReader);
-                            command = bufferedReader.readLine();
 
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        String command = dockerRunOptions.getValidRunCommand();
 
                         //TODO further check command for safety reasons
-                        if (command.contains("docker run")
-                                && !command.contains("|")
-                                && !command.contains(";")) {
+                        if (command != null){
                             String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath() + command};
                             String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
                             List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
@@ -175,9 +160,6 @@ public class BenchmarkConfiguratorResource {
                         }
                         String[] response = {"Wrong docker command."};
                         return Response.serverError().entity(response).build();
-                    }
-                    String[] response = {"docker command file missing"};
-                    return Response.serverError().entity(response).build();
                 }
                 String[] response = {"docker container " + containerName + " already running."};
                 return Response.ok().entity(response).build();

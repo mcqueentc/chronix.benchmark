@@ -1,9 +1,11 @@
 package de.qaware.chronix.client;
 
+
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.sun.org.apache.xpath.internal.operations.Mult;
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
+import dockerUtil.DockerRunOptions;
 import org.apache.commons.compress.utils.IOUtils;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.media.multipart.*;
@@ -86,17 +88,20 @@ public class HelloClient {
 
 
         //test build container
-        String commandFileName = "chronix.start";
+        //String commandFileName = "chronix.start";
         final Client client = ClientBuilder.newBuilder().build();
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/running?containerName=chronix");
-        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/start?containerName=chronix&commandFileName="+commandFileName);
+
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/ping?nTimes=4");
         //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/which");
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/stop?containerName=chronix");
         //final WebTarget target = client.target("http://localhost:9003/configurator/booleanTest?value=yes");
-        final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/remove?imageName=chronix&removeFiles=yes");
-        final Response response = target.request().get();
+        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/remove?imageName=chronix&removeFiles=yes");
+        DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
+
+        final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/start");
+        final Response response = target.request().put(Entity.json(chronix));
         String[] answers = response.readEntity(String[].class);
         System.out.println("Server status: " + response.getStatus());
         //System.out.println(response.readEntity(String.class));

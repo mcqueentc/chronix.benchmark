@@ -20,6 +20,8 @@ dependencies {
 
     // http://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.23'
+    compile project(':shared')
+
 
 
 }

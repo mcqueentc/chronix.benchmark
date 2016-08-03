@@ -50,6 +50,8 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-core:2.4'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.4'
     compile 'org.slf4j:jcl-over-slf4j:1.7.12'
+
+    compile project(':shared')
 }
 
 shadowJar  {
