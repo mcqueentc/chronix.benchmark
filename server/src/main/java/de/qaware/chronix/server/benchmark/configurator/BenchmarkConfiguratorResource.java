@@ -36,6 +36,25 @@ public class BenchmarkConfiguratorResource {
     }
 
 
+    //Test json
+    @GET
+    @Path("getjson")
+    @Produces(MediaType.APPLICATION_JSON)
+    public DockerRunOptions getjson(){
+        DockerRunOptions op = new DockerRunOptions("chronix",8983,8983,"");
+        return op;
+    }
+
+    @POST
+    @Path("postjson")
+    @Consumes(MediaType.APPLICATION_JSON)
+    //@Produces(MediaType.TEXT_PLAIN)
+    public Response postjson(DockerRunOptions op) {
+        return Response.ok().entity(op.getValidRunCommand()).build();
+    }
+
+
+
     @GET
     @Path("booleanTest")
     public Response test(@QueryParam("value") ChronixBoolean chronixBoolean) {

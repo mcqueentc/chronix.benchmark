@@ -1,5 +1,6 @@
 package de.qaware.chronix.server;
 
+import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import de.qaware.chronix.server.benchmark.collector.StatsCollectorResource;
 import de.qaware.chronix.server.benchmark.configurator.BenchmarkConfiguratorResource;
 import de.qaware.chronix.server.benchmark.queryrunner.QueryRunnerResource;
@@ -46,5 +47,6 @@ public class DropWizardServerApplication extends Application<DropWizardServerCon
         environment.healthChecks().register("template", healthCheck);
 
         environment.jersey().register(MultiPartFeature.class);
+        //environment.jersey().register(JacksonFeatures.class);
     }
 }
