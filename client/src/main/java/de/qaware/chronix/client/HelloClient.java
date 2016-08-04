@@ -1,6 +1,9 @@
 package de.qaware.chronix.client;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.corba.se.spi.activation.Server;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import dockerUtil.*;
 
@@ -8,7 +11,12 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -26,6 +34,60 @@ public class HelloClient {
 
 */
 
+        //json to file test (server record test)
+        {
+            File file = new File(System.getProperty("user.home") + File.separator
+                    + "chronixBenchmark" + File.separator + "serverRecord.json");
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
+            buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
+            buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
+
+            LinkedList<DockerRunOptions> runOptionses = new LinkedList<>();
+            runOptionses.add(new DockerRunOptions("chronix", 8983, 8983, "-v"));
+            runOptionses.add(new DockerRunOptions("kairos", 2003, 2003, "-v"));
+
+            ServerConfigRecord serverConfigRecord = new ServerConfigRecord("192.168.2.100");
+            serverConfigRecord.setTsdbBuildRecords(buildOptionses);
+            serverConfigRecord.setTsdbRunRecords(runOptionses);
+
+            ServerConfigRecord serverConfigRecord2 = new ServerConfigRecord("www.fau.cs.de");
+            serverConfigRecord2.setTsdbBuildRecords(buildOptionses);
+            serverConfigRecord2.setTsdbRunRecords(runOptionses);
+
+            LinkedList<ServerConfigRecord> records = new LinkedList<>();
+            records.add(serverConfigRecord);
+            records.add(serverConfigRecord2);
+
+            Configurator configurator = Configurator.getInstance();
+            //configurator.setServerConfigRecords(records);
+            LinkedList<ServerConfigRecord> readRecord = configurator.getServerConfigRecords();
+
+                //LinkedList<ServerConfigRecord> readRecord = mapper.readValue(file, new TypeReference<LinkedList<ServerConfigRecord>>() {});
+                for(ServerConfigRecord r : readRecord){
+
+
+                    System.out.println("Serveraddress: " + r.getServerAddress());
+                    LinkedList<DockerRunOptions> newRunList = r.getTsdbRunRecords();
+                    LinkedList<DockerBuildOptions> newBuildList = r.getTsdbBuildRecords();
+
+                    for (DockerRunOptions op : newRunList) {
+                        System.out.println(op.getValidRunCommand());
+                    }
+
+                    for (DockerBuildOptions op : newBuildList) {
+                        System.out.println(op.getValidBuildCommand());
+                    }
+                }
+
+        }
+
+
+
+
+        // Server is up test
         Configurator configurator = Configurator.getInstance();
         if(configurator.isServerUp("localhost")){
             System.out.println("Server is up");

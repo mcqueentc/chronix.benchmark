@@ -1,8 +1,11 @@
 package de.qaware.chronix.client.benchmark.configurator;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import dockerUtil.DockerBuildOptions;
 import dockerUtil.DockerRunOptions;
+import dockerUtil.ServerConfigRecord;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -10,6 +13,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,13 +22,27 @@ import java.util.List;
  */
 public class Configurator {
 
+    private final String configDirectory = System.getProperty("user.home") + File.separator + ".chronixBenchmark_conf" + File.separator;
+    private final String serverConfigFileName = "serverConfig.json";
+
     private static Configurator instance;
     private int applicationPort = 9003;
     private int adminPort = 9004;
-    private String configDirectory = System.getProperty("user.home") + File.separator + ".chronix_conf" + File.separator;
+    private LinkedList<ServerConfigRecord> serverConfigRecords;
 
 
-    private Configurator(){}
+
+    private Configurator(){
+        new File(configDirectory).mkdir();
+        if((new File(configDirectory + serverConfigFileName).exists())) {
+            readRecordFile();
+        }
+        if(serverConfigRecords == null){
+            serverConfigRecords =  new LinkedList<ServerConfigRecord>();
+            writeRecordFile();
+        }
+
+    }
 
     public static synchronized Configurator getInstance(){
         if(instance == null){
@@ -37,6 +55,48 @@ public class Configurator {
     public String getConfigDirectory(){
         return configDirectory;
     }
+
+    public String getServerConfigFileName(){
+        return serverConfigFileName;
+    }
+
+    public LinkedList<ServerConfigRecord> getServerConfigRecords(){
+        readRecordFile();
+        return serverConfigRecords;
+    }
+
+    public synchronized void setServerConfigRecords(LinkedList<ServerConfigRecord> serverConfigRecords){
+        this.serverConfigRecords = serverConfigRecords;
+        writeRecordFile();
+    }
+
+    /**
+     * Reads the server record file from json file in filesystem
+     */
+    private void readRecordFile(){
+        ObjectMapper mapper = new ObjectMapper();
+        File file = new File(configDirectory + serverConfigFileName);
+        try {
+            serverConfigRecords = mapper.readValue(file, new TypeReference<LinkedList<ServerConfigRecord>>() {});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Writes the server record file as json to filesystem
+     */
+    private void writeRecordFile(){
+        ObjectMapper mapper = new ObjectMapper();
+        File file = new File(configDirectory + serverConfigFileName);
+        try {
+            mapper.writeValue(file, serverConfigRecords);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //TODO upload server record file to server
 
     /**
      * Checks if dropwizard server is responding
