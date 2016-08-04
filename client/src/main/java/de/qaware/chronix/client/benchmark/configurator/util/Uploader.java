@@ -38,7 +38,7 @@ public class Uploader {
      * Uploads all docker files under given directory path recursively.
      *
      * @param parentDirectoryName The parent directory names. NOTE: just call with empty string "". Used for subsequent calls only!!!.
-     * @param dirPath The path to the docker file to upload as String. Will be used as folder name on the server.
+     * @param dirPath The path to the docker files to upload as String. Will be used as folder name on the server.
      * @param httpServerAddress The http or ip address as String. (e.g. "http://some.server.com)
      * @param portNumber The port number on which the server is listening as String. (e.g. "66666")
      *

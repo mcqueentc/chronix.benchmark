@@ -1,6 +1,7 @@
 package de.qaware.chronix.client;
 
 
+import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import dockerUtil.*;
 
 import javax.ws.rs.client.Client;
@@ -24,6 +25,15 @@ public class HelloClient {
         }
 
 */
+
+        Configurator configurator = Configurator.getInstance();
+        if(configurator.isServerUp("localhost")){
+            System.out.println("Server is up");
+        } else {
+            System.out.println("Server not responding");
+        }
+
+
 /*
         System.out.println(System.getProperty("user.home"));
         System.out.println(sun.awt.OSInfo.getOSType());
@@ -50,40 +60,65 @@ public class HelloClient {
 ///*
         //test build container
         //String commandFileName = "chronix.build";
-        final Client client = ClientBuilder.newBuilder().build();
+        //final Client client = ClientBuilder.newBuilder().build();
         //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/running?containerName=chronix");
 
        // final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
-        //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/ping?nTimes=4");
-        //final WebTarget target = client.target("http://192.168.2.118:9003/configurator/which");
-        final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/stop?containerName=chronix");
+        //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/ping?nTimes=4");
+        //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/which");
+        //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/stop?containerName=chronix");
         //final WebTarget target = client.target("http://localhost:9003/configurator/booleanTest?value=yes");
-        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/remove?imageName=chronix&removeFiles=yes");
+        //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/remove?imageName=chronix&removeFiles=yes");
 
  /*
         // start test
         DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
-        final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/start");
-        final Response response = target.request().post(Entity.json(chronix));
+        String[] answers = configurator.startDockerContainer("localhost",chronix);
+
+        //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/start");
+        //final Response response = target.request().post(Entity.json(chronix));
  */
+///*
+        //running test
+        String[] answers = null;
+        if(configurator.isDockerContainerRunning("localhost","chronix")){
+            String[] s = {"container is running"};
+            answers = s;
+        } else {
+            String[] s = {"container is not running"};
+            answers = s;
+        }
+//*/
+
+        //stop test
+        //String[] answers = configurator.stopDockerContainer("localhost","chronix");
 
 /*
         // build test
         DockerBuildOptions chronix = new DockerBuildOptions("chronix","-t");
-        final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build");
-        final Response response = target.request().post(Entity.json(chronix));
+        String[] answers = configurator.buildDockerContainer("localhost",chronix);
+
+        //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build");
+        //final Response response = target.request().post(Entity.json(chronix));
 */
 
-        final Response response = target.request().get();
+        // upload test
+        //String[] answers = configurator.uploadFiles("localhost",System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix");
+
+        // remove test
+        //String[] answers = configurator.removeDockerContainer("localhost","chronix",true);
+
+
+   //     final Response response = target.request().get();
 
         //DockerRunOptions op = response.readEntity(DockerRunOptions.class);
         //String op = response.readEntity(String.class);
         //System.out.println(response.getStatus() + " : " + op);
 
 
-
-        String[] answers = response.readEntity(String[].class);
-        System.out.println("Server status: " + response.getStatus());
+///*
+        //String[] answers = response.readEntity(String[].class);
+        //System.out.println("Server status: " + response.getStatus());
         //System.out.println(response.readEntity(String.class));
         for(String answer : answers){
             System.out.println(answer);

@@ -2,6 +2,7 @@ package de.qaware.chronix.server.benchmark.configurator;
 
 
 import com.codahale.metrics.annotation.Timed;
+import de.qaware.chronix.server.DropWizardServerHealthCheck;
 import de.qaware.chronix.server.util.ChronixBoolean;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
@@ -64,17 +65,11 @@ public class BenchmarkConfiguratorResource {
     }
 
 
-
-
-
+    //Obsolete
     @GET
     @Path("ping")
-    public Response ping(@QueryParam("nTimes") int nTimes){
-        String[] command = {"/bin/sh","-c","ping -c " + nTimes + " localhost","which docker"};
-        List<String> result = ServerSystemUtil.executeCommand(command);
-
-
-        return Response.ok().entity(result.toArray()).build();
+    public Response ping(){
+        return Response.ok().build();
     }
 
     @GET
@@ -92,11 +87,11 @@ public class BenchmarkConfiguratorResource {
     public Response isRunning(@QueryParam("containerName") String containerName){
         List<String> result = new LinkedList<String>();
         if(DockerCommandLineUtil.isDockerInstalled()){
-            Boolean isrunning = DockerCommandLineUtil.isDockerContainerRunning(containerName);
-            if(isrunning){
-                result.add("Container "+ containerName + " is running");
+            Boolean containerRunning = DockerCommandLineUtil.isDockerContainerRunning(containerName);
+            if(containerRunning){
+                result.add("true");
             } else {
-                result.add("Container "+ containerName + " is not running");
+                result.add("false");
             }
 
         } else {
