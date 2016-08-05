@@ -16,6 +16,7 @@ public class ServerConfigRecord {
     private String serverAddress;
     private LinkedList<DockerRunOptions> tsdbRunRecords;
     private LinkedList<DockerBuildOptions> tsdbBuildRecords;
+    private LinkedList<String> timeSeriesDataFolders;
 
     public ServerConfigRecord(){}
 
@@ -23,6 +24,7 @@ public class ServerConfigRecord {
         this.serverAddress = serverAddress;
         this.tsdbRunRecords = new LinkedList<>();
         this.tsdbBuildRecords = new LinkedList<>();
+        this.timeSeriesDataFolders = new LinkedList<>();
     }
 
     //setter
@@ -36,6 +38,10 @@ public class ServerConfigRecord {
 
     public void setTsdbBuildRecords(LinkedList<DockerBuildOptions> tsdbBuildRecords) {
         this.tsdbBuildRecords = tsdbBuildRecords;
+    }
+
+    public void setTimeSeriesDataFolders(LinkedList<String> timeSeriesDataFolders) {
+        this.timeSeriesDataFolders = timeSeriesDataFolders;
     }
 
     //getter
@@ -52,5 +58,7 @@ public class ServerConfigRecord {
         return tsdbBuildRecords;
     }
 
-
+    public LinkedList<String> getTimeSeriesDataFolders() {
+        return timeSeriesDataFolders;
+    }
 }

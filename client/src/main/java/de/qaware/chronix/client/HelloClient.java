@@ -38,10 +38,19 @@ public class HelloClient {
             ServerConfigRecord serverConfigRecord = new ServerConfigRecord("192.168.2.100");
             serverConfigRecord.setTsdbBuildRecords(buildOptionses);
             serverConfigRecord.setTsdbRunRecords(runOptionses);
+            LinkedList<String> tsdata = new LinkedList<>();
+            tsdata.add("p1");
+            tsdata.add("p2");
+            serverConfigRecord.setTimeSeriesDataFolders(tsdata);
+
 
             ServerConfigRecord serverConfigRecord2 = new ServerConfigRecord("www.fau.cs.de");
             serverConfigRecord2.setTsdbBuildRecords(buildOptionses);
             serverConfigRecord2.setTsdbRunRecords(runOptionses);
+            LinkedList<String> tsdata2 = new LinkedList<>();
+            tsdata2.add("p3");
+            tsdata2.add("p4");
+            serverConfigRecord2.setTimeSeriesDataFolders(tsdata2);
 
             LinkedList<ServerConfigRecord> records = new LinkedList<>();
             records.add(serverConfigRecord);
@@ -58,6 +67,7 @@ public class HelloClient {
                     System.out.println("Serveraddress: " + r.getServerAddress());
                     LinkedList<DockerRunOptions> newRunList = r.getTsdbRunRecords();
                     LinkedList<DockerBuildOptions> newBuildList = r.getTsdbBuildRecords();
+                    LinkedList<String> tsfolders = r.getTimeSeriesDataFolders();
 
                     for (DockerRunOptions op : newRunList) {
                         System.out.println(op.getValidRunCommand());
@@ -65,6 +75,10 @@ public class HelloClient {
 
                     for (DockerBuildOptions op : newBuildList) {
                         System.out.println(op.getValidBuildCommand());
+                    }
+
+                    for (String s : tsfolders){
+                        System.out.println("TS Data Folder: " + s);
                     }
                 }
 
