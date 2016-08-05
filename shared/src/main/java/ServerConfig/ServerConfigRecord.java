@@ -1,5 +1,8 @@
-package dockerUtil;
+package ServerConfig;
 
+
+import dockerUtil.DockerBuildOptions;
+import dockerUtil.DockerRunOptions;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.LinkedList;

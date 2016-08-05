@@ -1,22 +1,12 @@
 package de.qaware.chronix.client;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.corba.se.spi.activation.Server;
+import ServerConfig.ServerConfigAccessor;
+import ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import dockerUtil.*;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -36,10 +26,6 @@ public class HelloClient {
 
         //json to file test (server record test)
         {
-            File file = new File(System.getProperty("user.home") + File.separator
-                    + "chronixBenchmark" + File.separator + "serverRecord.json");
-
-            ObjectMapper mapper = new ObjectMapper();
 
             LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
             buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
@@ -62,10 +48,10 @@ public class HelloClient {
             records.add(serverConfigRecord2);
 
             Configurator configurator = Configurator.getInstance();
-            //configurator.setServerConfigRecords(records);
-            LinkedList<ServerConfigRecord> readRecord = configurator.getServerConfigRecords();
+            ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
+            serverConfigAccessor.setServerConfigRecords(records);
+            LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
 
-                //LinkedList<ServerConfigRecord> readRecord = mapper.readValue(file, new TypeReference<LinkedList<ServerConfigRecord>>() {});
                 for(ServerConfigRecord r : readRecord){
 
 
@@ -81,6 +67,15 @@ public class HelloClient {
                         System.out.println(op.getValidBuildCommand());
                     }
                 }
+
+
+                if(configurator.uploadServerConfig("localhost")){
+                    System.out.println("Config upload to server successful");
+                } else {
+                    System.out.println("Error config upload");
+                }
+
+
 
         }
 

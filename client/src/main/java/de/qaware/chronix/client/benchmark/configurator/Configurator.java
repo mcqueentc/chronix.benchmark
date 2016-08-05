@@ -1,19 +1,16 @@
 package de.qaware.chronix.client.benchmark.configurator;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import dockerUtil.DockerBuildOptions;
 import dockerUtil.DockerRunOptions;
-import dockerUtil.ServerConfigRecord;
+import ServerConfig.ServerConfigAccessor;
+import ServerConfig.ServerConfigRecord;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,26 +19,13 @@ import java.util.List;
  */
 public class Configurator {
 
-    private final String configDirectory = System.getProperty("user.home") + File.separator + ".chronixBenchmark_conf" + File.separator;
-    private final String serverConfigFileName = "serverConfig.json";
-
     private static Configurator instance;
     private int applicationPort = 9003;
     private int adminPort = 9004;
     private LinkedList<ServerConfigRecord> serverConfigRecords;
-
-
+    private ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
 
     private Configurator(){
-        new File(configDirectory).mkdir();
-        if((new File(configDirectory + serverConfigFileName).exists())) {
-            readRecordFile();
-        }
-        if(serverConfigRecords == null){
-            serverConfigRecords =  new LinkedList<ServerConfigRecord>();
-            writeRecordFile();
-        }
-
     }
 
     public static synchronized Configurator getInstance(){
@@ -52,61 +36,34 @@ public class Configurator {
         return instance;
     }
 
-    public String getConfigDirectory(){
-        return configDirectory;
-    }
 
-    public String getServerConfigFileName(){
-        return serverConfigFileName;
-    }
 
-    public LinkedList<ServerConfigRecord> getServerConfigRecords(){
-        readRecordFile();
-        return serverConfigRecords;
-    }
+    public boolean uploadServerConfig(String serverAddress){
+        final Client client = ClientBuilder.newBuilder().build();
+        final WebTarget target = client.target("http://"
+                + serverAddress
+                + ":"
+                + applicationPort
+                + "/configurator/upload/config");
+        final Response response = target.request().post(Entity.json(serverConfigAccessor.getServerConfigRecords()));
+        client.close();
 
-    public synchronized void setServerConfigRecords(LinkedList<ServerConfigRecord> serverConfigRecords){
-        this.serverConfigRecords = serverConfigRecords;
-        writeRecordFile();
-    }
-
-    /**
-     * Reads the server record file from json file in filesystem
-     */
-    private void readRecordFile(){
-        ObjectMapper mapper = new ObjectMapper();
-        File file = new File(configDirectory + serverConfigFileName);
-        try {
-            serverConfigRecords = mapper.readValue(file, new TypeReference<LinkedList<ServerConfigRecord>>() {});
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(response.getStatus() == 200){
+            return true;
         }
-    }
 
-    /**
-     * Writes the server record file as json to filesystem
-     */
-    private void writeRecordFile(){
-        ObjectMapper mapper = new ObjectMapper();
-        File file = new File(configDirectory + serverConfigFileName);
-        try {
-            mapper.writeValue(file, serverConfigRecords);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return false;
     }
-
-    //TODO upload server record file to server
 
     /**
      * Checks if dropwizard server is responding
      *
-     * @param address the server address or ip WITHOUT http://
+     * @param serverAddress the server serverAddress or ip WITHOUT http://
      * @return true if server response is http status 200
      */
-    public boolean isServerUp(String address){
+    public boolean isServerUp(String serverAddress){
         final Client client = ClientBuilder.newBuilder().build();
-        final WebTarget target = client.target("http://" + address + ":" + adminPort + "/ping");
+        final WebTarget target = client.target("http://" + serverAddress + ":" + adminPort + "/ping");
         final Response response = target.request().get();
         int status = response.getStatus();
         client.close();

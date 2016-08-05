@@ -2,12 +2,13 @@ package de.qaware.chronix.server.benchmark.configurator;
 
 
 import com.codahale.metrics.annotation.Timed;
-import de.qaware.chronix.server.DropWizardServerHealthCheck;
 import de.qaware.chronix.server.util.ChronixBoolean;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
 import dockerUtil.DockerBuildOptions;
 import dockerUtil.DockerRunOptions;
+import ServerConfig.ServerConfigAccessor;
+import ServerConfig.ServerConfigRecord;
 import org.apache.commons.compress.utils.IOUtils;
 //import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -29,6 +30,9 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class BenchmarkConfiguratorResource {
 
+    private ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
+
+
     // JUST FOR TESTING
     @GET
     @Path("test")
@@ -46,14 +50,6 @@ public class BenchmarkConfiguratorResource {
         DockerRunOptions op = new DockerRunOptions("chronix",8983,8983,"");
         return op;
     }
-    //Test json
-    @POST
-    @Path("postjson")
-    @Consumes(MediaType.APPLICATION_JSON)
-    //@Produces(MediaType.TEXT_PLAIN)
-    public Response postjson(DockerRunOptions op) {
-        return Response.ok().entity(op.getValidRunCommand()).build();
-    }
 
     //TEST
     @GET
@@ -63,7 +59,6 @@ public class BenchmarkConfiguratorResource {
 
         return Response.ok().entity(result).build();
     }
-
 
     //Obsolete
     @GET
@@ -81,6 +76,18 @@ public class BenchmarkConfiguratorResource {
 
         return Response.ok().entity(result).build();
     }
+
+
+
+    @POST
+    @Path("upload/config")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response uploadServerConfig(LinkedList<ServerConfigRecord> serverConfigRecords) {
+        serverConfigAccessor.setServerConfigRecords(serverConfigRecords);
+
+        return Response.ok().build();
+    }
+
 
     @GET
     @Path("docker/running")
