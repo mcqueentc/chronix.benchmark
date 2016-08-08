@@ -52,6 +52,7 @@ dependencies {
     compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 
     compile project(':shared')
+    compile project(':DatabaseInterface')
 }
 
 shadowJar  {

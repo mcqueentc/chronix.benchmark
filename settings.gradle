@@ -2,4 +2,6 @@ rootProject.name = 'chronix.benchmark'
 include 'client'
 include 'server'
 include 'shared'
+include 'DBClient'
+include 'DatabaseInterface'
 

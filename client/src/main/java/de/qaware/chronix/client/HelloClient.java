@@ -1,12 +1,11 @@
 package de.qaware.chronix.client;
 
 
-import ServerConfig.ServerConfigAccessor;
-import ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import dockerUtil.*;
+import database.BenchmarkDataSource;
+import de.qaware.chronix.client.benchmark.configurator.util.TSDBInterfaceHandler;
 
-import java.util.LinkedList;
+import java.io.File;
 
 
 /**
@@ -25,7 +24,7 @@ public class HelloClient {
 */
 
         //json to file test (server record test)
-        {
+       /* {
 
             LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
             buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
@@ -91,10 +90,22 @@ public class HelloClient {
 
 
 
+        }*/
+
+
+       // jar interface test
+        {
+            TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
+            File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/DBClient/build/libs/DBClient-1.0-SNAPSHOT.jar");
+            if (jarFile.exists()) {
+                interfaceHandler.copyTSDBInterface(jarFile, "Chronix");
+                BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance("Chronix");
+                System.out.println("Chronix interface is working: " + chronix.ping());
+
+            } else {
+                System.out.println("File not found!");
+            }
         }
-
-
-
 
         // Server is up test
         Configurator configurator = Configurator.getInstance();
