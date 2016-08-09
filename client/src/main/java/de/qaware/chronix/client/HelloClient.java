@@ -2,10 +2,18 @@ package de.qaware.chronix.client;
 
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import database.BenchmarkDataSource;
+import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
+import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.client.benchmark.configurator.util.TSDBInterfaceHandler;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
+import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -24,7 +32,7 @@ public class HelloClient {
 */
 
         //json to file test (server record test)
-       /* {
+        {
 
             LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
             buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
@@ -90,7 +98,7 @@ public class HelloClient {
 
 
 
-        }*/
+        }
 
 
        // jar interface test
@@ -126,17 +134,19 @@ public class HelloClient {
 */
 /*
         // Test file upload
-        Uploader uploader = Uploader.getInstance();
-        List<Response> responses = uploader.uploadDockerFiles("",System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix","http://192.168.2.108","9003");
-        //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
 
-        if(!responses.isEmpty()){
-            for(Response response : responses){
-                System.out.println(response.getStatus() +" "+ response.readEntity(String.class));
+            Uploader uploader = Uploader.getInstance();
+            List<Response> responses = uploader.uploadDockerFiles("", System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix", "http://192.168.2.108", "9003");
+            //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
+
+            if (!responses.isEmpty()) {
+                for (Response response : responses) {
+                    System.out.println(response.getStatus() + " " + response.readEntity(String.class));
+                }
+            } else {
+                System.out.println("Nothing uploaded");
             }
-        } else {
-            System.out.println("Nothing uploaded");
-        }
+
 */
 
 ///*

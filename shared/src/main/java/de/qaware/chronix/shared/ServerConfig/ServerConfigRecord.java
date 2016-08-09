@@ -1,8 +1,8 @@
-package ServerConfig;
+package de.qaware.chronix.shared.ServerConfig;
 
 
-import dockerUtil.DockerBuildOptions;
-import dockerUtil.DockerRunOptions;
+import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
+import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.LinkedList;

@@ -1,7 +1,7 @@
 package de.qaware.chronix.client.benchmark.configurator.util;
 
-import ServerConfig.ServerConfigAccessor;
-import database.BenchmarkDataSource;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.database.BenchmarkDataSource;
 
 import java.io.File;
 import java.io.IOException;

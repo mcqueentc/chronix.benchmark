@@ -1,4 +1,4 @@
-package dockerUtil;
+package de.qaware.chronix.shared.dockerUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.xml.bind.annotation.XmlRootElement;

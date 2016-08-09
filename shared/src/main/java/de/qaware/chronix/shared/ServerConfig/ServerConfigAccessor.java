@@ -1,4 +1,4 @@
-package ServerConfig;
+package de.qaware.chronix.shared.ServerConfig;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

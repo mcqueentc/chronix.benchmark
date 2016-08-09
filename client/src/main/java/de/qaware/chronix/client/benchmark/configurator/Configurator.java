@@ -1,10 +1,10 @@
 package de.qaware.chronix.client.benchmark.configurator;
 
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
-import dockerUtil.DockerBuildOptions;
-import dockerUtil.DockerRunOptions;
-import ServerConfig.ServerConfigAccessor;
-import ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
+import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

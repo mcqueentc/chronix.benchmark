@@ -1,4 +1,4 @@
-import database.BenchmarkDataSource;
+import de.qaware.chronix.database.BenchmarkDataSource;
 
 /**
  * Created by mcqueen666 on 08.08.16.
