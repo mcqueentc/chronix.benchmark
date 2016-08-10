@@ -97,7 +97,7 @@ public class TSDBInterfaceHandler {
                 try {
 
                     URLClassLoader classLoader = new URLClassLoader(new URL[] {classFile.toURI().toURL()},TSDBInterfaceHandler.class.getClassLoader());
-                    Class tsdbInterface = classLoader.loadClass(className);
+                    Class<?> tsdbInterface = classLoader.loadClass(className);
                     Class<? extends BenchmarkDataSource> castedTsdbInterface = tsdbInterface.asSubclass(BenchmarkDataSource.class);
                     BenchmarkDataSource castedTsdbInterfaceInstance = castedTsdbInterface.newInstance();
                     return  castedTsdbInterfaceInstance;
