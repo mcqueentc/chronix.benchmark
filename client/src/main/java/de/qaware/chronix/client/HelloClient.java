@@ -31,8 +31,10 @@ public class HelloClient {
 
 */
 
+        Configurator configurator = Configurator.getInstance();
+
         //json to file test (server record test)
-        {
+
 
             LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
             buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
@@ -63,60 +65,84 @@ public class HelloClient {
             records.add(serverConfigRecord);
             records.add(serverConfigRecord2);
 
-            Configurator configurator = Configurator.getInstance();
+
             ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
             serverConfigAccessor.setServerConfigRecords(records);
-            LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
 
-                for(ServerConfigRecord r : readRecord){
-
-
-                    System.out.println("Serveraddress: " + r.getServerAddress());
-                    LinkedList<DockerRunOptions> newRunList = r.getTsdbRunRecords();
-                    LinkedList<DockerBuildOptions> newBuildList = r.getTsdbBuildRecords();
-                    LinkedList<String> tsfolders = r.getTimeSeriesDataFolders();
-
-                    for (DockerRunOptions op : newRunList) {
-                        System.out.println(op.getValidRunCommand());
-                    }
-
-                    for (DockerBuildOptions op : newBuildList) {
-                        System.out.println(op.getValidBuildCommand());
-                    }
-
-                    for (String s : tsfolders){
-                        System.out.println("TS Data Folder: " + s);
-                    }
-                }
-
-
-                if(configurator.uploadServerConfig("localhost")){
-                    System.out.println("Config upload to server successful");
-                } else {
-                    System.out.println("Error config upload");
-                }
-
-
-
-        }
 
 
        // jar interface test
-        {
+
             TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
             File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/DBClient/build/libs/DBClient-1.0-SNAPSHOT.jar");
             if (jarFile.exists()) {
-                interfaceHandler.copyTSDBInterface(jarFile, "Solr");
-                BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance("Solr");
-                System.out.println(chronix.getClass().getName() + " interface is working: " + chronix.ping());
+                String implName = "Solr";
+                interfaceHandler.copyTSDBInterface(jarFile, implName);
+                BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
+                if(chronix.ping()){
+                    LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
+                    for(ServerConfigRecord configRecord : readRecord){
+                        LinkedList<String> externalImpls = configRecord.getExternalTimeSeriesDataBaseImplementations();
+                        externalImpls.add(implName);
+                        configRecord.setExternalTimeSeriesDataBaseImplementations(externalImpls);
+                    }
+                    //write back to hd
+                    serverConfigAccessor.setServerConfigRecords(readRecord);
+                }
 
             } else {
                 System.out.println("File not found!");
             }
+
+
+
+        // show server record
+
+        LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
+
+        for(ServerConfigRecord r : readRecord){
+
+
+            System.out.println("Serveraddress: " + r.getServerAddress());
+            LinkedList<DockerRunOptions> newRunList = r.getTsdbRunRecords();
+            LinkedList<DockerBuildOptions> newBuildList = r.getTsdbBuildRecords();
+            LinkedList<String> tsfolders = r.getTimeSeriesDataFolders();
+            LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
+
+            for (DockerRunOptions op : newRunList) {
+                System.out.println(op.getValidRunCommand());
+            }
+
+            for (DockerBuildOptions op : newBuildList) {
+                System.out.println(op.getValidBuildCommand());
+            }
+
+            for (String s : tsfolders){
+                System.out.println("TS Data Folder: " + s);
+            }
+
+            for (String s : externalImpls){
+                System.out.println(s + " implemented");
+                BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(s);
+                System.out.println(s + " interface "+ impl.getClass().getName() +" is working: " + impl.ping());
+            }
+
+
         }
 
+
+
+
+        if(configurator.uploadServerConfig("localhost")){
+            System.out.println("Config upload to server successful");
+        } else {
+            System.out.println("Error config upload");
+        }
+
+
+
         // Server is up test
-        Configurator configurator = Configurator.getInstance();
+
         if(configurator.isServerUp("localhost")){
             System.out.println("Server is up");
         } else {

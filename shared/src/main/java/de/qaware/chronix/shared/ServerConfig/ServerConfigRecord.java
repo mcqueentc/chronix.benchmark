@@ -17,6 +17,7 @@ public class ServerConfigRecord {
     private LinkedList<DockerRunOptions> tsdbRunRecords;
     private LinkedList<DockerBuildOptions> tsdbBuildRecords;
     private LinkedList<String> timeSeriesDataFolders;
+    private LinkedList<String> externalTimeSeriesDataBaseImplementations;
 
     public ServerConfigRecord(){}
 
@@ -25,6 +26,7 @@ public class ServerConfigRecord {
         this.tsdbRunRecords = new LinkedList<>();
         this.tsdbBuildRecords = new LinkedList<>();
         this.timeSeriesDataFolders = new LinkedList<>();
+        this.externalTimeSeriesDataBaseImplementations = new LinkedList<>();
     }
 
     //setter
@@ -38,6 +40,10 @@ public class ServerConfigRecord {
 
     public void setTsdbBuildRecords(LinkedList<DockerBuildOptions> tsdbBuildRecords) {
         this.tsdbBuildRecords = tsdbBuildRecords;
+    }
+
+    public void setExternalTimeSeriesDataBaseImplementations(LinkedList<String> externalTimeSeriesDataBaseImplementations) {
+        this.externalTimeSeriesDataBaseImplementations = externalTimeSeriesDataBaseImplementations;
     }
 
     public void setTimeSeriesDataFolders(LinkedList<String> timeSeriesDataFolders) {
@@ -60,5 +66,9 @@ public class ServerConfigRecord {
 
     public LinkedList<String> getTimeSeriesDataFolders() {
         return timeSeriesDataFolders;
+    }
+
+    public LinkedList<String> getExternalTimeSeriesDataBaseImplementations() {
+        return externalTimeSeriesDataBaseImplementations;
     }
 }
