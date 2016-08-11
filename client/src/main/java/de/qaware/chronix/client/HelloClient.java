@@ -106,9 +106,9 @@ public class HelloClient {
             TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
             File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/DBClient/build/libs/DBClient-1.0-SNAPSHOT.jar");
             if (jarFile.exists()) {
-                interfaceHandler.copyTSDBInterface(jarFile, "Chronix");
-                BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance("Chronix");
-                System.out.println("Chronix interface is working: " + chronix.ping());
+                interfaceHandler.copyTSDBInterface(jarFile, "Solr");
+                BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance("Solr");
+                System.out.println(chronix.getClass().getName() + " interface is working: " + chronix.ping());
 
             } else {
                 System.out.println("File not found!");

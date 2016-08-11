@@ -12,4 +12,12 @@ package de.qaware.chronix.database;
 public interface BenchmarkDataSource {
 
     boolean ping();
+
+    //Hier kommt alles rein, was man braucht um die anfragen zu formulieren (technikneutral, Strings...)
+   // void setQuery(String timeSeries, TimeRange startAndEnd,...)
+
+    //Min required functions
+   // double max();
+
+
 }

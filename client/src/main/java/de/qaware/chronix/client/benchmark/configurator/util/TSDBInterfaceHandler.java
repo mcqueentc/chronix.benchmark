@@ -5,11 +5,13 @@ import de.qaware.chronix.database.BenchmarkDataSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import static java.nio.file.StandardCopyOption.*;
 
@@ -59,15 +61,89 @@ public class TSDBInterfaceHandler {
     }
 
     /**
+     * Get all full class names contained in given jar file.
+     *
+     * @param file the jar file
+     * @return List of all contained full class names.
+     */
+    public List<String> getClassesFromJarFile(File file){
+        if(file != null && file.exists()){
+            if(file.getName().endsWith(".jar")){
+                List<String> classes = new LinkedList<>();
+                try{
+                    JarFile jarFile = new JarFile(file);
+                    Enumeration<JarEntry> entries = jarFile.entries();
+                    while (entries.hasMoreElements()){
+                        JarEntry entry = entries.nextElement();
+                        String name = entry.getName();
+                        if(name.endsWith(".class")){
+                            if(name.lastIndexOf(".class") != -1) {
+                                name = name.substring(0, name.lastIndexOf(".class"));
+                            }
+                            if (name.indexOf("/")!= -1) {
+                                name = name.replaceAll("/", ".");
+                            }
+                            classes.add(name);
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return classes;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the class name of the the implementation of given interface.
+     * NOTE: Only one implementation per jar file is supported.
+     *
+     * @param file the jar file
+     * @param iface the interface for the implementation
+     * @return the full class name of the implementation.
+     */
+    public String getImplementingClassNameFromJarFile(File file, Class<?> iface){
+        List<String> classes = getClassesFromJarFile(file);
+        if(classes != null && !classes.isEmpty()){
+            for(String className : classes){
+                Class<?> clazz;
+                try {
+                    // it is clear at this point, that file is indeed a jar file
+                    URLClassLoader classLoader = new URLClassLoader(new URL[] {file.toURI().toURL()},TSDBInterfaceHandler.class.getClassLoader());
+                    clazz = classLoader.loadClass(className);
+
+                    if(iface.isAssignableFrom(clazz) && !clazz.equals(iface)){
+                        return className;
+                    }
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+        return null;
+    }
+
+
+
+
+    /**
      * Copys the given interface implementation jar file to config directory and renames it to given class name.
      *
      * @param jarFile the interface implementation jar file
-     * @param className the class name which was implemented
+     * @param tsdbName the time series database name which was implemented
      * @return true if copy was successful
      */
-    public boolean copyTSDBInterface(File jarFile, String className){
+    public boolean copyTSDBInterface(File jarFile, String tsdbName){
         if(jarFile.exists()){
-            File target = new File(interfaceDirectory + className + ".jar");
+            File target = new File(interfaceDirectory + tsdbName + ".jar");
             try {
                 Files.copy(jarFile.toPath(), target.toPath(), REPLACE_EXISTING);
 
@@ -77,7 +153,7 @@ public class TSDBInterfaceHandler {
             }
 
             if(target.exists()){
-                interfaces.put(className, target);
+                interfaces.put(tsdbName, target);
                 return true;
             }
         }
@@ -87,20 +163,24 @@ public class TSDBInterfaceHandler {
     /**
      * Get an instance of the implemented interface given by class name
      *
-     * @param className the name of the implemented class
+     * @param tsdbName the name of the implemented time series database
      * @return instance of implemented interface as BenchmarkDataSource
      */
-    public BenchmarkDataSource getTSDBInstance(String className){
-        if(interfaces.containsKey(className)){
-            File classFile = interfaces.get(className);
+    public BenchmarkDataSource getTSDBInstance(String tsdbName){
+        if(interfaces.containsKey(tsdbName)){
+            File classFile = interfaces.get(tsdbName);
             if(classFile.exists()){
                 try {
 
-                    URLClassLoader classLoader = new URLClassLoader(new URL[] {classFile.toURI().toURL()},TSDBInterfaceHandler.class.getClassLoader());
-                    Class<?> tsdbInterface = classLoader.loadClass(className);
-                    Class<? extends BenchmarkDataSource> castedTsdbInterface = tsdbInterface.asSubclass(BenchmarkDataSource.class);
-                    BenchmarkDataSource castedTsdbInterfaceInstance = castedTsdbInterface.newInstance();
-                    return  castedTsdbInterfaceInstance;
+                    String className = getImplementingClassNameFromJarFile(classFile, BenchmarkDataSource.class);
+                    if(className != null){
+                        URLClassLoader classLoader = new URLClassLoader(new URL[] {classFile.toURI().toURL()},TSDBInterfaceHandler.class.getClassLoader());
+                        Class<?> tsdbInterface = classLoader.loadClass(className);
+                        Class<? extends BenchmarkDataSource> castedTsdbInterface = tsdbInterface.asSubclass(BenchmarkDataSource.class);
+                        BenchmarkDataSource castedTsdbInterfaceInstance = castedTsdbInterface.newInstance();
+                        return  castedTsdbInterfaceInstance;
+                    }
+
 
 
                 } catch (Exception e) {
