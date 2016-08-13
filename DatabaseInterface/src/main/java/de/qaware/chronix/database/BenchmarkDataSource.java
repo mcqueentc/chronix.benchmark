@@ -82,7 +82,7 @@ public interface BenchmarkDataSource {
      *
      * @return Map of timestamp-value pairs.
      */
-    Map<Instant, Integer> getQueryResult(String ipAddress,
+    Map<Instant, Double> getQueryResult(String ipAddress,
                                         int porNumber,
                                         String databaseName,
                                         String measurementName,
