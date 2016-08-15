@@ -114,7 +114,7 @@ public class BenchmarkConfiguratorResource {
     public Response isInterfaceRunning(@QueryParam("tsdbName") String tsdbName){
         TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
         BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(tsdbName);
-        if(impl.ping()) {
+        if(impl != null) {
             return Response.ok().entity(tsdbName + " interface is up").build();
         }
 

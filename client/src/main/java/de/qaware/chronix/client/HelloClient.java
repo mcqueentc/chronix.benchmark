@@ -81,7 +81,7 @@ public class HelloClient {
                 String implName = "Solr";
                 interfaceHandler.copyTSDBInterface(jarFile, implName);
                 BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
-                if(chronix.ping()){
+                if(chronix != null){
                     LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
                     for(ServerConfigRecord configRecord : readRecord){
                         LinkedList<String> externalImpls = configRecord.getExternalTimeSeriesDataBaseImplementations();
@@ -140,9 +140,15 @@ public class HelloClient {
             for (String s : externalImpls){
                 System.out.println(s + " implemented");
                 BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(s);
-                System.out.println(s + " interface "+ impl.getClass().getName() +" is working: " + impl.ping());
-                System.out.println("Query is: " + impl.getQueryForFunction(null,0,null,null,null,null,null,null,0.f,
-                                                                            BenchmarkDataSource.QueryFunction.COUNT));
+                if(impl != null){
+                    System.out.println(s + " interface "+ impl.getClass().getName() +" is working");
+                    System.out.println("Query is: " + impl.getQueryForFunction(null,0,null,null,null,null,null,null,0.f,
+                            BenchmarkDataSource.QueryFunction.COUNT));
+                } else {
+                    System.out.println(s + " interface not available");
+                }
+
+
             }
 
 

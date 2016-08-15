@@ -23,10 +23,6 @@ public interface BenchmarkDataSource {
         PERCENTILE
     }
 
-
-    // TODO REMOVE after testing
-    boolean ping();
-
     /**
      * Creates a new database with given name on the database server.
      *

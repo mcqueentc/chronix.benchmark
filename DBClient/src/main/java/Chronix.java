@@ -15,11 +15,6 @@ import java.util.Map;
 public class Chronix implements BenchmarkDataSource{
 
     @Override
-    public boolean ping() {
-        return true;
-    }
-
-    @Override
     public boolean createDatabase(String ipAddress,
                                   int portNumber,
                                   String databaseName) {
