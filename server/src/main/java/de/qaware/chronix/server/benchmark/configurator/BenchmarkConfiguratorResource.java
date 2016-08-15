@@ -109,7 +109,7 @@ public class BenchmarkConfiguratorResource {
     }
 
     @POST
-    @Path("/upload/jar")
+    @Path("upload/jar")
     @Consumes({MediaType.MULTIPART_FORM_DATA})
     public Response uploadJarFile(@QueryParam("tsdbName") String tsdbName,
                                       @FormDataParam("file")InputStream fileInputStream,

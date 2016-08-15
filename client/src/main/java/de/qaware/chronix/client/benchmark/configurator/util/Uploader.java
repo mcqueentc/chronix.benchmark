@@ -20,7 +20,7 @@ import java.util.List;
 public class Uploader {
 
     private static final String SERVER_UPLOAD_DOCKER_COMMAND_STRING = "/configurator/docker/upload/";
-    private static final String SERVER_UPLOAD_JAR_COMMAND_STRING = "/upload/jar?tsdbName=";
+    private static final String SERVER_UPLOAD_JAR_COMMAND_STRING = "/configurator/upload/jar?tsdbName=";
     private static Uploader instance;
 
     private Uploader(){
