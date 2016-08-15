@@ -1,10 +1,9 @@
-package de.qaware.chronix.client.benchmark.configurator.util;
+package de.qaware.chronix.shared.ServerConfig;
 
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.database.BenchmarkDataSource;
+import org.apache.commons.compress.utils.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -41,6 +40,10 @@ public class TSDBInterfaceHandler {
             instance = new TSDBInterfaceHandler();
         }
         return instance;
+    }
+
+    public String getInterfaceDirectory() {
+        return interfaceDirectory;
     }
 
     private void makeInterfaceDirectory(){
@@ -159,6 +162,33 @@ public class TSDBInterfaceHandler {
         }
         return false;
     }
+
+    public boolean copyTSDBInterface(InputStream fileInputStream, String tsdbName){
+        if(fileInputStream != null){
+            File target = new File(interfaceDirectory + tsdbName + ".jar");
+            try {
+                FileOutputStream outputStream = new FileOutputStream(target);
+                IOUtils.copy(fileInputStream, outputStream);
+                outputStream.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            if(target.exists()){
+                interfaces.put(tsdbName, target);
+                return true;
+            }
+        }
+
+
+        return false;
+    }
+
 
     /**
      * Get an instance of the implemented interface given by class name

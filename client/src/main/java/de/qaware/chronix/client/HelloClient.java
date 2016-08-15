@@ -4,16 +4,18 @@ package de.qaware.chronix.client;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.client.benchmark.configurator.util.TSDBInterfaceHandler;
+import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -88,11 +90,23 @@ public class HelloClient {
                     }
                     //write back to hd
                     serverConfigAccessor.setServerConfigRecords(readRecord);
+                    // upload config to server
+                    if(configurator.uploadServerConfig("localhost")){
+                        System.out.println("Config upload to server successful");
+                        // upload jarFile
+                        String[] answer = configurator.uploadJarFile(jarFile,implName,"192.168.2.108");
+                        System.out.println("Server: " + answer[0]);
+
+
+                    } else {
+                        System.out.println("Error config upload");
+                    }
                 }
 
             } else {
                 System.out.println("File not found!");
             }
+
 
 
 
@@ -135,14 +149,6 @@ public class HelloClient {
 
 
 
-        if(configurator.uploadServerConfig("localhost")){
-            System.out.println("Config upload to server successful");
-        } else {
-            System.out.println("Error config upload");
-        }
-
-
-
         // Server is up test
 
         if(configurator.isServerUp("localhost")){
@@ -181,7 +187,9 @@ public class HelloClient {
         //test build container
         //String commandFileName = "chronix.build";
         //final Client client = ClientBuilder.newBuilder().build();
-        //final WebTarget target = client.target("http://192.168.2.168:9003/configurator/docker/running?containerName=chronix");
+        //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/test?name=chronix.jar");
+        //final Response response = target.request().get();
+        //System.out.println(response.readEntity(String.class));
 
        // final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build?containerName=chronix&commandFileName="+commandFileName);
         //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/ping?nTimes=4");
@@ -208,7 +216,13 @@ public class HelloClient {
             String[] s = {"container is not running"};
             answers = s;
         }
+        for(String answer : answers){
+            System.out.println(answer);
+        }
+
+
 //*/
+
 
         //stop test
         //String[] answers = configurator.stopDockerContainer("localhost","chronix");
@@ -240,9 +254,7 @@ public class HelloClient {
         //String[] answers = response.readEntity(String[].class);
         //System.out.println("Server status: " + response.getStatus());
         //System.out.println(response.readEntity(String.class));
-        for(String answer : answers){
-            System.out.println(answer);
-        }
+
 //*/
 
 

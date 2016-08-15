@@ -20,6 +20,7 @@ import java.util.List;
 public class Uploader {
 
     private static final String SERVER_UPLOAD_DOCKER_COMMAND_STRING = "/configurator/docker/upload/";
+    private static final String SERVER_UPLOAD_JAR_COMMAND_STRING = "/upload/jar?tsdbName=";
     private static Uploader instance;
 
     private Uploader(){
@@ -78,6 +79,26 @@ public class Uploader {
         }
 
         return responses;
+    }
+
+    public Response uploadJarFile(File jarFile, String tsdbName, String httpServerAddress, String portNumber) {
+        Response response = null;
+        if(jarFile.exists()){
+            final FileDataBodyPart filepart = new FileDataBodyPart("file", jarFile);
+            FormDataMultiPart multiPart = new FormDataMultiPart();
+            multiPart.field("file", jarFile, MediaType.MULTIPART_FORM_DATA_TYPE).bodyPart(filepart);
+            final Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
+            final WebTarget target = client.target(
+                    httpServerAddress + ":"
+                    + portNumber
+                    + SERVER_UPLOAD_JAR_COMMAND_STRING
+                    + tsdbName
+            );
+            response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
+
+        }
+
+        return response;
     }
 
 

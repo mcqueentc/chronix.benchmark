@@ -2,9 +2,11 @@ package de.qaware.chronix.server.benchmark.configurator;
 
 
 import com.codahale.metrics.annotation.Timed;
+import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.server.util.ChronixBoolean;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
+import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
@@ -36,9 +38,8 @@ public class BenchmarkConfiguratorResource {
     // JUST FOR TESTING
     @GET
     @Path("test")
-    @Timed
-    public String test() {
-        return "Hello from Configurator Resource!";
+    public String test(@QueryParam("name") String name) {
+        return "Sent info: " + name;
     }
 
 
@@ -105,6 +106,27 @@ public class BenchmarkConfiguratorResource {
             result.add("Docker not installed or running.");
         }
         return Response.ok().entity(result.toArray()).build();
+    }
+
+    @POST
+    @Path("/upload/jar")
+    @Consumes({MediaType.MULTIPART_FORM_DATA})
+    public Response uploadJarFile(@QueryParam("tsdbName") String tsdbName,
+                                      @FormDataParam("file")InputStream fileInputStream,
+                                      @FormDataParam("file")FormDataContentDisposition fileMetaData){
+        TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
+        if(interfaceHandler.copyTSDBInterface(fileInputStream, tsdbName)){
+            BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(tsdbName);
+
+
+            if(impl.ping()) {
+                return Response.ok().entity("copied interface is up").build();
+            } else {
+                return Response.serverError().entity("copied interface not responding").build();
+            }
+        }
+
+        return Response.serverError().entity("copy error").build();
     }
 
 

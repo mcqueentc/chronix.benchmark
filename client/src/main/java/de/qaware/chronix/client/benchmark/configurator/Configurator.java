@@ -11,6 +11,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -193,6 +194,25 @@ public class Configurator {
         }
 
         return answers.toArray(new String[answers.size()]);
+    }
+
+    /**
+     * Uploads the jar file of an interface implementation
+     *
+     * @param jarFile the jar file
+     * @param tsdbName the implementation name
+     * @param serverAddress the server address or ip WITHOUT http://
+     * @return the server response output
+     */
+    public String[] uploadJarFile(File jarFile, String tsdbName, String serverAddress){
+        Uploader uploader = Uploader.getInstance();
+        Response response = uploader.uploadJarFile(
+                jarFile,
+                tsdbName,
+                "http://"+serverAddress,
+                Integer.toString(applicationPort));
+        String[] answer = {response.readEntity(String.class)};
+        return answer;
     }
 
 
