@@ -125,6 +125,8 @@ public class HelloClient {
                 System.out.println(s + " implemented");
                 BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(s);
                 System.out.println(s + " interface "+ impl.getClass().getName() +" is working: " + impl.ping());
+                System.out.println("Query is: " + impl.getQueryForFunction(null,0,null,null,null,null,null,null,0.f,
+                                                                            BenchmarkDataSource.QueryFunction.COUNT));
             }
 
 
