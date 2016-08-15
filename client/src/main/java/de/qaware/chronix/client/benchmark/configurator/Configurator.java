@@ -199,18 +199,33 @@ public class Configurator {
     /**
      * Uploads the jar file of an interface implementation
      *
+     * @param serverAddress the server address or ip WITHOUT http://
      * @param jarFile the jar file
      * @param tsdbName the implementation name
-     * @param serverAddress the server address or ip WITHOUT http://
      * @return the server response output
      */
-    public String[] uploadJarFile(File jarFile, String tsdbName, String serverAddress){
+    public String[] uploadJarFile(String serverAddress, File jarFile, String tsdbName){
         Uploader uploader = Uploader.getInstance();
         Response response = uploader.uploadJarFile(
                 jarFile,
                 tsdbName,
                 "http://"+serverAddress,
                 Integer.toString(applicationPort));
+        String[] answer = {response.readEntity(String.class)};
+        return answer;
+    }
+
+    /**
+     * Checks if given interface is available on the server.
+     *
+     * @param serverAddress the server address or ip WITHOUT http://
+     * @param tsdbName the implementation name
+     * @return the server response output
+     */
+    public String[] checkInterfaceStatus(String serverAddress, String tsdbName){
+        final Client client = ClientBuilder.newBuilder().build();
+        final WebTarget target = client.target("http://" + serverAddress + ":" + applicationPort + "/configurator/interface/running?tsdbName=" + tsdbName);
+        final Response response = target.request().get();
         String[] answer = {response.readEntity(String.class)};
         return answer;
     }

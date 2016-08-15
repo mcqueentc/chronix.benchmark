@@ -94,7 +94,9 @@ public class HelloClient {
                     if(configurator.uploadServerConfig("localhost")){
                         System.out.println("Config upload to server successful");
                         // upload jarFile
-                        String[] answer = configurator.uploadJarFile(jarFile,implName,"192.168.2.108");
+                        String[] answer = configurator.uploadJarFile("192.168.2.108",jarFile,implName);
+                        System.out.println("Server: " + answer[0]);
+                        answer = configurator.checkInterfaceStatus("192.168.2.108",implName);
                         System.out.println("Server: " + answer[0]);
 
 

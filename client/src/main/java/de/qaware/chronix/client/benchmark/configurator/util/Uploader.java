@@ -81,6 +81,15 @@ public class Uploader {
         return responses;
     }
 
+    /**
+     * Uploads given jar file to the given server.
+     *
+     * @param jarFile the jar file
+     * @param tsdbName the implementation name
+     * @param httpServerAddress The http or ip address as String. (e.g. "http://some.server.com)
+     * @param portNumber The port number on which the server is listening as String. (e.g. "66666")
+     * @return the server response.
+     */
     public Response uploadJarFile(File jarFile, String tsdbName, String httpServerAddress, String portNumber) {
         Response response = null;
         if(jarFile.exists()){

@@ -108,6 +108,20 @@ public class BenchmarkConfiguratorResource {
         return Response.ok().entity(result.toArray()).build();
     }
 
+
+    @GET
+    @Path("interface/running")
+    public Response isInterfaceRunning(@QueryParam("tsdbName") String tsdbName){
+        TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
+        BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(tsdbName);
+        if(impl.ping()) {
+            return Response.ok().entity(tsdbName + " interface is up").build();
+        }
+
+        return Response.serverError().entity(tsdbName + " interface not responding").build();
+
+    }
+
     @POST
     @Path("upload/jar")
     @Consumes({MediaType.MULTIPART_FORM_DATA})
@@ -116,14 +130,7 @@ public class BenchmarkConfiguratorResource {
                                       @FormDataParam("file")FormDataContentDisposition fileMetaData){
         TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
         if(interfaceHandler.copyTSDBInterface(fileInputStream, tsdbName)){
-            BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(tsdbName);
-
-
-            if(impl.ping()) {
-                return Response.ok().entity("copied interface is up").build();
-            } else {
-                return Response.serverError().entity("copied interface not responding").build();
-            }
+            return Response.ok().entity("copy successful").build();
         }
 
         return Response.serverError().entity("copy error").build();
