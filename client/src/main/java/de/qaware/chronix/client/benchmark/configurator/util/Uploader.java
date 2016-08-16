@@ -74,7 +74,7 @@ public class Uploader {
                 //System.out.println("Status: " + response.getStatus() + " " + response.readEntity(String.class));
 
                 responses.add(response);
-                client.close();
+                //client.close();
 
             }
         }
@@ -105,7 +105,7 @@ public class Uploader {
                     + tsdbName
             );
             response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            client.close();
+            //client.close();
 
         }
 
