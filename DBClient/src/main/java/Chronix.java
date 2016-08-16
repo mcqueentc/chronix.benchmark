@@ -70,7 +70,8 @@ public class Chronix implements BenchmarkDataSource{
 
     @Override
     public String performQuery(String ipAddress, String portNumber, String query) {
-        return null;
+        //TODO
+        return query;
     }
 
 

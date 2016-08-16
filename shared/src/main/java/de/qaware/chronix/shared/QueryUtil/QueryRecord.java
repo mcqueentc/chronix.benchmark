@@ -14,12 +14,24 @@ public class QueryRecord {
     private String tsdbName;
     private String query;
     private String diskUsage;
-    private long queryTimeMilliseconds;
+    private Long queryTimeMilliseconds;
     private String MemoryUsage;
     private String cpuUsage;
 
 
     public QueryRecord(){}
+
+    public QueryRecord(String queryID, String ipAddress, String portNumber, String tsdbName, String query) {
+        this.queryID = queryID;
+        this.ipAddress = ipAddress;
+        this.portNumber = portNumber;
+        this.tsdbName = tsdbName;
+        this.query = query;
+        this.diskUsage = null;
+        this.queryTimeMilliseconds = null;
+        this.MemoryUsage = null;
+        this.cpuUsage = null;
+    }
 
     //getter
     public String getQueryID() {
@@ -46,7 +58,7 @@ public class QueryRecord {
         return diskUsage;
     }
 
-    public long getQueryTimeMilliseconds() {
+    public Long getQueryTimeMilliseconds() {
         return queryTimeMilliseconds;
     }
 
@@ -84,7 +96,7 @@ public class QueryRecord {
         this.diskUsage = diskUsage;
     }
 
-    public void setQueryTimeMilliseconds(long queryTimeMilliseconds) {
+    public void setQueryTimeMilliseconds(Long queryTimeMilliseconds) {
         this.queryTimeMilliseconds = queryTimeMilliseconds;
     }
 

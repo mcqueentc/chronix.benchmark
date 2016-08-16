@@ -3,7 +3,9 @@ package de.qaware.chronix.client;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
+import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
@@ -34,20 +36,30 @@ public class HelloClient {
 */
 
         Configurator configurator = Configurator.getInstance();
+        QueryHandler queryHandler = QueryHandler.getInstance();
         String server = "localhost";
+
+        // Server is up test
+
+        if(configurator.isServerUp(server)){
+            System.out.println("Server is up");
+        } else {
+            System.out.println("Server not responding");
+        }
+
 
         //json to file test (server record test)
 
 
             LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
-            buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
-            buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
+            buildOptionses.add(new DockerBuildOptions("solr", "-t"));
+            //buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
 
             LinkedList<DockerRunOptions> runOptionses = new LinkedList<>();
-            runOptionses.add(new DockerRunOptions("chronix", 8983, 8983, "-v"));
-            runOptionses.add(new DockerRunOptions("kairos", 2003, 2003, "-v"));
+            runOptionses.add(new DockerRunOptions("solr", 8983, 8983, ""));
+            //runOptionses.add(new DockerRunOptions("kairos", 2003, 2003, "-v"));
 
-            ServerConfigRecord serverConfigRecord = new ServerConfigRecord("192.168.2.100");
+            ServerConfigRecord serverConfigRecord = new ServerConfigRecord(server);
             serverConfigRecord.setTsdbBuildRecords(buildOptionses);
             serverConfigRecord.setTsdbRunRecords(runOptionses);
             LinkedList<String> tsdata = new LinkedList<>();
@@ -55,7 +67,7 @@ public class HelloClient {
             tsdata.add("p2");
             serverConfigRecord.setTimeSeriesDataFolders(tsdata);
 
-
+/*
             ServerConfigRecord serverConfigRecord2 = new ServerConfigRecord("www.fau.cs.de");
             serverConfigRecord2.setTsdbBuildRecords(buildOptionses);
             serverConfigRecord2.setTsdbRunRecords(runOptionses);
@@ -63,10 +75,10 @@ public class HelloClient {
             tsdata2.add("p3");
             tsdata2.add("p4");
             serverConfigRecord2.setTimeSeriesDataFolders(tsdata2);
-
+*/
             LinkedList<ServerConfigRecord> records = new LinkedList<>();
             records.add(serverConfigRecord);
-            records.add(serverConfigRecord2);
+            //records.add(serverConfigRecord2);
 
 
             ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
@@ -79,7 +91,7 @@ public class HelloClient {
             TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
             File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/DBClient/build/libs/DBClient-1.0-SNAPSHOT.jar");
             if (jarFile.exists()) {
-                String implName = "Solr";
+                String implName = "solr";
                 interfaceHandler.copyTSDBInterface(jarFile, implName);
                 BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
                 if(chronix != null){
@@ -139,30 +151,40 @@ public class HelloClient {
             }
 
             for (String s : externalImpls){
-                System.out.println(s + " implemented");
+                System.out.println("Client: " + s + " implemented");
                 BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(s);
                 if(impl != null){
-                    System.out.println(s + " interface "+ impl.getClass().getName() +" is working");
-                    System.out.println("Query is: " + impl.getQueryForFunction(null,null,null,null,null,null,0.f,
-                            BenchmarkDataSource.QueryFunction.COUNT));
+                    System.out.println("Client: " + s + " interface "+ impl.getClass().getName() +" is working");
+                    //System.out.println("Query is: " + impl.getQueryForFunction(null,null,null,null,null,null,0.f,BenchmarkDataSource.QueryFunction.COUNT));
                 } else {
                     System.out.println(s + " interface not available");
                 }
-
-
             }
-
-
         }
 
 
-        // Server is up test
-
-        if(configurator.isServerUp(server)){
-            System.out.println("Server is up");
-        } else {
-            System.out.println("Server not responding");
+        // query test
+        for(ServerConfigRecord r : readRecord){
+            LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
+            for(String s : externalImpls){
+                BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(s);
+                String ip = r.getServerAddress();
+                String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
+                String queryID = "test:1";
+                String query = tsdb.getQueryForFunction(null,null,null,null,null,null,0, BenchmarkDataSource.QueryFunction.STDDEV);
+                QueryRecord queryRecord = new QueryRecord(queryID,ip,port,s,query);
+                String result = queryHandler.doQueryOnServer(ip,queryRecord);
+                Long latency = queryHandler.getLatencyForQueryID(queryID);
+                if(latency != null){
+                    System.out.println("QueryID: " + queryID);
+                    System.out.println("Result: " + result);
+                    System.out.println("Latency: " + latency + " milliseconds");
+                } else {
+                    System.out.println("Error: " + result);
+                }
+            }
         }
+
 
 
 /*

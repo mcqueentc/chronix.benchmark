@@ -8,6 +8,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by mcqueen666 on 20.06.16.
@@ -16,9 +18,11 @@ public class QueryHandler {
 
     private static QueryHandler instance;
     private Configurator configurator;
+    private Map<String, Long> queryLatency;
 
     private QueryHandler(){
         configurator = Configurator.getInstance();
+        queryLatency = new HashMap<>();
     }
 
     public static synchronized QueryHandler getInstance(){
@@ -26,6 +30,16 @@ public class QueryHandler {
             instance = new QueryHandler();
         }
         return instance;
+    }
+
+    /**
+     * Returns the latency of a query with given query id.
+     *
+     * @param queryID the query id
+     * @return the latency in milliseconds or null if no record of given query id exists (query failed for some reason)
+     */
+    public Long getLatencyForQueryID(String queryID){
+        return queryLatency.get(queryID);
     }
 
 
@@ -44,7 +58,13 @@ public class QueryHandler {
                 + ":"
                 + configurator.getApplicationPort()
                 + "/queryrunner/performQuery");
+        long startMillis = System.currentTimeMillis();
         final Response response = target.request().post(Entity.json(queryRecord));
+        long endMillis = System.currentTimeMillis();
+
+        if(response.getStatus() == 200){
+            queryLatency.put(queryRecord.getQueryID(), (endMillis - startMillis));
+        }
 
         return response.getStatus() + " : " + response.readEntity(String.class);
 

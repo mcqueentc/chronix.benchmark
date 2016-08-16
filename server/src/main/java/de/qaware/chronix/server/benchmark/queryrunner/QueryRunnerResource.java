@@ -34,7 +34,7 @@ public class QueryRunnerResource {
         long endMilliseconds = System.currentTimeMillis();
 
         queryRecord.setQueryTimeMilliseconds(endMilliseconds - startMilliseconds);
-        //TODO give measurements to threaded StatsCollector(set queryRecord with RAM-, disk- and cpu usage | write queryRecord to file)
+        //TODO give measurements to (threaded?) StatsCollector(set queryRecord with RAM-, disk- and cpu usage | write queryRecord to file)
 
 
         if (queryResult != null) {
