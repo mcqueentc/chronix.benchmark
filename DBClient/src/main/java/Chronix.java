@@ -14,10 +14,14 @@ import java.util.Map;
 
 public class Chronix implements BenchmarkDataSource{
 
+
     @Override
-    public boolean createDatabase(String ipAddress,
-                                  int portNumber,
-                                  String databaseName) {
+    public boolean setup(String ipAddress, int portNumber, String databaseName, String measurementName) {
+        return false;
+    }
+
+    @Override
+    public boolean clean(String ipAddress, int portNumber) {
         return false;
     }
 
@@ -34,9 +38,7 @@ public class Chronix implements BenchmarkDataSource{
     }
 
     @Override
-    public String getQueryForFunction(String ipAddress,
-                                      int porNumber,
-                                      String databaseName,
+    public String getQueryForFunction(String databaseName,
                                       String measurementName,
                                       String metricName,
                                       Instant start,
@@ -67,9 +69,10 @@ public class Chronix implements BenchmarkDataSource{
     }
 
     @Override
-    public String performQuery(String query) {
+    public String performQuery(String ipAddress, String portNumber, String query) {
         return null;
     }
+
 
     @Override
     public Map<Instant, Double> getQueryResult(String ipAddress,

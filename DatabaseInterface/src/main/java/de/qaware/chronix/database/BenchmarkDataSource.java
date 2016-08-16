@@ -24,25 +24,38 @@ public interface BenchmarkDataSource {
     }
 
     /**
-     * Creates a new database with given name on the database server.
+     * Creates a new database and table aka measurementName with given names on the database server.
      *
      * @apiNote This method will NOT be part of the benchmark measurement.
      *
      * @param ipAddress the database server ip address.
      * @param portNumber the port number on which the database system is available.
      * @param databaseName the database name to be created.
-     * @return true if creating the database was successful.
+     * @param measurementName aka table name. the measured system.
+     * @return true if creation was successful.
      */
-    boolean createDatabase(String ipAddress,
-                           int portNumber,
-                           String databaseName
+    boolean setup(String ipAddress,
+                  int portNumber,
+                  String databaseName,
+                  String measurementName
     );
+
+    /**
+     * Cleanses the database on given server. Drops all tables and databases.
+     *
+     * @apiNote This method will NOT be part of the benchmark measurement.
+     *
+     * @param ipAddress the database server ip address.
+     * @param portNumber the port number on which the database system is available.
+     * @return true if clean-up was successful.
+     */
+    boolean clean(String ipAddress, int portNumber);
 
 
     /**
      * Generates a complete import query string to import a single timestamp value pair.
      *
-     * @apiNote This method will NOT be part of the benchmark measurement.
+     * @apiNote This method WILL be part of the benchmark measurement.
      *
      * @param ipAddress the database server ip address
      * @param portNumber the port number on which the database system is available.
@@ -70,13 +83,10 @@ public interface BenchmarkDataSource {
      * @apiNote This method will NOT be part of the benchmark measurement.
      *
      * @implNote  Example pseudo code:
-     * http://[ipAddress]:[portNumber]/query [databaseName] SELECT [metricName] FROM [measurementName] WHERE
+     * query = [databaseName] SELECT [metricName] FROM [measurementName] WHERE
      * time >= [start] AND time <= [end] AND [tagKey_1] = [tagValue_1] AND ...
      *
      *
-     *
-     * @param ipAddress the database server ip address
-     * @param porNumber the port number on which the database system is available.
      * @param databaseName the database name where to import the data. (created by createDatabase(...))
      * @param measurementName aka table name. the measured system. ("FROM")
      * @param metricName aka field key, aka column name, the name of the measured metric. ("SELECT")
@@ -90,16 +100,14 @@ public interface BenchmarkDataSource {
      *
      * @return the complete function specific query string.
      */
-    String getQueryForFunction(String ipAddress,
-                                        int porNumber,
-                                        String databaseName,
-                                        String measurementName,
-                                        String metricName,
-                                        Instant start,
-                                        Instant end,
-                                        Map<String, String> tagKey_tagValue,
-                                        float percentile,
-                                        QueryFunction function
+    String getQueryForFunction(String databaseName,
+                               String measurementName,
+                               String metricName,
+                               Instant start,
+                               Instant end,
+                               Map<String, String> tagKey_tagValue,
+                               float percentile,
+                               QueryFunction function
     );
 
     /**
@@ -107,10 +115,15 @@ public interface BenchmarkDataSource {
      *
      * @apiNote This method WILL BE part of the benchmark measurement.
      *
+     * @implNote  Example pseudo code:
+     * http://[ipAddress]:[portNumber]/[query]
+     *
+     * @param ipAddress the database server ip address
+     * @param portNumber the port number on which the database system is available.
      * @param query the query string to perform.
      * @return the result string from the database.
      */
-    String performQuery(String query);
+    String performQuery(String ipAddress, String portNumber, String query);
 
 
 

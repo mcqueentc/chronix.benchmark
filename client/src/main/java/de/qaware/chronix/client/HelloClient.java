@@ -34,6 +34,7 @@ public class HelloClient {
 */
 
         Configurator configurator = Configurator.getInstance();
+        String server = "localhost";
 
         //json to file test (server record test)
 
@@ -91,12 +92,12 @@ public class HelloClient {
                     //write back to hd
                     serverConfigAccessor.setServerConfigRecords(readRecord);
                     // upload config to server
-                    if(configurator.uploadServerConfig("localhost")){
+                    if(configurator.uploadServerConfig(server)){
                         System.out.println("Config upload to server successful");
                         // upload jarFile
-                        String[] answer = configurator.uploadJarFile("192.168.2.108",jarFile,implName);
+                        String[] answer = configurator.uploadJarFile(server,jarFile,implName);
                         System.out.println("Server: " + answer[0]);
-                        answer = configurator.checkInterfaceStatus("192.168.2.108",implName);
+                        answer = configurator.checkInterfaceStatus(server,implName);
                         System.out.println("Server: " + answer[0]);
 
 
@@ -142,7 +143,7 @@ public class HelloClient {
                 BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(s);
                 if(impl != null){
                     System.out.println(s + " interface "+ impl.getClass().getName() +" is working");
-                    System.out.println("Query is: " + impl.getQueryForFunction(null,0,null,null,null,null,null,null,0.f,
+                    System.out.println("Query is: " + impl.getQueryForFunction(null,null,null,null,null,null,0.f,
                             BenchmarkDataSource.QueryFunction.COUNT));
                 } else {
                     System.out.println(s + " interface not available");
@@ -155,11 +156,9 @@ public class HelloClient {
         }
 
 
-
-
         // Server is up test
 
-        if(configurator.isServerUp("localhost")){
+        if(configurator.isServerUp(server)){
             System.out.println("Server is up");
         } else {
             System.out.println("Server not responding");
@@ -217,7 +216,7 @@ public class HelloClient {
 ///*
         //running test
         String[] answers = null;
-        if(configurator.isDockerContainerRunning("localhost","chronix")){
+        if(configurator.isDockerContainerRunning(server,"chronix")){
             String[] s = {"container is running"};
             answers = s;
         } else {
