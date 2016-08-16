@@ -2,6 +2,7 @@ package de.qaware.chronix.shared.ServerConfig;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,28 @@ public class ServerConfigAccessor {
     public synchronized void setServerConfigRecords(LinkedList<ServerConfigRecord> serverConfigRecords){
         this.serverConfigRecords = serverConfigRecords;
         writeRecordFile();
+    }
+
+    /**
+     * Returns the host port on given server where given tsdb is available.
+     *
+     * @param serverAddress
+     * @param tsdbName
+     * @return
+     */
+    public String getHostPortForTSDB(String serverAddress, String tsdbName){
+        LinkedList<ServerConfigRecord> records = getServerConfigRecords();
+        for(ServerConfigRecord r : records){
+            if (r.getServerAddress().equals(serverAddress)){
+                LinkedList<DockerRunOptions> runOptions = r.getTsdbRunRecords();
+                for(DockerRunOptions o : runOptions){
+                    if(o.getContainerName().equals(tsdbName)){
+                        return Integer.toString(o.getHostPort());
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 

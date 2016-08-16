@@ -130,7 +130,6 @@ public class TSDBInterfaceHandler {
             }
         }
 
-
         return null;
     }
 
@@ -163,6 +162,13 @@ public class TSDBInterfaceHandler {
         return false;
     }
 
+    /**
+     * Copys the given interface implementation jar file to config directory and renames it to given class name.
+     *
+     * @param fileInputStream the file input stream of the interface implementation jar file
+     * @param tsdbName the time series database name which was implemented
+     * @return true if copy was successful
+     */
     public boolean copyTSDBInterface(InputStream fileInputStream, String tsdbName){
         if(fileInputStream != null){
             File target = new File(interfaceDirectory + tsdbName + ".jar");
@@ -184,7 +190,6 @@ public class TSDBInterfaceHandler {
                 return true;
             }
         }
-
 
         return false;
     }
@@ -211,14 +216,11 @@ public class TSDBInterfaceHandler {
                         return  castedTsdbInterfaceInstance;
                     }
 
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-
 
         return null;
     }

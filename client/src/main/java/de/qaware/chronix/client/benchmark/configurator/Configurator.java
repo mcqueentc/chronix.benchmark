@@ -4,7 +4,6 @@ import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,7 +22,6 @@ public class Configurator {
     private static Configurator instance;
     private int applicationPort = 9003;
     private int adminPort = 9004;
-    private LinkedList<ServerConfigRecord> serverConfigRecords;
     private ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
 
     private Configurator(){
@@ -37,7 +35,13 @@ public class Configurator {
         return instance;
     }
 
+    public int getApplicationPort() {
+        return applicationPort;
+    }
 
+    public int getAdminPort() {
+        return adminPort;
+    }
 
     public boolean uploadServerConfig(String serverAddress){
         final Client client = ClientBuilder.newBuilder().build();
@@ -227,6 +231,7 @@ public class Configurator {
         final WebTarget target = client.target("http://" + serverAddress + ":" + applicationPort + "/configurator/interface/running?tsdbName=" + tsdbName);
         final Response response = target.request().get();
         String[] answer = {response.readEntity(String.class)};
+        client.close();
         return answer;
     }
 
