@@ -18,6 +18,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -195,22 +196,18 @@ public class HelloClient {
             System.out.println("getPath() = " + dir.getPath());
         }
 */
-/*
+
         // Test file upload
 
-            Uploader uploader = Uploader.getInstance();
-            List<Response> responses = uploader.uploadDockerFiles("", System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix", "http://192.168.2.108", "9003");
+           // Uploader uploader = Uploader.getInstance();
+            //List<String> responses = uploader.uploadDockerFiles("", System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix", server, "9003");
             //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
-
-            if (!responses.isEmpty()) {
-                for (Response response : responses) {
-                    System.out.println(response.getStatus() + " " + response.readEntity(String.class));
-                }
-            } else {
-                System.out.println("Nothing uploaded");
+            String[] uploadAnswers = configurator.uploadFiles(server,System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix");
+            for(String answer : uploadAnswers){
+                System.out.println(answer);
             }
 
-*/
+
 
 ///*
         //test build container
@@ -230,7 +227,7 @@ public class HelloClient {
  /*
         // start test
         DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
-        String[] answers = configurator.startDockerContainer("localhost",chronix);
+        String[] answers = configurator.startDockerContainer(server,chronix);
 
         //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/start");
         //final Response response = target.request().post(Entity.json(chronix));
@@ -254,12 +251,12 @@ public class HelloClient {
 
 
         //stop test
-        //String[] answers = configurator.stopDockerContainer("localhost","chronix");
+        //String[] answers = configurator.stopDockerContainer(server,"chronix");
 
 /*
         // build test
         DockerBuildOptions chronix = new DockerBuildOptions("chronix","-t");
-        String[] answers = configurator.buildDockerContainer("localhost",chronix);
+        String[] answers = configurator.buildDockerContainer(server,chronix);
 
         //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build");
         //final Response response = target.request().post(Entity.json(chronix));

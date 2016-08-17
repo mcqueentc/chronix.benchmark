@@ -185,19 +185,12 @@ public class Configurator {
      */
     public String[] uploadFiles(String serverAddress, String directoryPath){
         Uploader uploader = Uploader.getInstance();
-        List<Response> responses = uploader.uploadDockerFiles("",
+        List<String> responses = uploader.uploadDockerFiles("",
                 directoryPath,
-                "http://"+serverAddress,
+                serverAddress,
                 Integer.toString(applicationPort));
 
-        LinkedList<String> answers = new LinkedList<String>();
-        if(!responses.isEmpty()){
-            for(Response response : responses){
-                 answers.add(response.readEntity(String.class));
-            }
-        }
-
-        return answers.toArray(new String[answers.size()]);
+        return responses.toArray(new String[responses.size()]);
     }
 
     /**
@@ -210,12 +203,12 @@ public class Configurator {
      */
     public String[] uploadJarFile(String serverAddress, File jarFile, String tsdbName){
         Uploader uploader = Uploader.getInstance();
-        Response response = uploader.uploadJarFile(
+        String response = uploader.uploadJarFile(
                 jarFile,
                 tsdbName,
-                "http://"+serverAddress,
+                serverAddress,
                 Integer.toString(applicationPort));
-        String[] answer = {response.readEntity(String.class)};
+        String[] answer = {response};
         return answer;
     }
 
