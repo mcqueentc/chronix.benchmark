@@ -52,6 +52,7 @@ public class QueryHandler {
      *         "[StatusCode] : [QueryResult] or [error message]"
      */
     public String doQueryOnServer(String serverAddress, QueryRecord queryRecord) {
+        //TODO close client!!!
         final Client client = ClientBuilder.newBuilder().build();
         final WebTarget target = client.target("http://"
                 + serverAddress
@@ -68,6 +69,18 @@ public class QueryHandler {
 
         return response.getStatus() + " : " + response.readEntity(String.class);
 
+    }
+
+    //test
+    public String[] getMeasurement(String serverAddress){
+        final Client client = ClientBuilder.newBuilder().build();
+        final WebTarget target = client.target("http://"
+                + serverAddress
+                + ":"
+                + configurator.getApplicationPort()
+                + "/queryrunner/measurement");
+        final Response response = target.request().get();
+        return  response.readEntity(String[].class);
     }
 
 }

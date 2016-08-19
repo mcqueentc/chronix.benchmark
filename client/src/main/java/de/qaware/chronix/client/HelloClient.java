@@ -53,11 +53,11 @@ public class HelloClient {
 
 
             LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
-            buildOptionses.add(new DockerBuildOptions("solr", "-t"));
+            buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
             //buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
 
             LinkedList<DockerRunOptions> runOptionses = new LinkedList<>();
-            runOptionses.add(new DockerRunOptions("solr", 8983, 8983, ""));
+            runOptionses.add(new DockerRunOptions("chronix", 8983, 8983, ""));
             //runOptionses.add(new DockerRunOptions("kairos", 2003, 2003, "-v"));
 
             ServerConfigRecord serverConfigRecord = new ServerConfigRecord(server);
@@ -92,7 +92,7 @@ public class HelloClient {
             TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
             File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/DBClient/build/libs/DBClient-1.0-SNAPSHOT.jar");
             if (jarFile.exists()) {
-                String implName = "solr";
+                String implName = "chronix";
                 interfaceHandler.copyTSDBInterface(jarFile, implName);
                 BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
                 if(chronix != null){
@@ -148,7 +148,7 @@ public class HelloClient {
             }
 
             for (String s : tsfolders){
-                System.out.println("TS Data Folder: " + s);
+                System.out.println("TS DataModels Folder: " + s);
             }
 
             for (String s : externalImpls){
@@ -161,6 +161,23 @@ public class HelloClient {
                     System.out.println(s + " interface not available");
                 }
             }
+        }
+
+        // Test file upload
+
+        // Uploader uploader = Uploader.getInstance();
+        //List<String> responses = uploader.uploadDockerFiles("", System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix", server, "9003");
+        //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
+        String[] uploadAnswers = configurator.uploadFiles(server,System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix");
+        for(String answer : uploadAnswers){
+            System.out.println(answer);
+        }
+
+        // start test
+        DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
+        String[] start = configurator.startDockerContainer(server,chronix);
+        for(String s : start){
+            System.out.println("Start: " + s + " started");
         }
 
 
@@ -183,6 +200,11 @@ public class HelloClient {
                 } else {
                     System.out.println("Error: " + result);
                 }
+
+                String[] measurements = queryHandler.getMeasurement(server);
+                for(String m : measurements){
+                    System.out.println("Measurement: " + m);
+                }
             }
         }
 
@@ -196,16 +218,6 @@ public class HelloClient {
             System.out.println("getPath() = " + dir.getPath());
         }
 */
-
-        // Test file upload
-
-           // Uploader uploader = Uploader.getInstance();
-            //List<String> responses = uploader.uploadDockerFiles("", System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix", server, "9003");
-            //List<Response> responses = uploader.uploadDockerFiles("",args[0],args[1],args[2]);
-            String[] uploadAnswers = configurator.uploadFiles(server,System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix");
-            for(String answer : uploadAnswers){
-                System.out.println(answer);
-            }
 
 
 
@@ -224,14 +236,10 @@ public class HelloClient {
         //final WebTarget target = client.target("http://localhost:9003/configurator/booleanTest?value=yes");
         //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/remove?imageName=chronix&removeFiles=yes");
 
- /*
-        // start test
-        DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
-        String[] answers = configurator.startDockerContainer(server,chronix);
 
         //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/start");
         //final Response response = target.request().post(Entity.json(chronix));
- */
+
 ///*
         //running test
         String[] answers = null;
