@@ -15,6 +15,9 @@ import javax.ws.rs.core.MediaType;
 @Path("/collector")
 @Produces(MediaType.APPLICATION_JSON)
 public class StatsCollectorResource {
+
+    private final StatsCollector statsCollector = StatsCollector.getInstance();
+
     // JUST FOR TESTING
     @GET
     @Path("test")

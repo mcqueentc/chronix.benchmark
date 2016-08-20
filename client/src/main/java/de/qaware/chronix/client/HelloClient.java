@@ -201,10 +201,12 @@ public class HelloClient {
                     System.out.println("Error: " + result);
                 }
 
+                /*
                 String[] measurements = queryHandler.getMeasurement(server);
                 for(String m : measurements){
                     System.out.println("Measurement: " + m);
                 }
+                */
             }
         }
 

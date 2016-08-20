@@ -24,7 +24,7 @@ public class DockerStatsUtil {
 
     }
 
-    public static DockerStatsUtil getInstance(){
+    public static synchronized DockerStatsUtil getInstance(){
         if(instance == null){
             instance = new DockerStatsUtil();
         }
