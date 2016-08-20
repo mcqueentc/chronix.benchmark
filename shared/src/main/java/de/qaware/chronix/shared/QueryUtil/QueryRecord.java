@@ -33,6 +33,18 @@ public class QueryRecord {
         this.cpuUsage = null;
     }
 
+    public QueryRecord(QueryRecord queryRecord){
+        this.queryID = queryRecord.getQueryID();
+        this.ipAddress = queryRecord.getIpAddress();
+        this.portNumber = queryRecord.getPortNumber();
+        this.tsdbName = queryRecord.getTsdbName();
+        this.query = queryRecord.getQuery();
+        this.diskUsage = queryRecord.getDiskUsage();
+        this.queryTimeMilliseconds = queryRecord.getQueryTimeMilliseconds();
+        this.MemoryUsage = queryRecord.getMemoryUsage();
+        this.cpuUsage = queryRecord.getCpuUsage();
+    }
+
     //getter
     public String getQueryID() {
         return queryID;
