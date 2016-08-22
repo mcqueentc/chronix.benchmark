@@ -6,6 +6,7 @@ import de.qaware.chronix.server.benchmark.collector.StatsCollector;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.DockerStatsUtil;
 import de.qaware.chronix.shared.DataModels.Pair;
+import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 
@@ -55,7 +56,7 @@ public class QueryRunnerResource {
             e.printStackTrace();
         }
         long endMilliseconds = System.currentTimeMillis();
-        List<Pair<Double,Double>> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
+        List<Tuple<Double,Double,Long,Long>> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
 
 
         //TODO set queryRecord with diskUsage

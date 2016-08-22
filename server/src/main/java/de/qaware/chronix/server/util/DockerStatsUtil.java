@@ -2,6 +2,7 @@ package de.qaware.chronix.server.util;
 
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.shared.DataModels.Pair;
+import de.qaware.chronix.shared.DataModels.Tuple;
 
 import java.lang.management.ManagementFactory;
 import java.util.LinkedList;
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public class DockerStatsUtil {
     private static final long MEASURE_INTERVAL_MILLISECONDS = 100;
-    private static final long DOCKER_STATS_REACTION_MILLISECONDS = 2000;
+    private static final long DOCKER_STATS_REACTION_MILLISECONDS = 1000;
 
     private static DockerStatsUtil instance;
     private MeasureRunner[] threads;
@@ -57,8 +58,8 @@ public class DockerStatsUtil {
      *
      * @return A list of Pairs containing as Pair.first the cpu usage in % and as Pair.second the memory usage in %
      */
-    public List<Pair<Double,Double>> stopDockerContainerMeasurement(){
-        List<Pair<Double,Double>> completeMeasures = new LinkedList<>();
+    public List<Tuple<Double,Double, Long, Long>> stopDockerContainerMeasurement(){
+        List<Tuple<Double,Double, Long, Long>> completeMeasures = new LinkedList<>();
         for(int i = 0; i < threads.length; i++){
             threads[i].stopRunning();
             try {
@@ -75,7 +76,7 @@ public class DockerStatsUtil {
 
 
     private class MeasureRunner extends Thread{
-        private List<Pair<Double,Double>> measures = new LinkedList<>();
+        private List<Tuple<Double,Double,Long,Long>> measures = new LinkedList<>();
         private String containerID;
         private String[] command;
         private volatile boolean running;
@@ -87,11 +88,11 @@ public class DockerStatsUtil {
                     + containerID
                     + " --no-stream | grep "
                     + containerID
-                    + " | awk '{print $2 $8}'"});
+                    + " | awk '{print $2 $8 $14$15\"%\" $17$18\"%\"}'"});
             this.running = running;
         }
 
-        public List<Pair<Double,Double>> getMeasures(){
+        public List<Tuple<Double,Double,Long,Long>> getMeasures(){
             return measures;
         }
 
@@ -103,10 +104,40 @@ public class DockerStatsUtil {
             while(this.running) {
                 List<String> answers = ServerSystemUtil.executeCommand(command);
                 String[] splits = answers.get(0).split("%");
-                Pair<Double, Double> record = Pair.of(Double.valueOf(splits[0]), Double.valueOf(splits[1]));
-                measures.add(record);
+                if(splits.length == 4) {
+                    Tuple<Double, Double, Long, Long> record = Tuple.of(
+                            Double.valueOf(splits[0]),
+                            Double.valueOf(splits[1]),
+                            getBytesCountFromString(splits[2]),
+                            getBytesCountFromString(splits[3]));
+                    measures.add(record);
+                }
             }
 
+        }
+
+        private Long getBytesCountFromString(String s){
+            Double result = new Double(-1);
+            Character last = s.charAt(s.length()-1);
+            Character secondLast = s.charAt(s.length()-2);
+
+            if(last == 'B') {
+                if (Character.getType(secondLast) == Character.LOWERCASE_LETTER || Character.getType(secondLast) == Character.UPPERCASE_LETTER) {
+                    result = Double.valueOf(s.substring(0, s.length()-2));
+                    switch (secondLast){
+                        case 'k': result *= 1000;
+                            break;
+                        case 'M': result *= 1000 * 1000;
+                            break;
+                        case 'G': result *= 1000 * 1000 * 1000;
+                            break;
+                    }
+                } else {
+                    // secondLast is not a letter -> only Bytes here
+                    result = Double.valueOf(s.substring(0, s.length()-1));
+                }
+            }
+            return result.longValue();
         }
 
 
