@@ -17,6 +17,8 @@ public class QueryRecord {
     private Long queryTimeMilliseconds;
     private String MemoryUsage;
     private String cpuUsage;
+    private String writtenBytes;
+    private String readBytes;
 
 
     public QueryRecord(){}
@@ -31,6 +33,8 @@ public class QueryRecord {
         this.queryTimeMilliseconds = null;
         this.MemoryUsage = null;
         this.cpuUsage = null;
+        this.writtenBytes = null;
+        this.readBytes = null;
     }
 
     public QueryRecord(QueryRecord queryRecord){
@@ -43,6 +47,9 @@ public class QueryRecord {
         this.queryTimeMilliseconds = queryRecord.getQueryTimeMilliseconds();
         this.MemoryUsage = queryRecord.getMemoryUsage();
         this.cpuUsage = queryRecord.getCpuUsage();
+        this.writtenBytes = queryRecord.getWrittenBytes();
+        this.readBytes = queryRecord.getReadBytes();
+
     }
 
     //getter
@@ -82,6 +89,13 @@ public class QueryRecord {
         return cpuUsage;
     }
 
+    public String getWrittenBytes() {
+        return writtenBytes;
+    }
+
+    public String getReadBytes() {
+        return readBytes;
+    }
 
     //setter
     public void setQueryID(String queryID) {
@@ -118,5 +132,13 @@ public class QueryRecord {
 
     public void setCpuUsage(String cpuUsage) {
         this.cpuUsage = cpuUsage;
+    }
+
+    public void setWrittenBytes(String writtenBytes) {
+        this.writtenBytes = writtenBytes;
+    }
+
+    public void setReadBytes(String readBytes) {
+        this.readBytes = readBytes;
     }
 }
