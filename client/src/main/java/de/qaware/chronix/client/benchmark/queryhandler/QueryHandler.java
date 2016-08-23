@@ -9,6 +9,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,8 +53,7 @@ public class QueryHandler {
      * @return String starting with server status code and either the query result string or the server error message string
      *         "[StatusCode] : [QueryResult] or [error message]"
      */
-    public String doQueryOnServer(String serverAddress, QueryRecord queryRecord) {
-        //TODO close client!!!
+    public String[] doQueryOnServer(String serverAddress, QueryRecord queryRecord) {
         final Client client = ClientBuilder.newBuilder().build();
         final WebTarget target = client.target("http://"
                 + serverAddress
@@ -63,11 +64,17 @@ public class QueryHandler {
         final Response response = target.request().post(Entity.json(queryRecord));
         long endMillis = System.currentTimeMillis();
 
-        if(response.getStatus() == 200){
+        int statusCode = response.getStatus();
+        String[] queryResults = response.readEntity(String[].class);
+        client.close();
+
+        if(statusCode == 200){
             queryLatency.put(queryRecord.getQueryID(), (endMillis - startMillis));
+            return queryResults;
         }
 
-        return response.getStatus() + " : " + response.readEntity(String.class);
+        return new String[]{"Server status code: " + statusCode};
+
 
     }
 

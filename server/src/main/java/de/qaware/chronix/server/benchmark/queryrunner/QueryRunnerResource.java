@@ -5,7 +5,6 @@ import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.server.benchmark.collector.StatsCollector;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.DockerStatsUtil;
-import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
@@ -36,6 +35,9 @@ public class QueryRunnerResource {
             return Response.serverError().entity("No TSDB implementation with name " + queryRecord.getTsdbName() + " found on server!").build();
         }
 
+        List<String> queryList = queryRecord.getQueryList();
+        List<String> queryResults = new LinkedList<>();
+
         //TODO log disk usage
 
 
@@ -46,8 +48,11 @@ public class QueryRunnerResource {
         dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(queryRecord.getTsdbName()));
         long startMilliseconds = System.currentTimeMillis();
 
-        //the query
-        String queryResult = tsdb.performQuery(queryRecord.getIpAddress(), queryRecord.getPortNumber(), queryRecord.getQuery());
+        //the query mix
+        for(String query : queryList){
+            queryResults.add(tsdb.performQuery(queryRecord.getIpAddress(), queryRecord.getPortNumber(), query));
+        }
+
 
         // for testing
         try {
@@ -55,6 +60,8 @@ public class QueryRunnerResource {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        // end measurement
         long endMilliseconds = System.currentTimeMillis();
         List<Tuple<Double,Double,Long,Long>> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
 
@@ -64,11 +71,11 @@ public class QueryRunnerResource {
         queryRecord.setQueryTimeMilliseconds(endMilliseconds - startMilliseconds);
         statsCollector.addQueryRecordEditJob(queryRecord, dockerMeasurement);
 
-        if (queryResult != null) {
-            return Response.ok().entity(queryResult).build();
+        if (!queryResults.isEmpty()) {
+            return Response.ok().entity(queryResults.toArray(new String[]{})).build();
         }
 
-        return Response.serverError().entity("Error performing query!").build();
+        return Response.serverError().entity(new String[]{"Error performing query!"}).build();
 
     }
 

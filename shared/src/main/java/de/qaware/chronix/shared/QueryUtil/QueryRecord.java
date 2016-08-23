@@ -1,6 +1,7 @@
 package de.qaware.chronix.shared.QueryUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * Created by mcqueen666 on 16.08.16.
@@ -12,7 +13,7 @@ public class QueryRecord {
     private String ipAddress;
     private String portNumber;
     private String tsdbName;
-    private String query;
+    private List<String> queryList;
     private String diskUsage;
     private Long queryTimeMilliseconds;
     private String MemoryUsage;
@@ -23,12 +24,12 @@ public class QueryRecord {
 
     public QueryRecord(){}
 
-    public QueryRecord(String queryID, String ipAddress, String portNumber, String tsdbName, String query) {
+    public QueryRecord(String queryID, String ipAddress, String portNumber, String tsdbName, List<String> queryList) {
         this.queryID = queryID;
         this.ipAddress = ipAddress;
         this.portNumber = portNumber;
         this.tsdbName = tsdbName;
-        this.query = query;
+        this.queryList = queryList;
         this.diskUsage = null;
         this.queryTimeMilliseconds = null;
         this.MemoryUsage = null;
@@ -42,7 +43,7 @@ public class QueryRecord {
         this.ipAddress = queryRecord.getIpAddress();
         this.portNumber = queryRecord.getPortNumber();
         this.tsdbName = queryRecord.getTsdbName();
-        this.query = queryRecord.getQuery();
+        this.queryList = queryRecord.getQueryList();
         this.diskUsage = queryRecord.getDiskUsage();
         this.queryTimeMilliseconds = queryRecord.getQueryTimeMilliseconds();
         this.MemoryUsage = queryRecord.getMemoryUsage();
@@ -69,8 +70,8 @@ public class QueryRecord {
         return tsdbName;
     }
 
-    public String getQuery() {
-        return query;
+    public List<String> getQueryList() {
+        return queryList;
     }
 
     public String getDiskUsage() {
@@ -114,8 +115,8 @@ public class QueryRecord {
         this.tsdbName = tsdbName;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setQueryList(List<String> queryList) {
+        this.queryList = queryList;
     }
 
     public void setDiskUsage(String diskUsage) {

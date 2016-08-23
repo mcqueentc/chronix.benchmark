@@ -180,6 +180,23 @@ public class HelloClient {
             System.out.println("Start: " + s + " started");
         }
 
+        //running test
+        String[] answers = null;
+        boolean isDockerContainerRunning = configurator.isDockerContainerRunning(server,"chronix");
+        if(isDockerContainerRunning){
+            String[] s = {"container is running"};
+            answers = s;
+        } else {
+            String[] s = {"container is not running"};
+            answers = s;
+        }
+        for(String answer : answers){
+            System.out.println(answer);
+        }
+        if(!isDockerContainerRunning){
+            return;
+        }
+
 
         // query test
         for(ServerConfigRecord r : readRecord){
@@ -189,16 +206,19 @@ public class HelloClient {
                 String ip = r.getServerAddress();
                 String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
                 String queryID = "test:1";
-                String query = tsdb.getQueryForFunction(null,null,null,null,null,null,0, BenchmarkDataSource.QueryFunction.STDDEV);
-                QueryRecord queryRecord = new QueryRecord(queryID,ip,port,s,query);
-                String result = queryHandler.doQueryOnServer(ip,queryRecord);
+                List<String> querys = new LinkedList<>();
+                querys.add(tsdb.getQueryForFunction(null,null,null,null,null,null,0, BenchmarkDataSource.QueryFunction.STDDEV));
+                QueryRecord queryRecord = new QueryRecord(queryID,ip,port,s,querys);
+                String[] results = queryHandler.doQueryOnServer(ip,queryRecord);
                 Long latency = queryHandler.getLatencyForQueryID(queryID);
                 if(latency != null){
                     System.out.println("QueryID: " + queryID);
-                    System.out.println("Result: " + result);
                     System.out.println("Latency: " + latency + " milliseconds");
+                    for(String result : results) {
+                        System.out.println("Result: " + result);
+                    }
                 } else {
-                    System.out.println("Error: " + result);
+                    System.out.println("Error: " + results[0]);
                 }
 
                 /*
@@ -243,18 +263,7 @@ public class HelloClient {
         //final Response response = target.request().post(Entity.json(chronix));
 
 ///*
-        //running test
-        String[] answers = null;
-        if(configurator.isDockerContainerRunning(server,"chronix")){
-            String[] s = {"container is running"};
-            answers = s;
-        } else {
-            String[] s = {"container is not running"};
-            answers = s;
-        }
-        for(String answer : answers){
-            System.out.println(answer);
-        }
+
 
 
 //*/
