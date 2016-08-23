@@ -49,19 +49,21 @@ public class ServerSystemUtil {
     public static List<String> executeCommand(String[] command) {
         List<String> result = new LinkedList<String>();
         Process p;
-        try {
-            p = Runtime.getRuntime().exec(command);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String curLine;
-            while ((curLine = reader.readLine()) != null) {
-                result.add(curLine);
-            }
-            p.waitFor();
-            reader.close();
+        if(command != null) {
+            try {
+                p = Runtime.getRuntime().exec(command);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String curLine;
+                while ((curLine = reader.readLine()) != null) {
+                    result.add(curLine);
+                }
+                p.waitFor();
+                reader.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            result.add(e.getLocalizedMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.add(e.getLocalizedMessage());
+            }
         }
         return result;
     }
@@ -74,15 +76,17 @@ public class ServerSystemUtil {
     public static void executeCommandSimple(String[] command) {
         List<String> result = new LinkedList<String>();
         Process p;
-        try {
-            p = Runtime.getRuntime().exec(command);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while ((reader.readLine()) != null) {
-            }
-            p.waitFor();
+        if(command != null) {
+            try {
+                p = Runtime.getRuntime().exec(command);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                while ((reader.readLine()) != null) {
+                }
+                p.waitFor();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
