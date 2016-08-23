@@ -35,10 +35,7 @@ public class StatsCollector {
     private QueryRecordEditor queryRecordEditor;
 
     private StatsCollector(){
-        File dir = new File(recordDirectory);
-        if( !(dir.exists()) ){
-            dir.mkdirs();
-        }
+        initRecordFile();
         mapper = new ObjectMapper();
         blockingDequeWriteJobs = new LinkedBlockingDeque<>();
         blockingDequeEditJobs = new LinkedBlockingDeque<>();
@@ -50,6 +47,13 @@ public class StatsCollector {
         queryRecordEditor = new QueryRecordEditor(blockingDequeWriteJobs, blockingDequeEditJobs);
         queryRecordEditor.start();
 
+    }
+
+    private synchronized void initRecordFile(){
+        File dir = new File(recordDirectory);
+        if( !(dir.exists()) ){
+            dir.mkdirs();
+        }
     }
 
     public static synchronized StatsCollector getInstance(){
@@ -100,6 +104,7 @@ public class StatsCollector {
                     if (recordFile.exists()) {
                         Files.write(recordFile.toPath(), Arrays.asList(queryRecordJSON), StandardOpenOption.APPEND);
                     } else {
+                        initRecordFile(); // in case record file is deleted while server is running.
                         Files.write(recordFile.toPath(), Arrays.asList(queryRecordJSON), StandardOpenOption.CREATE);
                     }
 
