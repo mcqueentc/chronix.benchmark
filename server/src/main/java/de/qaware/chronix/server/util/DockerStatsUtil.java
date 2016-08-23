@@ -75,6 +75,34 @@ public class DockerStatsUtil {
     }
 
 
+    /**
+     * Estimates the storage size of the given container.
+     *
+     * @param containerName the name of the docker container
+     * @param storageDirectoryPath the path to the storage directory in the container of the running tsdb.
+     * @return the size of the storage directory in the container in bytes.
+     */
+    public Long estimateStorageSize(String containerName, String storageDirectoryPath){
+        Long resultBytes = new Long(-1);
+        String containerID = DockerCommandLineUtil.getRunningContainerId(containerName);
+        if(!containerID.isEmpty()){
+            String[] command = ServerSystemUtil.getOsSpecificCommand(new String[]{DockerCommandLineUtil.getDockerInstallPath()
+                    + "docker exec -t "
+                    + containerID
+                    + " /usr/bin/du -c -b --max=1 "
+                    + storageDirectoryPath
+                    + " | awk '{print $1}'"});
+
+            List<String> answers = ServerSystemUtil.executeCommand(command);
+            if(!answers.isEmpty()){
+                resultBytes = Long.valueOf(answers.get(answers.size()-1));
+            }
+        }
+
+        return resultBytes;
+    }
+
+
     private class MeasureRunner extends Thread{
         private List<Tuple<Double,Double,Long,Long>> measures = new LinkedList<>();
         private String containerID;
