@@ -38,17 +38,13 @@ public class QueryRunnerResource {
         List<String> queryList = queryRecord.getQueryList();
         List<String> queryResults = new LinkedList<>();
 
-        //TODO log disk usage
-
-
-
-
-
-        //start threaded backround measurement
+        //start threaded background measurement
+        Long startDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
         dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(queryRecord.getTsdbName()));
         long startMilliseconds = System.currentTimeMillis();
 
-        //the query mix
+
+        //perform the query mix
         for(String query : queryList){
             queryResults.add(tsdb.performQuery(queryRecord.getIpAddress(), queryRecord.getPortNumber(), query));
         }
@@ -61,14 +57,18 @@ public class QueryRunnerResource {
             e.printStackTrace();
         }
 
+
         // end measurement
         long endMilliseconds = System.currentTimeMillis();
         List<Tuple<Double,Double,Long,Long>> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
+        Long endDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
 
 
-        //TODO set queryRecord with diskUsage
         // edit and write the queryrecord to json file (threaded)
         queryRecord.setQueryTimeMilliseconds(endMilliseconds - startMilliseconds);
+        if(startDiskUsage != -1 && endDiskUsage != -1){
+            queryRecord.setDiskUsage(String.valueOf((endDiskUsage - startDiskUsage)));
+        }
         statsCollector.addQueryRecordEditJob(queryRecord, dockerMeasurement);
 
         if (!queryResults.isEmpty()) {
@@ -78,20 +78,5 @@ public class QueryRunnerResource {
         return Response.serverError().entity(new String[]{"Error performing query!"}).build();
 
     }
-
-/*
-    //tesing
-    @GET
-    @Path("measurement")
-    public Response getMeasurement(){
-        if(dockerMeasurement == null || dockerMeasurement.isEmpty()){
-            return Response.serverError().entity(new String[]{"no measurement available"}).build();
-        }
-        List<String> answers = new LinkedList<>();
-        for (Pair<Double, Double> pair : dockerMeasurement){
-            answers.add("Cpu: " + pair.getFirst() + "% with Memory: " + pair.getSecond()+"%");
-        }
-        return Response.ok().entity(answers.toArray(new String[]{})).build();
-    }
- */
+    
 }
