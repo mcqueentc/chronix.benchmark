@@ -53,6 +53,13 @@ public interface BenchmarkDataSource {
 
 
     /**
+     *
+     * @return the absolute storage directory path to a TSDB implementation IN the docker container.
+     */
+    String getStorageDirectoryPath();
+
+
+    /**
      * Generates a complete import query string to import a single timestamp value pair.
      *
      * @apiNote This method WILL be part of the benchmark measurement.

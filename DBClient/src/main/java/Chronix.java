@@ -26,6 +26,11 @@ public class Chronix implements BenchmarkDataSource{
     }
 
     @Override
+    public String getStorageDirectoryPath() {
+        return "/opt/chronix-0.1.3/";
+    }
+
+    @Override
     public String importDataPoint(String ipAddress,
                                   int portNumber,
                                   String databaseName,
