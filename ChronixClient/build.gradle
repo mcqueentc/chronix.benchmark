@@ -9,5 +9,11 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    // Chronix
+    compile 'de.qaware.chronix:chronix-api:0.1'
+    compile 'de.qaware.chronix:chronix-kassiopeia-simple:0.1.7'
+    compile 'de.qaware.chronix:chronix-kassiopeia-simple-converter:0.1.7'
+    compile 'org.apache.solr:solr-solrj:5.5.0'
+
     compile project(':DatabaseInterface')
 }
