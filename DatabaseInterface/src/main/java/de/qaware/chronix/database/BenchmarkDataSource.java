@@ -1,6 +1,7 @@
 package de.qaware.chronix.database;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import de.qaware.chronix.database.TimeSeriesPoint;
 import de.qaware.chronix.database.TimeSeries;
@@ -68,38 +69,15 @@ public interface BenchmarkDataSource {
      */
     String importDataPoints(TimeSeries timeSeries);
 
-    /**
-     * Generates the complete query string for a specified function.
-     *
-     * @apiNote This method WILL be part of the benchmark measurement.
-     *
-     * @implNote  Example pseudo code:
-     * query = [databaseName] SELECT [metricName] FROM [measurementName] WHERE
-     * time >= [start] AND time <= [end] AND [tagKey_1] = [tagValue_1] AND ...
-     *
-     *
-     * @param percentile the percentile to be calculated. (Example: percentile == 5.0 -> 5th percentile)
-     *                   (ignore if not function.PERCENTILE)
-     * @param function the query function which to perform.
-     *
-     * @return the complete function specific query string.
-     */
-    String getQueryForFunction(TimeSeriesMetaData timeSeriesMetaData,
-                               Float percentile,
-                               QueryFunction function
-    );
 
     /**
      * Performs the given query.
      *
      * @apiNote This method WILL be part of the benchmark measurement.
      *
-     * @implNote  Example pseudo code:
-     * http://[ipAddress]:[portNumber]/[query]
-     *
-     * @param query the query string to perform.
-     * @return the result string from the database.
+     * @param benchmarkQuery the query representation which to perform.
+     * @return the result strings from the database.
      */
-    String performQuery(String query);
+    List<String> performQuery(BenchmarkQuery benchmarkQuery);
 
 }
