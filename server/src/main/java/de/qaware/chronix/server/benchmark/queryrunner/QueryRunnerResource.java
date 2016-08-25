@@ -46,7 +46,7 @@ public class QueryRunnerResource {
 
         //perform the query mix
         for(String query : queryList){
-            queryResults.add(tsdb.performQuery(queryRecord.getIpAddress(), queryRecord.getPortNumber(), query));
+            queryResults.add(tsdb.performQuery(query));
         }
 
 

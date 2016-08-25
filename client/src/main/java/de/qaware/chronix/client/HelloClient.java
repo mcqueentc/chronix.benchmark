@@ -5,6 +5,7 @@ import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
@@ -90,7 +91,7 @@ public class HelloClient {
        // jar interface test
 
             TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
-            File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/DBClient/build/libs/DBClient-1.0-SNAPSHOT.jar");
+            File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/ChronixClient/build/libs/ChronixClient-1.0-SNAPSHOT.jar");
             if (jarFile.exists()) {
                 String implName = "chronix";
                 interfaceHandler.copyTSDBInterface(jarFile, implName);
@@ -207,7 +208,7 @@ public class HelloClient {
                 String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
                 String queryID = "test:1";
                 List<String> querys = new LinkedList<>();
-                querys.add(tsdb.getQueryForFunction(null,null,null,null,null,null,0, BenchmarkDataSource.QueryFunction.STDDEV));
+                querys.add(tsdb.getQueryForFunction(new TimeSeriesMetaData(), null, BenchmarkDataSource.QueryFunction.STDDEV));
                 QueryRecord queryRecord = new QueryRecord(queryID,ip,port,s,querys);
                 String[] results = queryHandler.doQueryOnServer(ip,queryRecord);
                 Long latency = queryHandler.getLatencyForQueryID(queryID);
