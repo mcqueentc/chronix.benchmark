@@ -83,4 +83,18 @@ public class TimeSeries {
     public void setEnd(Long end) {
         this.end = end;
     }
+
+    public void addPointToTimeSeries(TimeSeriesPoint point){
+        if(point != null){
+            points.add(point);
+        }
+    }
+
+    public boolean removePointFromTimeSeries(TimeSeriesPoint point){
+        boolean removed = false;
+        if(point !=null){
+            removed = points.remove(point);
+        }
+        return removed;
+    }
 }
