@@ -6,6 +6,7 @@ import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.timeseries.MetricTimeSeries;
+import de.qaware.chronix.timeseries.dt.Point;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -13,6 +14,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,7 @@ public class Chronix implements BenchmarkDataSource{
     private SolrClient solrClient;
     private Function<MetricTimeSeries, String> groupBy;
     private BinaryOperator<MetricTimeSeries> reduce;
+    private ChronixClient<MetricTimeSeries, SolrClient, SolrQuery> chronixClient;
 
 
     @Override
@@ -56,6 +59,9 @@ public class Chronix implements BenchmarkDataSource{
                 ts1.addAll(ts2.getTimestampsAsArray(), ts2.getValuesAsArray());
                 return ts1;
             };
+
+
+            chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
 
             isSetup = true;
             return true;
@@ -82,8 +88,30 @@ public class Chronix implements BenchmarkDataSource{
 
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
-        //TODO
-        return "test import";
+        String reply = "Error importing data points";
+        if(timeSeries != null){
+            MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(timeSeries.getMetricName());
+            for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
+                builder.attribute(entry.getKey(),entry.getValue());
+            }
+
+            //Convert points
+            timeSeries.getPoints().forEach(point -> builder.point(point.getTimeStamp(), point.getValue()));
+
+            List<MetricTimeSeries> pointsToAdd = new ArrayList<>();
+            pointsToAdd.add(builder.build());
+
+            if(chronixClient != null) {
+                try{
+                    chronixClient.add(pointsToAdd, solrClient);
+                    reply =  "Import of points successfull.";
+                } catch (Exception e){
+                    reply = "Error importing data points: " + e.getLocalizedMessage();
+                }
+            }
+        }
+
+        return reply;
     }
 
 
@@ -138,7 +166,6 @@ public class Chronix implements BenchmarkDataSource{
 
 
                     // do the query
-                    ChronixClient<MetricTimeSeries, SolrClient, SolrQuery> chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
                     if (chronixClient != null) {
                         try{
                             Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, query);
