@@ -3,6 +3,7 @@ package de.qaware.chronix.client;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
+import de.qaware.chronix.client.benchmark.queryhandler.util.CsvImporter;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
@@ -51,6 +52,25 @@ public class HelloClient {
             System.out.println("Server not responding");
         }
 
+
+        // csv importer test
+        List<TimeSeries> checktimeSeriesList = CsvImporter.getTimeSeriesFromFile(new File("/Users/mcqueen666/Desktop/p1/air-lasttest/liapp55_air_j4p-all-air_java-lang-name-PS-Eden-Space-type-MemoryPool-.csv.gz"));
+        if(checktimeSeriesList != null && !checktimeSeriesList.isEmpty()) {
+            for(TimeSeries ts : checktimeSeriesList){
+                System.out.println("TimesSeries measurmentName: " + ts.getMeasurementName());
+                System.out.println("TimeSeries: metricnName: " +ts.getMetricName());
+                System.out.println("TimeSeries: start: " +  Instant.ofEpochMilli(ts.getStart()));
+                System.out.println("TimeSeries: end: " + Instant.ofEpochMilli(ts.getEnd()));
+                ts.getTagKey_tagValue().forEach((key, value) -> System.out.println("TimeSeries: tagkey: " + key + " with tagValue: " + value));
+                System.out.println("TimeSeries: points size: " + ts.getPoints().size());
+                if(ts.getPoints().size() >= 20){
+                    for(int i = 0; i <= 20; i++){
+                        System.out.println("TimeSeries: Date: " + Instant.ofEpochMilli(ts.getPoints().get(i).getTimeStamp())
+                                + " Value: " + ts.getPoints().get(i).getValue());
+                    }
+                }
+            }
+        }
 
         //json to file test (server record test)
 
