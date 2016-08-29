@@ -1,7 +1,16 @@
+plugins {
+    id 'java' // or 'groovy' Must be explicitly applied
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
 group 'de.qaware.chronix'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'java'
+mainClassName = 'Chronix'
 
 repositories {
     mavenCentral()
@@ -17,4 +26,16 @@ dependencies {
     compile 'org.apache.solr:solr-solrj:5.5.0'
 
     compile project(':DatabaseInterface')
+}
+
+shadowJar  {
+    mergeServiceFiles()
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
 }

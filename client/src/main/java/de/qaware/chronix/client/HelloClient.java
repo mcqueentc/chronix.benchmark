@@ -90,7 +90,7 @@ public class HelloClient {
        // jar interface test
 
             TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
-            File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/ChronixClient/build/libs/ChronixClient-1.0-SNAPSHOT.jar");
+            File jarFile = new File("/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/ChronixClient/build/libs/ChronixClient-1.0-SNAPSHOT-all.jar");
             if (jarFile.exists()) {
                 String implName = "chronix";
                 interfaceHandler.copyTSDBInterface(jarFile, implName);
@@ -201,7 +201,7 @@ public class HelloClient {
             return;
         }
 
-/*
+
         // import test
         for(ServerConfigRecord r : readRecord){
             LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
@@ -227,10 +227,10 @@ public class HelloClient {
             }
         }
 
-*/
 
 
-        // query test
+
+        /*// query test
         for(ServerConfigRecord r : readRecord){
             LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
             for(String s : externalImpls){
@@ -253,14 +253,14 @@ public class HelloClient {
                     System.out.println("Error: " + results[0]);
                 }
 
-                /*
+                *//*
                 String[] measurements = queryHandler.getMeasurement(server);
                 for(String m : measurements){
                     System.out.println("Measurement: " + m);
                 }
-                */
+                *//*
             }
-        }
+        }*/
 
 
 

@@ -115,7 +115,7 @@ public class BenchmarkConfiguratorResource {
         TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
         BenchmarkDataSource impl = interfaceHandler.getTSDBInstance(tsdbName);
         if(impl != null) {
-            return Response.ok().entity(tsdbName + " interface is up").build();
+            return Response.ok().entity(tsdbName + " interface is up. storage directory is: " + impl.getStorageDirectoryPath()).build();
         }
 
         return Response.serverError().entity(tsdbName + " interface not responding").build();

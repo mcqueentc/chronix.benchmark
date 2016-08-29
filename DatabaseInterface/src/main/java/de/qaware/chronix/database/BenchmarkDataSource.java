@@ -1,11 +1,6 @@
 package de.qaware.chronix.database;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import de.qaware.chronix.database.TimeSeriesPoint;
-import de.qaware.chronix.database.TimeSeries;
-import de.qaware.chronix.database.TimeSeriesMetaData;
 
 /**
  * Created by mcqueen666 on 08.08.16.
