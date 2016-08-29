@@ -2,6 +2,7 @@ package de.qaware.chronix.database;
 
 import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 
+
 /**
  * A representation of a time series query.
  *

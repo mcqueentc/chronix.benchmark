@@ -1,6 +1,5 @@
 package de.qaware.chronix.database;
 
-import java.time.Instant;
 
 /**
  * A representation of a timestamp value pair.
@@ -9,17 +8,17 @@ import java.time.Instant;
  */
 public class TimeSeriesPoint {
 
-    private Instant timeStamp;
+    private Long timeStamp;
     private Double value;
 
     public TimeSeriesPoint(){}
 
-    public TimeSeriesPoint(Instant timeStamp, Double value){
+    public TimeSeriesPoint(Long timeStamp, Double value){
         this.timeStamp = timeStamp;
         this.value = value;
     }
 
-    public Instant getTimeStamp() {
+    public Long getTimeStamp() {
         return timeStamp;
     }
 
@@ -27,7 +26,7 @@ public class TimeSeriesPoint {
         return value;
     }
 
-    public void setTimeStamp(Instant timeStamp) {
+    public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
     }
 

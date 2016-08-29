@@ -1,6 +1,5 @@
 package de.qaware.chronix.database;
 
-import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -13,7 +12,7 @@ public class TimeSeriesMetaData {
     private String measurementName;
     private String metricName;
     private Map<String, String> tagKey_tagValue;
-    private Instant start, end;
+    private Long start, end;
 
     public TimeSeriesMetaData(){}
 
@@ -25,7 +24,7 @@ public class TimeSeriesMetaData {
      * @param start the beginning of the time series.
      * @param end the end of the time series.
      */
-    public TimeSeriesMetaData(String measurementName, String metricName, Map<String, String> tagKey_tagValue, Instant start, Instant end) {
+    public TimeSeriesMetaData(String measurementName, String metricName, Map<String, String> tagKey_tagValue, Long start, Long end) {
         this.measurementName = measurementName;
         this.metricName = metricName;
         this.tagKey_tagValue = tagKey_tagValue;
@@ -45,11 +44,11 @@ public class TimeSeriesMetaData {
         return tagKey_tagValue;
     }
 
-    public Instant getStart() {
+    public Long getStart() {
         return start;
     }
 
-    public Instant getEnd() {
+    public Long getEnd() {
         return end;
     }
 
@@ -65,11 +64,11 @@ public class TimeSeriesMetaData {
         this.tagKey_tagValue = tagKey_tagValue;
     }
 
-    public void setStart(Instant start) {
+    public void setStart(Long start) {
         this.start = start;
     }
 
-    public void setEnd(Instant end) {
+    public void setEnd(Long end) {
         this.end = end;
     }
 }

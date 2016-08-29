@@ -17,8 +17,11 @@ import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
 import java.io.File;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -230,17 +233,24 @@ public class HelloClient {
 
 
 
-        /*// query test
+        // query test
         for(ServerConfigRecord r : readRecord){
             LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
-            for(String s : externalImpls){
-                BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(s);
+            for(String externalImpl : externalImpls){
+                BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(externalImpl);
                 String ip = r.getServerAddress();
-                String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
+                String port = serverConfigAccessor.getHostPortForTSDB(ip, externalImpl);
                 String queryID = "test:1";
+
+                // make benchmarkquery list with entries
                 List<BenchmarkQuery> querys = new LinkedList<>();
-                querys.add(new BenchmarkQuery(new TimeSeriesMetaData(), new Float(0.1), BenchmarkDataSource.QueryFunction.STDDEV));
-                QueryRecord queryRecord = new QueryRecord(queryID,ip,port,s,querys);
+                Map<String, String> tags = new HashMap<>();
+                tags.put("testkeytag","testvaluetag");
+                TimeSeriesMetaData timeSeriesMetaData = new TimeSeriesMetaData("Servers", "load", tags, new Long(Instant.now().toEpochMilli()),new Long(Instant.now().toEpochMilli()));
+                querys.add(new BenchmarkQuery(timeSeriesMetaData, new Float(0.1), BenchmarkDataSource.QueryFunction.STDDEV));
+
+                // make queryRecord with the benchmarkquery list
+                QueryRecord queryRecord = new QueryRecord(queryID,ip,port,externalImpl,querys);
                 String[] results = queryHandler.doQueryOnServer(ip, queryRecord);
                 Long latency = queryHandler.getLatencyForQueryID(queryID);
                 if(latency != null){
@@ -253,14 +263,14 @@ public class HelloClient {
                     System.out.println("Error: " + results[0]);
                 }
 
-                *//*
-                String[] measurements = queryHandler.getMeasurement(server);
+
+                /*String[] measurements = queryHandler.getMeasurement(server);
                 for(String m : measurements){
                     System.out.println("Measurement: " + m);
-                }
-                *//*
+                }*/
+
             }
-        }*/
+        }
 
 
 
