@@ -2,10 +2,11 @@ package de.qaware.chronix.client;
 
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeriesMetaData;
+import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
@@ -13,10 +14,6 @@ import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -207,10 +204,10 @@ public class HelloClient {
                 String ip = r.getServerAddress();
                 String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
                 String queryID = "test:1";
-                List<String> querys = new LinkedList<>();
-                querys.add(tsdb.getQueryForFunction(new TimeSeriesMetaData(), null, BenchmarkDataSource.QueryFunction.STDDEV));
+                List<BenchmarkQuery> querys = new LinkedList<>();
+                querys.add(new BenchmarkQuery(new TimeSeriesMetaData(), new Float(0.1), BenchmarkDataSource.QueryFunction.STDDEV));
                 QueryRecord queryRecord = new QueryRecord(queryID,ip,port,s,querys);
-                String[] results = queryHandler.doQueryOnServer(ip,queryRecord);
+                String[] results = queryHandler.doQueryOnServer(ip, queryRecord);
                 Long latency = queryHandler.getLatencyForQueryID(queryID);
                 if(latency != null){
                     System.out.println("QueryID: " + queryID);

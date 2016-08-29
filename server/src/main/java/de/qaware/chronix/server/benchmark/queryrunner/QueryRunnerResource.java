@@ -2,10 +2,12 @@ package de.qaware.chronix.server.benchmark.queryrunner;
 
 
 import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.server.benchmark.collector.StatsCollector;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.DockerStatsUtil;
 import de.qaware.chronix.shared.DataModels.Tuple;
+import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 
@@ -35,7 +37,7 @@ public class QueryRunnerResource {
             return Response.serverError().entity("No TSDB implementation with name " + queryRecord.getTsdbName() + " found on server!").build();
         }
 
-        List<String> queryList = queryRecord.getQueryList();
+        List<BenchmarkQuery> queryList = queryRecord.getQueryList();
         List<String> queryResults = new LinkedList<>();
 
         //start threaded background measurement
@@ -45,8 +47,8 @@ public class QueryRunnerResource {
 
 
         //perform the query mix
-        for(String query : queryList){
-            queryResults.add(tsdb.performQuery(query));
+        for(BenchmarkQuery query : queryList){
+            queryResults.addAll(tsdb.performQuery(query));
         }
 
 
@@ -68,6 +70,7 @@ public class QueryRunnerResource {
         queryRecord.setQueryTimeMilliseconds(endMilliseconds - startMilliseconds);
         if(startDiskUsage != -1 && endDiskUsage != -1){
             queryRecord.setDiskUsage(String.valueOf((endDiskUsage - startDiskUsage)));
+            queryRecord.setDiskUsageTotal(String.valueOf(endDiskUsage));
         }
         statsCollector.addQueryRecordEditJob(queryRecord, dockerMeasurement);
 

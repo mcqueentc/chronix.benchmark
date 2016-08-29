@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.DataModels.Tuple;
-import de.qaware.chronix.shared.QueryUtil.QueryRecord;
+import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +28,8 @@ public class StatsCollector {
             + "queryRecords" + File.separator;
     private final String recordFile = "queryRecords.json";
     private final ObjectMapper mapper;
-    private volatile BlockingDeque<QueryRecord> blockingDequeWriteJobs;
-    private volatile BlockingDeque<Pair<QueryRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs;
+    private volatile BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs;
+    private volatile BlockingDeque<Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs;
 
     private StatsWriter statsWriter;
     private QueryRecordEditor queryRecordEditor;
@@ -64,14 +64,14 @@ public class StatsCollector {
     }
 
     /**
-     * Adds a QueryRecord and a List of measurement pairs to the job queue of the QueryRecordEditor.
+     * Adds a BenchmarkRecord and a List of measurement pairs to the job queue of the QueryRecordEditor.
      *
-     * @param queryRecord the QueryRecord to be edited and written.
+     * @param benchmarkRecord the BenchmarkRecord to be edited and written.
      * @param dockerMeasurement the list of measurement pairs.
      */
-    public void addQueryRecordEditJob(QueryRecord queryRecord, List<Tuple<Double,Double,Long,Long>> dockerMeasurement){
+    public void addQueryRecordEditJob(BenchmarkRecord benchmarkRecord, List<Tuple<Double,Double,Long,Long>> dockerMeasurement){
         try {
-            blockingDequeEditJobs.put(Pair.of(queryRecord,dockerMeasurement));
+            blockingDequeEditJobs.put(Pair.of(benchmarkRecord,dockerMeasurement));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -85,11 +85,11 @@ public class StatsCollector {
      * Writes QueryRecords to the query record json file.
      */
     private class StatsWriter extends Thread{
-        private volatile BlockingDeque<QueryRecord> blockingDequeWriteJobs;
+        private volatile BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs;
         private File recordFile;
         private final ObjectMapper mapper;
 
-        public StatsWriter(File recordFile, BlockingDeque<QueryRecord> blockingDequeWriteJobs, ObjectMapper mapper){
+        public StatsWriter(File recordFile, BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs, ObjectMapper mapper){
             this.blockingDequeWriteJobs = blockingDequeWriteJobs;
             this.recordFile = recordFile;
             this.mapper = mapper;
@@ -99,8 +99,8 @@ public class StatsCollector {
             while (true) {
                 try {
 
-                    QueryRecord queryRecord = blockingDequeWriteJobs.take();
-                    final String queryRecordJSON = mapper.writeValueAsString(queryRecord);
+                    BenchmarkRecord benchmarkRecord = blockingDequeWriteJobs.take();
+                    final String queryRecordJSON = mapper.writeValueAsString(benchmarkRecord);
                     if (recordFile.exists()) {
                         Files.write(recordFile.toPath(), Arrays.asList(queryRecordJSON), StandardOpenOption.APPEND);
                     } else {
@@ -123,14 +123,14 @@ public class StatsCollector {
 
     /**
      * Determines the cpu and memory usage from previous docker measurement.
-     * Edits the QueryRecord and adds a new write job the the writers queue.
+     * Edits the BenchmarkRecord and adds a new write job the the writers queue.
      */
     private class QueryRecordEditor extends Thread{
-        private volatile BlockingDeque<QueryRecord> blockingDequeWriteJobs;
-        private volatile BlockingDeque<Pair<QueryRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs;
+        private volatile BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs;
+        private volatile BlockingDeque<Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs;
 
-        public QueryRecordEditor(BlockingDeque<QueryRecord> blockingDequeWriteJobs,
-                                 BlockingDeque<Pair<QueryRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs){
+        public QueryRecordEditor(BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs,
+                                 BlockingDeque<Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs){
             this.blockingDequeWriteJobs = blockingDequeWriteJobs;
             this.blockingDequeEditJobs = blockingDequeEditJobs;
 
@@ -139,12 +139,12 @@ public class StatsCollector {
         public void run(){
             while(true){
                 try {
-                    Pair<QueryRecord, List<Tuple<Double,Double,Long,Long>>> queryRecordListPair = blockingDequeEditJobs.take();
+                    Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>> queryRecordListPair = blockingDequeEditJobs.take();
                     List<Double> cpuUsage = new LinkedList<>();
                     List<Double> memoryUsage = new LinkedList<>();
                     List<Long> readBytes = new LinkedList<>();
                     List<Long> writtenBytes = new LinkedList<>();
-                    QueryRecord queryRecord = queryRecordListPair.getFirst();
+                    BenchmarkRecord benchmarkRecord = queryRecordListPair.getFirst();
                     for(Tuple<Double,Double,Long,Long> measurePair : queryRecordListPair.getSecond()){
                         cpuUsage.add(measurePair.getFirst());
                         memoryUsage.add(measurePair.getSecond());
@@ -156,25 +156,27 @@ public class StatsCollector {
                     // cpu usage
                     Double maxCpuUsage = Collections.max(cpuUsage);
                     Double minCpuUsage = Collections.min(cpuUsage);
-                    queryRecord.setCpuUsage(String.valueOf(maxCpuUsage - minCpuUsage));
+                    benchmarkRecord.setCpuUsage(String.valueOf(maxCpuUsage - minCpuUsage));
+                    benchmarkRecord.setCpuUsageTotal(String.valueOf(maxCpuUsage));
 
                     // memory usage
                     Double maxMemoryUsage = Collections.max(memoryUsage);
                     Double minMemoryUsage = Collections.min(memoryUsage);
-                    queryRecord.setMemoryUsage(String.valueOf((maxMemoryUsage - minMemoryUsage)));
+                    benchmarkRecord.setMemoryUsage(String.valueOf((maxMemoryUsage - minMemoryUsage)));
+                    benchmarkRecord.setMemoryUsageTotal(String.valueOf(maxMemoryUsage));
 
                     // readBytes
                     Long maxReadBytes = Collections.max(readBytes);
                     Long minReadBytes = Collections.min(readBytes);
-                    queryRecord.setReadBytes(String.valueOf((maxReadBytes - minReadBytes)));
+                    benchmarkRecord.setReadBytes(String.valueOf((maxReadBytes - minReadBytes)));
 
                     // writtenBytes
                     Long maxWrittenBytes = Collections.max(writtenBytes);
                     Long minWrittenBytes = Collections.min(writtenBytes);
-                    queryRecord.setWrittenBytes(String.valueOf((maxWrittenBytes - minWrittenBytes)));
+                    benchmarkRecord.setWrittenBytes(String.valueOf((maxWrittenBytes - minWrittenBytes)));
 
                     // add job for writer
-                    blockingDequeWriteJobs.put(queryRecord);
+                    blockingDequeWriteJobs.put(benchmarkRecord);
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();

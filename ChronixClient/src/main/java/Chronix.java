@@ -1,10 +1,10 @@
 import de.qaware.chronix.ChronixClient;
 import de.qaware.chronix.converter.KassiopeiaSimpleConverter;
+import de.qaware.chronix.solr.client.ChronixSolrStorage;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
-import de.qaware.chronix.solr.client.ChronixSolrStorage;
 import de.qaware.chronix.timeseries.MetricTimeSeries;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -13,7 +13,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -91,47 +90,60 @@ public class Chronix implements BenchmarkDataSource{
     @Override
     public List<String> performQuery(BenchmarkQuery benchmarkQuery) {
         List<String> queryResults = new LinkedList<>();
-        QueryFunction function = benchmarkQuery.getFunction();
-        TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
-        Map<String, String> tags = timeSeriesMetaData.getTagKey_tagValue();
+        if(benchmarkQuery != null) {
+            QueryFunction function = benchmarkQuery.getFunction();
+            TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
+            Map<String, String> tags = timeSeriesMetaData.getTagKey_tagValue();
 
-        // build the query string
-        String queryString = "metric:*" + timeSeriesMetaData.getMetricName() + "*"
-                + " AND start:" + timeSeriesMetaData.getStart().toEpochMilli()
-                + " AND end:" + timeSeriesMetaData.getEnd().toEpochMilli();
+            if(timeSeriesMetaData != null && function != null) {
+                // build the query string
+                String queryString = "metric:*" + timeSeriesMetaData.getMetricName() + "*"
+                        + " AND start:" + timeSeriesMetaData.getStart().toEpochMilli()
+                        + " AND end:" + timeSeriesMetaData.getEnd().toEpochMilli();
 
-        for(Map.Entry<String, String> entry : tags.entrySet()){
-            queryString += " AND " + entry.getKey() + ":" + entry.getValue();
+                for (Map.Entry<String, String> entry : tags.entrySet()) {
+                    queryString += " AND " + entry.getKey() + ":" + entry.getValue();
+                }
+
+                SolrQuery query = new SolrQuery(queryString);
+
+
+                switch (function) {
+                    case COUNT:
+                        query.addFilterQuery("function=count");
+                        break;
+                    case MEAN:
+                        query.addFilterQuery("function=avg");
+                        break;
+                    case SUM:
+                        query.addFilterQuery("function=sum");
+                        break;
+                    case MIN:
+                        query.addFilterQuery("function=min");
+                        break;
+                    case MAX:
+                        query.addFilterQuery("function=max");
+                        break;
+                    case STDDEV:
+                        query.addFilterQuery("function=dev");
+                        break;
+                    case PERCENTILE:
+                        Float p = benchmarkQuery.getPercentile();
+                        if(p != null) {
+                            query.addFilterQuery("function=p:" + p);
+                        }
+                        break;
+                }
+
+                // do the query
+                ChronixClient<MetricTimeSeries, SolrClient, SolrQuery> chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
+                Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, query);
+                List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
+                if (!resultList.isEmpty()) {
+                    resultList.forEach(ts -> queryResults.add(ts.toString()));
+                }
+            }
         }
-
-        SolrQuery query = new SolrQuery(queryString);
-
-
-        switch (function){
-            case COUNT: query.addFilterQuery("function=count");
-                break;
-            case MEAN:  query.addFilterQuery("function=avg");
-                break;
-            case SUM:   query.addFilterQuery("function=sum");
-                break;
-            case MIN:   query.addFilterQuery("function=min");
-                break;
-            case MAX:   query.addFilterQuery("function=max");
-                break;
-            case STDDEV: query.addFilterQuery("function=dev");
-                break;
-            case PERCENTILE: query.addFilterQuery("function=p:" + benchmarkQuery.getPercentile());
-                break;
-        }
-
-        // do the query
-        ChronixClient<MetricTimeSeries, SolrClient, SolrQuery> chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
-        Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient,query);
-        List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
-        if(!resultList.isEmpty()){
-            resultList.forEach(ts -> queryResults.add(ts.toString()));
-        }
-
         return queryResults;
     }
 }
