@@ -2,6 +2,8 @@ package de.qaware.chronix.client.benchmark.queryhandler;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.shared.QueryUtil.ImportRecord;
+import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -44,14 +46,14 @@ public class QueryHandler {
 
 
     /**
-     * Transmits the given benchmarkRecord to given server on which the query should be performed.
+     * Transmits the given queryRecord to given server on which the query should be performed.
      *
      * @param serverAddress the server address or ip WITHOUT http://
-     * @param benchmarkRecord the benchmarkRecord
+     * @param queryRecord the queryRecord
      * @return String starting with server status code and either the query result string or the server error message string
      *         "[StatusCode] : [QueryResult] or [error message]"
      */
-    public String[] doQueryOnServer(String serverAddress, BenchmarkRecord benchmarkRecord) {
+    public String[] doQueryOnServer(String serverAddress, QueryRecord queryRecord) {
         final Client client = ClientBuilder.newBuilder().build();
         final WebTarget target = client.target("http://"
                 + serverAddress
@@ -59,7 +61,7 @@ public class QueryHandler {
                 + configurator.getApplicationPort()
                 + "/queryrunner/performQuery");
         long startMillis = System.currentTimeMillis();
-        final Response response = target.request().post(Entity.json(benchmarkRecord));
+        final Response response = target.request().post(Entity.json(queryRecord));
         long endMillis = System.currentTimeMillis();
 
         int statusCode = response.getStatus();
@@ -67,7 +69,7 @@ public class QueryHandler {
         client.close();
 
         if(statusCode == 200){
-            queryLatency.put(benchmarkRecord.getQueryID(), (endMillis - startMillis));
+            queryLatency.put(queryRecord.getQueryID(), (endMillis - startMillis));
             return queryResults;
         }
 
@@ -75,6 +77,31 @@ public class QueryHandler {
 
 
     }
+
+    public String[] doImportOnServer(String serverAddress, ImportRecord importRecord) {
+        final Client client = ClientBuilder.newBuilder().build();
+        final WebTarget target = client.target("http://"
+                + serverAddress
+                + ":"
+                + configurator.getApplicationPort()
+                + "/queryrunner/performImport");
+        long startMillis = System.currentTimeMillis();
+        final Response response = target.request().post(Entity.json(importRecord));
+        long endMillis = System.currentTimeMillis();
+
+        int statusCode = response.getStatus();
+        String[] queryResults = response.readEntity(String[].class);
+        client.close();
+
+        if(statusCode == 200){
+            queryLatency.put(importRecord.getQueryID(), (endMillis - startMillis));
+            return queryResults;
+        }
+
+        return new String[]{"Server status code: " + statusCode};
+    }
+
+
 
     //test
     public String[] getMeasurement(String serverAddress){

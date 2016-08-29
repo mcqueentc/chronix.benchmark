@@ -13,6 +13,7 @@ public class QueryRecord extends BenchmarkRecord {
 
     private List<BenchmarkQuery> queryList;
 
+    public QueryRecord(){super();}
 
     public QueryRecord(String queryID, String ipAddress, String portNumber, String tsdbName, List<BenchmarkQuery> queryList) {
         super(queryID, ipAddress, portNumber, tsdbName);

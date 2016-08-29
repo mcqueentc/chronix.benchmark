@@ -83,7 +83,7 @@ public class Chronix implements BenchmarkDataSource{
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
         //TODO
-        return null;
+        return "test import";
     }
 
 
@@ -135,6 +135,7 @@ public class Chronix implements BenchmarkDataSource{
                         break;
                 }
 
+
                 // do the query
                 ChronixClient<MetricTimeSeries, SolrClient, SolrQuery> chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
                 Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, query);
@@ -142,6 +143,7 @@ public class Chronix implements BenchmarkDataSource{
                 if (!resultList.isEmpty()) {
                     resultList.forEach(ts -> queryResults.add(ts.toString()));
                 }
+
             }
         }
         return queryResults;

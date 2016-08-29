@@ -5,8 +5,10 @@ import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
+import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
@@ -94,6 +96,9 @@ public class HelloClient {
                 interfaceHandler.copyTSDBInterface(jarFile, implName);
                 BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
                 if(chronix != null){
+                        System.out.println("Client: interface " + chronix.getClass().getName() +" is working");
+                        System.out.println("Client: interface " + chronix.getClass().getName() +" storage directory is: " + chronix.getStorageDirectoryPath());
+
                     LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
                     for(ServerConfigRecord configRecord : readRecord){
                         LinkedList<String> externalImpls = configRecord.getExternalTimeSeriesDataBaseImplementations();
@@ -127,7 +132,7 @@ public class HelloClient {
         // show server record
 
         LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
-
+ /*
         for(ServerConfigRecord r : readRecord){
 
 
@@ -160,6 +165,7 @@ public class HelloClient {
                 }
             }
         }
+ */
 
         // Test file upload
 
@@ -194,6 +200,34 @@ public class HelloClient {
         if(!isDockerContainerRunning){
             return;
         }
+
+/*
+        // import test
+        for(ServerConfigRecord r : readRecord){
+            LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
+            for(String s : externalImpls){
+                BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(s);
+                String ip = r.getServerAddress();
+                String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
+                String queryID = "import:1";
+                List<TimeSeries> timeSeriesList = new LinkedList<>();
+                timeSeriesList.add(new TimeSeries());
+                ImportRecord importRecord = new ImportRecord(queryID,ip,port,s,timeSeriesList);
+                String[] results = queryHandler.doImportOnServer(ip,importRecord);
+                Long latency = queryHandler.getLatencyForQueryID(queryID);
+                if(latency != null){
+                    System.out.println("QueryID: " + queryID);
+                    System.out.println("Latency: " + latency + " milliseconds");
+                    for(String result : results) {
+                        System.out.println("Result: " + result);
+                    }
+                } else {
+                    System.out.println("Error: " + results[0]);
+                }
+            }
+        }
+
+*/
 
 
         // query test

@@ -25,6 +25,8 @@ public abstract class BenchmarkRecord {
     private String diskUsageTotal;
     private String memoryUsageTotal;
 
+    public BenchmarkRecord(){}
+
 
     public BenchmarkRecord(String queryID, String ipAddress, String portNumber, String tsdbName) {
         this.queryID = queryID;

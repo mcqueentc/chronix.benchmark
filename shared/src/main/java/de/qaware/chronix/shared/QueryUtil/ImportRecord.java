@@ -13,6 +13,7 @@ public class ImportRecord extends BenchmarkRecord{
 
     List<TimeSeries> timeSeriesList;
 
+    public ImportRecord(){ super();}
 
     public ImportRecord(String queryID, String ipAddress, String portNumber, String tsdbName, List<TimeSeries> timeSeriesList) {
         super(queryID, ipAddress, portNumber, tsdbName);
