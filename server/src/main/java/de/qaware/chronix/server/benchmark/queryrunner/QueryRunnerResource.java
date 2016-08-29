@@ -37,9 +37,10 @@ public class QueryRunnerResource {
         if(queryRecord != null) {
             BenchmarkDataSource tsdb = tsdbInterfaceHandler.getTSDBInstance(queryRecord.getTsdbName());
             if (tsdb == null) {
-                return Response.serverError().entity("No TSDB implementation with name " + queryRecord.getTsdbName() + " found on server!").build();
+                return Response.serverError().entity(new String[]{"No TSDB implementation with name " + queryRecord.getTsdbName() + " found on server!"}).build();
             }
 
+            tsdb.setup(queryRecord.getIpAddress(),Integer.valueOf(queryRecord.getPortNumber()));
             List<BenchmarkQuery> queryList = queryRecord.getQueryList();
             List<String> queryResults = new LinkedList<>();
 
@@ -51,7 +52,18 @@ public class QueryRunnerResource {
 
             //perform the query mix
             for (BenchmarkQuery query : queryList) {
-                queryResults.addAll(tsdb.performQuery(query));
+                if(query == null){
+                    return Response.serverError().entity(new String[]{"query entry is null"}).build();
+                }
+                List<String> results = tsdb.performQuery(query);
+                if(results == null){
+                    return Response.serverError().entity(new String[]{"query result list is null"}).build();
+                }
+                if(results.isEmpty()){
+                    return Response.serverError().entity(new String[]{"query result is empty"}).build();
+                }
+
+                queryResults.addAll(results);
             }
 
 

@@ -90,61 +90,74 @@ public class Chronix implements BenchmarkDataSource{
     @Override
     public List<String> performQuery(BenchmarkQuery benchmarkQuery) {
         List<String> queryResults = new LinkedList<>();
-        if(benchmarkQuery != null) {
-            QueryFunction function = benchmarkQuery.getFunction();
-            TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
-            Map<String, String> tags = timeSeriesMetaData.getTagKey_tagValue();
+        if(isSetup) {
+            if (benchmarkQuery != null) {
+                QueryFunction function = benchmarkQuery.getFunction();
+                TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
+                Map<String, String> tags = timeSeriesMetaData.getTagKey_tagValue();
 
-            if(timeSeriesMetaData != null && function != null) {
-                // build the query string
-                String queryString = "metric:*" + timeSeriesMetaData.getMetricName() + "*"
-                        + " AND start:" + timeSeriesMetaData.getStart().toEpochMilli()
-                        + " AND end:" + timeSeriesMetaData.getEnd().toEpochMilli();
+                if (timeSeriesMetaData != null && function != null) {
+                    // build the query string
+                    String queryString = "metric:*" + timeSeriesMetaData.getMetricName() + "*"
+                            + " AND start:" + timeSeriesMetaData.getStart()
+                            + " AND end:" + timeSeriesMetaData.getEnd();
 
-                for (Map.Entry<String, String> entry : tags.entrySet()) {
-                    queryString += " AND " + entry.getKey() + ":" + entry.getValue();
-                }
+                    for (Map.Entry<String, String> entry : tags.entrySet()) {
+                        queryString += " AND " + entry.getKey() + ":" + entry.getValue();
+                    }
 
-                SolrQuery query = new SolrQuery(queryString);
+                    SolrQuery query = new SolrQuery(queryString);
 
 
-                switch (function) {
-                    case COUNT:
-                        query.addFilterQuery("function=count");
-                        break;
-                    case MEAN:
-                        query.addFilterQuery("function=avg");
-                        break;
-                    case SUM:
-                        query.addFilterQuery("function=sum");
-                        break;
-                    case MIN:
-                        query.addFilterQuery("function=min");
-                        break;
-                    case MAX:
-                        query.addFilterQuery("function=max");
-                        break;
-                    case STDDEV:
-                        query.addFilterQuery("function=dev");
-                        break;
-                    case PERCENTILE:
-                        Float p = benchmarkQuery.getPercentile();
-                        if(p != null) {
-                            query.addFilterQuery("function=p:" + p);
+                    switch (function) {
+                        case COUNT:
+                            query.addFilterQuery("function=count");
+                            break;
+                        case MEAN:
+                            query.addFilterQuery("function=avg");
+                            break;
+                        case SUM:
+                            query.addFilterQuery("function=sum");
+                            break;
+                        case MIN:
+                            query.addFilterQuery("function=min");
+                            break;
+                        case MAX:
+                            query.addFilterQuery("function=max");
+                            break;
+                        case STDDEV:
+                            query.addFilterQuery("function=dev");
+                            break;
+                        case PERCENTILE:
+                            Float p = benchmarkQuery.getPercentile();
+                            if (p != null) {
+                                query.addFilterQuery("function=p:" + p);
+                            }
+                            break;
+                    }
+
+
+                    // do the query
+                    ChronixClient<MetricTimeSeries, SolrClient, SolrQuery> chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
+                    if (chronixClient != null) {
+                        try{
+                            Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, query);
+                            List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
+                            if (!resultList.isEmpty()) {
+                                resultList.forEach(ts -> queryResults.add(ts.toString()));
+                            }
+                        } catch (Exception e){
+                            queryResults.add(e.getLocalizedMessage());
                         }
-                        break;
+
+                    } else {
+                        queryResults.add("no connection to the Solr ChronixClient");
+                    }
+
                 }
-
-
-                // do the query
-                ChronixClient<MetricTimeSeries, SolrClient, SolrQuery> chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
-                Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, query);
-                List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
-                if (!resultList.isEmpty()) {
-                    resultList.forEach(ts -> queryResults.add(ts.toString()));
-                }
-
             }
+        } else {
+            queryResults.add("the interface is not setup properly");
         }
         return queryResults;
     }
