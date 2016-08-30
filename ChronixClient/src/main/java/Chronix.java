@@ -78,6 +78,7 @@ public class Chronix implements BenchmarkDataSource{
     @Override
     public boolean clean() {
         //TODO
+
         return false;
     }
 
@@ -130,11 +131,13 @@ public class Chronix implements BenchmarkDataSource{
                             + " AND start:" + timeSeriesMetaData.getStart()
                             + " AND end:" + timeSeriesMetaData.getEnd();
 
+                    //host _ process _ group
                     for (Map.Entry<String, String> entry : tags.entrySet()) {
                         queryString += " AND " + entry.getKey() + ":" + entry.getValue();
                     }
 
                     SolrQuery query = new SolrQuery(queryString);
+                    query.setRows(Integer.MAX_VALUE);
 
 
                     switch (function) {

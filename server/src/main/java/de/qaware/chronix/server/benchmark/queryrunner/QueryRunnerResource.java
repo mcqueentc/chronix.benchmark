@@ -108,6 +108,7 @@ public class QueryRunnerResource {
                 return Response.serverError().entity("No TSDB implementation with name " + importRecord.getTsdbName() + " found on server!").build();
             }
 
+            tsdb.setup(importRecord.getIpAddress(),Integer.valueOf(importRecord.getPortNumber()));
             List<TimeSeries> importList = importRecord.getTimeSeriesList();
             List<String> importResults = new LinkedList<>();
 

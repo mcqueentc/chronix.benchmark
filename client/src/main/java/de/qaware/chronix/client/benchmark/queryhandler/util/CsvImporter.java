@@ -17,7 +17,7 @@ public class CsvImporter {
     /**
      * Creates time series for each metricName from a csv file.
      *
-     * @apiNote File format: /measurement/host_process_metricGroup_metricName.csv.(gz)
+     * @apiNote File format: /measurement/host_process_group_metric.csv.(gz)
      *          file header line: Date;metricName1;metricName2;...
      *          file data:        2015-03-04T13:59:46.673Z;0.0;0.0;...
      *
@@ -42,7 +42,7 @@ public class CsvImporter {
                 //read the first line
                 String headerLine = bufferedReader.readLine();
                 if(headerLine != null && !headerLine.isEmpty()){
-                    //host _ process _ metricGroup
+                    //host _ process _ group
                     String[] fileNameMetaData = csvFile.getName().split("_");
                     String[] metrics = headerLine.split(";");
                     //build meta data object
@@ -55,7 +55,7 @@ public class CsvImporter {
                     Map<String, String> tags = new HashMap<>();
                     tags.put("host", host);
                     tags.put("process", process);
-                    tags.put("metricGroup",metricGroup);
+                    tags.put("group",metricGroup);
 
 
                     // create metadata per metric
@@ -63,7 +63,8 @@ public class CsvImporter {
                     for(int i = 1; i < metrics.length; i++){
                         String metric = metrics[i];
                         String metricNameOnlyAscii = Normalizer.normalize(metric, Normalizer.Form.NFD);
-                        metricNameOnlyAscii = metric.replaceAll("[^\\x00-\\x7F]", "");
+                        metricNameOnlyAscii = metricNameOnlyAscii.replaceAll("[^\\x00-\\x7F]", "");
+                        metricNameOnlyAscii = metricNameOnlyAscii.replaceAll("\\*", "");
                         TimeSeries timeSeriesForMetric = new TimeSeries(measurement,metricNameOnlyAscii,new LinkedList<TimeSeriesPoint>(),tags,null,null);
                         timeSeriesMapPerMetric.put(i,timeSeriesForMetric);
                     }

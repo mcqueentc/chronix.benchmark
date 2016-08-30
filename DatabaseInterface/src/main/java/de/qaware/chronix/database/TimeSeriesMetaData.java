@@ -1,5 +1,6 @@
 package de.qaware.chronix.database;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,6 +31,15 @@ public class TimeSeriesMetaData {
         this.tagKey_tagValue = tagKey_tagValue;
         this.start = start;
         this.end = end;
+    }
+
+
+    public TimeSeriesMetaData(TimeSeries timeSeries){
+        this.measurementName = timeSeries.getMeasurementName();
+        this.metricName = timeSeries.getMetricName();
+        this.tagKey_tagValue = new HashMap<>(timeSeries.getTagKey_tagValue());
+        this.start = timeSeries.getStart();
+        this.end = timeSeries.getEnd();
     }
 
     public String getMeasurementName() {

@@ -232,10 +232,9 @@ public class HelloClient {
                 BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(s);
                 String ip = r.getServerAddress();
                 String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
-                String queryID = "import:1";
-                List<TimeSeries> timeSeriesList = new LinkedList<>();
-                timeSeriesList.add(new TimeSeries());
-                ImportRecord importRecord = new ImportRecord(queryID,ip,port,s,timeSeriesList);
+                String queryID = "import_air-lasttest:1";
+
+                ImportRecord importRecord = new ImportRecord(queryID,ip,port,s,checktimeSeriesList);
                 String[] results = queryHandler.doImportOnServer(ip,importRecord);
                 Long latency = queryHandler.getLatencyForQueryID(queryID);
                 if(latency != null){
@@ -260,14 +259,12 @@ public class HelloClient {
                 BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(externalImpl);
                 String ip = r.getServerAddress();
                 String port = serverConfigAccessor.getHostPortForTSDB(ip, externalImpl);
-                String queryID = "test:1";
+                String queryID = "air-lasttest:sum:1";
 
                 // make benchmarkquery list with entries
                 List<BenchmarkQuery> querys = new LinkedList<>();
-                Map<String, String> tags = new HashMap<>();
-                tags.put("testkeytag","testvaluetag");
-                TimeSeriesMetaData timeSeriesMetaData = new TimeSeriesMetaData("Servers", "load", tags, new Long(Instant.now().toEpochMilli()),new Long(Instant.now().toEpochMilli()));
-                querys.add(new BenchmarkQuery(timeSeriesMetaData, new Float(0.1), BenchmarkDataSource.QueryFunction.STDDEV));
+                TimeSeriesMetaData timeSeriesMetaData = new TimeSeriesMetaData(checktimeSeriesList.get(0));
+                querys.add(new BenchmarkQuery(timeSeriesMetaData, null, BenchmarkDataSource.QueryFunction.COUNT));
 
                 // make queryRecord with the benchmarkquery list
                 QueryRecord queryRecord = new QueryRecord(queryID,ip,port,externalImpl,querys);
