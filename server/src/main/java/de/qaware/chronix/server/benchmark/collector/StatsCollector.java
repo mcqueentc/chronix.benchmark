@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.shared.QueryUtil.IgnoreTimesSeriesForJSON;
+import de.qaware.chronix.shared.QueryUtil.ImportRecord;
+import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +40,9 @@ public class StatsCollector {
     private StatsCollector(){
         initRecordFile();
         mapper = new ObjectMapper();
+        //Ignore TimeSeries at writing
+        //mapper.addMixIn(QueryRecord.class, IgnoreTimesSeriesForJSON.class);
+        mapper.addMixIn(ImportRecord.class, IgnoreTimesSeriesForJSON.class);
         blockingDequeWriteJobs = new LinkedBlockingDeque<>();
         blockingDequeEditJobs = new LinkedBlockingDeque<>();
         // start writer
