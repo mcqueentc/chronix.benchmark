@@ -54,23 +54,49 @@ public class HelloClient {
 
 
         // csv importer test
-        List<TimeSeries> checktimeSeriesList = CsvImporter.getTimeSeriesFromFile(new File("/Users/mcqueen666/Desktop/p1/air-lasttest/liapp55_air_j4p-all-air_java-lang-name-PS-Eden-Space-type-MemoryPool-.csv.gz"));
-        if(checktimeSeriesList != null && !checktimeSeriesList.isEmpty()) {
-            for(TimeSeries ts : checktimeSeriesList){
-                System.out.println("TimesSeries measurmentName: " + ts.getMeasurementName());
-                System.out.println("TimeSeries: metricnName: " +ts.getMetricName());
-                System.out.println("TimeSeries: start: " +  Instant.ofEpochMilli(ts.getStart()));
-                System.out.println("TimeSeries: end: " + Instant.ofEpochMilli(ts.getEnd()));
-                ts.getTagKey_tagValue().forEach((key, value) -> System.out.println("TimeSeries: tagkey: " + key + " with tagValue: " + value));
-                System.out.println("TimeSeries: points size: " + ts.getPoints().size());
-                if(ts.getPoints().size() >= 20){
-                    for(int i = 0; i <= 20; i++){
-                        System.out.println("TimeSeries: Date: " + Instant.ofEpochMilli(ts.getPoints().get(i).getTimeStamp())
-                                + " Value: " + ts.getPoints().get(i).getValue());
+        CsvImporter csvImporter = new CsvImporter();
+        List<TimeSeries> checktimeSeriesList = new LinkedList<>();
+        File directory = new File("/Users/mcqueen666/Desktop/p1/air-lasttest");
+        if(directory.exists() && directory.isDirectory()) {
+            File[] csvFileList = directory.listFiles();
+            // read the csv files and generate times series
+            checktimeSeriesList = csvImporter.getTimeSeriesFromFiles(csvFileList);
+            if(!checktimeSeriesList.isEmpty()) {
+                if(checktimeSeriesList.size() >= 3){
+                    for(int i = 0; i <= 3; i++){
+                        System.out.println("TimesSeries measurmentName: " + checktimeSeriesList.get(i).getMeasurementName());
+                        System.out.println("TimeSeries: metricnName: " + checktimeSeriesList.get(i).getMetricName());
+                        System.out.println("TimeSeries: start: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getStart()));
+                        System.out.println("TimeSeries: end: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getEnd()));
+                        checktimeSeriesList.get(i).getTagKey_tagValue().forEach((key, value) -> System.out.println("TimeSeries: tagkey: " + key + " with tagValue: " + value));
+                        System.out.println("TimeSeries: points size: " + checktimeSeriesList.get(i).getPoints().size());
+                        if (checktimeSeriesList.get(i).getPoints().size() >= 20) {
+                            for (int j = 0; j <= 20; j++) {
+                                System.out.println("TimeSeries: Date: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getPoints().get(j).getTimeStamp())
+                                        + " Value: " + checktimeSeriesList.get(i).getPoints().get(j).getValue());
+                            }
+                        }
+                    }
+                } else {
+                    for (TimeSeries ts : checktimeSeriesList) {
+                        System.out.println("TimesSeries measurmentName: " + ts.getMeasurementName());
+                        System.out.println("TimeSeries: metricnName: " + ts.getMetricName());
+                        System.out.println("TimeSeries: start: " + Instant.ofEpochMilli(ts.getStart()));
+                        System.out.println("TimeSeries: end: " + Instant.ofEpochMilli(ts.getEnd()));
+                        ts.getTagKey_tagValue().forEach((key, value) -> System.out.println("TimeSeries: tagkey: " + key + " with tagValue: " + value));
+                        System.out.println("TimeSeries: points size: " + ts.getPoints().size());
+                        if (ts.getPoints().size() >= 20) {
+                            for (int i = 0; i <= 20; i++) {
+                                System.out.println("TimeSeries: Date: " + Instant.ofEpochMilli(ts.getPoints().get(i).getTimeStamp())
+                                        + " Value: " + ts.getPoints().get(i).getValue());
+                            }
+                        }
                     }
                 }
             }
         }
+        System.out.println("Read TimeSeries: " + checktimeSeriesList.size());
+
 
         //json to file test (server record test)
 
@@ -234,7 +260,7 @@ public class HelloClient {
                 String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
                 String queryID = "import_air-lasttest:1";
 
-                ImportRecord importRecord = new ImportRecord(queryID,ip,port,s,checktimeSeriesList);
+                ImportRecord importRecord = new ImportRecord(queryID,ip,port,s,checktimeSeriesList.subList(0,1));
                 String[] results = queryHandler.doImportOnServer(ip,importRecord);
                 Long latency = queryHandler.getLatencyForQueryID(queryID);
                 if(latency != null){
@@ -263,6 +289,7 @@ public class HelloClient {
 
                 // make benchmarkquery list with entries
                 List<BenchmarkQuery> querys = new LinkedList<>();
+                // entry
                 TimeSeriesMetaData timeSeriesMetaData = new TimeSeriesMetaData(checktimeSeriesList.get(0));
                 querys.add(new BenchmarkQuery(timeSeriesMetaData, null, BenchmarkDataSource.QueryFunction.COUNT));
 
