@@ -127,14 +127,15 @@ public class Chronix implements BenchmarkDataSource{
 
                 if (timeSeriesMetaData != null && function != null) {
                     // build the query string
-                    String queryString = "metric:*" + timeSeriesMetaData.getMetricName() + "*"
-                            + " AND start:" + timeSeriesMetaData.getStart()
-                            + " AND end:" + timeSeriesMetaData.getEnd();
+                    String queryString = "";
 
-                    //host _ process _ group
+                    //host _ process _ group _ metric
                     for (Map.Entry<String, String> entry : tags.entrySet()) {
-                        queryString += " AND " + entry.getKey() + ":" + entry.getValue();
+                        queryString += entry.getKey() + ":" + entry.getValue() + " AND ";
                     }
+                    queryString += "metric:" + timeSeriesMetaData.getMetricName()
+                                + " AND start:" + timeSeriesMetaData.getStart()
+                                + " AND end:" + timeSeriesMetaData.getEnd();
 
                     SolrQuery query = new SolrQuery(queryString);
                     query.setRows(Integer.MAX_VALUE);
