@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 
 
+
 /**
  * Created by mcqueen666 on 14.06.16.
  */
@@ -37,6 +38,8 @@ public class HelloClient {
         }
 
 */
+
+
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         System.out.println("Client date: " + formatter.format(new Date(Instant.now().toEpochMilli())));
         Configurator configurator = Configurator.getInstance();
