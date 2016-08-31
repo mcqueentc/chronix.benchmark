@@ -18,11 +18,9 @@ import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -39,7 +37,8 @@ public class HelloClient {
         }
 
 */
-
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        System.out.println("Client date: " + formatter.format(new Date(Instant.now().toEpochMilli())));
         Configurator configurator = Configurator.getInstance();
         QueryHandler queryHandler = QueryHandler.getInstance();
         String server = "localhost";
@@ -250,7 +249,7 @@ public class HelloClient {
             return;
         }
 
-
+/*
         // import test
         for(ServerConfigRecord r : readRecord){
             LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
@@ -274,7 +273,7 @@ public class HelloClient {
                 }
             }
         }
-
+*/
 
 
 

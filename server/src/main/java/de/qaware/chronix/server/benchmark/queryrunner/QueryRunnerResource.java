@@ -67,12 +67,12 @@ public class QueryRunnerResource {
             }
 
 
-            // for testing
+            /*// for testing
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
 
 
             // end measurement

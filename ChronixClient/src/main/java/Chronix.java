@@ -6,7 +6,6 @@ import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.timeseries.MetricTimeSeries;
-import de.qaware.chronix.timeseries.dt.Point;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -14,10 +13,9 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -105,7 +103,7 @@ public class Chronix implements BenchmarkDataSource{
             if(chronixClient != null) {
                 try{
                     if(chronixClient.add(pointsToAdd, solrClient)){
-                        reply =  "Import of points successfull.";
+                        reply =  "Import of points successful.";
                     } else {
                         reply = "Error importing data points on chronix.";
                     }
@@ -114,6 +112,11 @@ public class Chronix implements BenchmarkDataSource{
                     reply = "Error importing data points: " + e.getLocalizedMessage();
                 }
             }
+        }
+        try {
+            solrClient.commit();
+        } catch (SolrServerException | IOException e) {
+           //handle this
         }
 
         return reply;
@@ -137,12 +140,12 @@ public class Chronix implements BenchmarkDataSource{
                     for (Map.Entry<String, String> entry : tags.entrySet()) {
                         queryString += entry.getKey() + ":" + entry.getValue() + " AND ";
                     }
-                    queryString += "metric:" + timeSeriesMetaData.getMetricName()
-                                + " AND start:" + timeSeriesMetaData.getStart()
+                    queryString += "metric:\"" + timeSeriesMetaData.getMetricName()
+                                + "\" AND start:" + timeSeriesMetaData.getStart()
                                 + " AND end:" + timeSeriesMetaData.getEnd();
 
                     SolrQuery query = new SolrQuery(queryString);
-                    query.setRows(Integer.MAX_VALUE);
+                    //query.setRows(Integer.MAX_VALUE);
 
 
                     switch (function) {
@@ -180,6 +183,17 @@ public class Chronix implements BenchmarkDataSource{
                             List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
                             if (!resultList.isEmpty()) {
                                 resultList.forEach(ts -> queryResults.add(ts.toString()));
+                                // debug
+                                queryResults.add("start: " + timeSeriesMetaData.getStart());
+                                queryResults.add("end: " + timeSeriesMetaData.getEnd());
+                                queryResults.add("Query: " + queryString);
+                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                                queryResults.add("Chronix Solr Server date: " + formatter.format(new Date(Instant.now().toEpochMilli())));
+
+                                // debug
+                                queryResults.add("Fields: " + query.getFields());
+                                queryResults.add("SolrQuery: " + query.toQueryString());
+
                             }
                         } catch (Exception e){
                             queryResults.add(e.getLocalizedMessage());
