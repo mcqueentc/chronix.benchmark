@@ -104,8 +104,12 @@ public class Chronix implements BenchmarkDataSource{
 
             if(chronixClient != null) {
                 try{
-                    chronixClient.add(pointsToAdd, solrClient);
-                    reply =  "Import of points successfull.";
+                    if(chronixClient.add(pointsToAdd, solrClient)){
+                        reply =  "Import of points successfull.";
+                    } else {
+                        reply = "Error importing data points on chronix.";
+                    }
+
                 } catch (Exception e){
                     reply = "Error importing data points: " + e.getLocalizedMessage();
                 }
