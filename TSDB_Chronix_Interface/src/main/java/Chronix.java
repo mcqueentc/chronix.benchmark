@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 public class Chronix implements BenchmarkDataSource{
 
-    private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.1.3/";
+    private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.3/";
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
