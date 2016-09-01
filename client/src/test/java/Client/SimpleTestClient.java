@@ -32,8 +32,9 @@ public class SimpleTestClient {
         UploadDockerFiles.main(null);
         InterfaceAndConfigUploadTest.main(null);
         //BuildDockerContainer.main(new String[]{/*"chronix",*/"influxdb"});
-        StartDockerContainer.main(new String[]{"chronix","influxdb"});
+        //StartDockerContainer.main(new String[]{"chronix","influxdb"});
         RunningTestDockerContainer.main(new String[]{"chronix","influxdb"});
+
         //StopDockerContainer.main(new String[]{"chronix","influxdb"});
 
 
