@@ -3,6 +3,7 @@ import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 import org.influxdb.InfluxDBFactory;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -42,12 +43,25 @@ public class InfluxDB implements BenchmarkDataSource {
 
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
+        String reply = "Error importing data points";
 
-        return null;
+
+        return reply;
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery) {
-        return null;
+    public String getQueryString(BenchmarkQuery benchmarkQuery){
+        String queryString = "";
+
+
+        return queryString;
+    }
+
+    @Override
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString) {
+        List<String> queryResults = new LinkedList<>();
+
+
+        return queryResults;
     }
 }

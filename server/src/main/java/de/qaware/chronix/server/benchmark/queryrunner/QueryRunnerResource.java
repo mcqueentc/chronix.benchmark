@@ -16,8 +16,10 @@ import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mcqueen666 on 15.06.16.
@@ -44,36 +46,27 @@ public class QueryRunnerResource {
             List<BenchmarkQuery> queryList = queryRecord.getQueryList();
             List<String> queryResults = new LinkedList<>();
 
+            //get the query strings
+            Map<String, BenchmarkQuery> queryBenchmarkQueryMap = new HashMap<>();
+            for(BenchmarkQuery benchmarkQuery : queryList){
+                if(benchmarkQuery != null) {
+                    queryBenchmarkQueryMap.put(tsdb.getQueryString(benchmarkQuery), benchmarkQuery);
+                }
+            }
+
             //start threaded background measurement
             Long startDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
             dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(queryRecord.getTsdbName()));
             long startMilliseconds = System.currentTimeMillis();
 
-
             //perform the query mix
-            for (BenchmarkQuery query : queryList) {
-                if(query == null){
-                    return Response.serverError().entity(new String[]{"query entry is null"}).build();
-                }
-                List<String> results = tsdb.performQuery(query);
-                if(results == null){
-                    return Response.serverError().entity(new String[]{"query result list is null"}).build();
-                }
-                if(results.isEmpty()){
-                    return Response.serverError().entity(new String[]{"query result is empty"}).build();
-                }
+            for (Map.Entry<String, BenchmarkQuery> entry : queryBenchmarkQueryMap.entrySet()) {
 
-                queryResults.addAll(results);
+                List<String> results = tsdb.performQuery(entry.getValue(), entry.getKey());
+                if(results != null && !results.isEmpty()){
+                    queryResults.addAll(results);
+                }
             }
-
-
-            /*// for testing
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
-
 
             // end measurement
             long endMilliseconds = System.currentTimeMillis();
@@ -94,7 +87,7 @@ public class QueryRunnerResource {
             }
 
         }
-        return Response.serverError().entity(new String[]{"Error performing query!"}).build();
+        return Response.serverError().entity(new String[]{"Error performing queries!"}).build();
 
     }
 

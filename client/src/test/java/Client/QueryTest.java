@@ -59,6 +59,7 @@ public class QueryTest {
                     String[] results = queryHandler.doQueryOnServer(ip, queryRecord);
                     Long latency = queryHandler.getLatencyForQueryID(queryID);
                     if (latency != null) {
+                        System.out.println("\nTSDB: " + externalImpl);
                         System.out.println("QueryID: " + queryID);
                         System.out.println("Latency: " + latency + " milliseconds");
                         for (String result : results) {

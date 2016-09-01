@@ -41,16 +41,17 @@ public class ImportTest {
 
             for (ServerConfigRecord r : readRecord) {
                 LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
-                for (String s : externalImpls) {
-                        BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(s);
+                for (String externalImpl : externalImpls) {
+                        BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(externalImpl);
                         String ip = r.getServerAddress();
-                        String port = serverConfigAccessor.getHostPortForTSDB(ip, s);
+                        String port = serverConfigAccessor.getHostPortForTSDB(ip, externalImpl);
                         String queryID = "import_air-lasttest:1";
 
-                        ImportRecord importRecord = new ImportRecord(queryID, ip, port, s, checktimeSeriesList.subList(0, 1));
+                        ImportRecord importRecord = new ImportRecord(queryID, ip, port, externalImpl, checktimeSeriesList.subList(0, 1));
                         String[] results = queryHandler.doImportOnServer(ip, importRecord);
                         Long latency = queryHandler.getLatencyForQueryID(queryID);
                         if (latency != null) {
+                            System.out.println("\nTSDB: " + externalImpl);
                             System.out.println("QueryID: " + queryID);
                             System.out.println("Latency: " + latency + " milliseconds");
                             for (String result : results) {

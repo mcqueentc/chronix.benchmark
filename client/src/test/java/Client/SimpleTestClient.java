@@ -38,13 +38,13 @@ public class SimpleTestClient {
 
 
 
-        //List<TimeSeries> timeSeriesList = ReadCsvFilesTest.readCsv(new File("/Users/mcqueen666/Desktop/p1/air-lasttest"));
+        List<TimeSeries> timeSeriesList = ReadCsvFilesTest.readCsv(new File("/Users/mcqueen666/Desktop/p1/air-lasttest"));
 
         // import test
-        //ImportTest.importCsv(timeSeriesList);
+        ImportTest.importCsv(timeSeriesList);
 
         // query test
-        //QueryTest.query(timeSeriesList);
+        QueryTest.query(timeSeriesList);
 
 
 
