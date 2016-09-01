@@ -1,6 +1,7 @@
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
+import org.influxdb.InfluxDBFactory;
 
 import java.util.List;
 
@@ -10,16 +11,28 @@ import java.util.List;
 public class InfluxDB implements BenchmarkDataSource {
 
     private final String INFLUXDB_STORAGE_DIRECTORY = "/var/lib/influxdb/";
+    private String ipAddress;
+    private int portNumber;
+    private boolean isSetup = false;
+    private org.influxdb.InfluxDB influxDB;
+    private String dbName = "chronixBenchmark";
 
 
     @Override
     public boolean setup(String ipAddress, int portNumber) {
+        influxDB = InfluxDBFactory.connect("http://" + ipAddress + ":" + portNumber, "root", "root");
+        if(influxDB != null){
+            influxDB.createDatabase(dbName);
+            isSetup = true;
+            return isSetup;
+        }
         return false;
     }
 
     @Override
     public boolean clean() {
-        return false;
+        influxDB.deleteDatabase(dbName);
+        return true;
     }
 
     @Override
@@ -29,6 +42,7 @@ public class InfluxDB implements BenchmarkDataSource {
 
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
+
         return null;
     }
 

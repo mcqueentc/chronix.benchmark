@@ -3,6 +3,7 @@ package Client;
 import Docker.*;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
+import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.database.TimeSeries;
 
 import java.io.File;
@@ -14,6 +15,17 @@ import java.util.List;
 public class SimpleTestClient {
 
     public static void main(String[] args){
+
+        Configurator configurator = Configurator.getInstance();
+        String server = "localhost";
+        try {
+            if (configurator.isServerUp(server)) {
+                System.out.println("Server is up");
+            }
+        } catch (Exception e){
+            System.out.println("Server not responding. Error: " + e.getLocalizedMessage());
+            return;
+        }
 
 
         GenerateServerConfigRecord.main(null);

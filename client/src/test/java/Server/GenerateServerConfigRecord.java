@@ -29,7 +29,7 @@ public class GenerateServerConfigRecord {
 
         //InfluxDB
         buildOptionses.add(new DockerBuildOptions("influxdb", "-t"));
-        runOptionses.add(new DockerRunOptions("influxdb", 8083, 8083, "-p 8086:8086"));
+        runOptionses.add(new DockerRunOptions("influxdb", 8086, 8086, "-p 8083:8083"));
 
 
 
