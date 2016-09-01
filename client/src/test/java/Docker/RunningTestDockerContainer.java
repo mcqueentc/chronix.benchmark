@@ -23,22 +23,27 @@ public class RunningTestDockerContainer {
 
 
         //running test
-        String[] answers = null;
-        String containerName = "chronix";
-        boolean isDockerContainerRunning = configurator.isDockerContainerRunning(server, containerName);
-        if(isDockerContainerRunning){
-            String[] s = {"container " + containerName + " is running"};
-            answers = s;
+        String[] answers = {"no container name given"};
+        if(args != null && args.length > 0){
+            for(String containerName : args){
+                boolean isDockerContainerRunning = configurator.isDockerContainerRunning(server, containerName);
+                if(isDockerContainerRunning){
+                    String[] s = {"container " + containerName + " is running"};
+                    answers = s;
+                } else {
+                    String[] s = {"container " + containerName + " is not running"};
+                    answers = s;
+                }
+                for(String answer : answers){
+                    System.out.println(answer);
+                }
+            }
         } else {
-            String[] s = {"container " + containerName + " is not running"};
-            answers = s;
+            for(String answer : answers){
+                System.out.println(answer);
+            }
         }
-        for(String answer : answers){
-            System.out.println(answer);
-        }
-        if(!isDockerContainerRunning){
-            return;
-        }
+
 
 
     }

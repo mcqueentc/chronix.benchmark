@@ -7,7 +7,9 @@ import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Created by mcqueen666 on 31.08.16.
@@ -31,48 +33,54 @@ public class InterfaceAndConfigUploadTest {
         // jar interface test and upload
 
         TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
-        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
-        String jarPath = "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/ChronixClient/build/libs/ChronixClient-1.0-SNAPSHOT-all.jar";
-        File jarFile = new File(jarPath);
-        if (jarFile.exists()) {
-            String implName = "chronix";
-            interfaceHandler.copyTSDBInterface(jarFile, implName);
-            BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
-            if(chronix != null){
-                System.out.println("Client: interface " + chronix.getClass().getName() +" is working");
-                System.out.println("Client: interface " + chronix.getClass().getName() +" storage directory is: " + chronix.getStorageDirectoryPath());
+        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();//String jarPath = "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_Chronix_Interface/build/libs/TSDB_Chronix_Interface-1.0-SNAPSHOT-all.jar";
 
-                LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
-                for(ServerConfigRecord configRecord : readRecord){
-                    LinkedList<String> externalImpls = configRecord.getExternalTimeSeriesDataBaseImplementations();
-                    if(!externalImpls.contains(implName)){
-                        externalImpls.add(implName);
-                        configRecord.setExternalTimeSeriesDataBaseImplementations(externalImpls);
+        Map<String,String> tsdbImpls = new HashMap<>();
+        tsdbImpls.put("chronix", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_Chronix_Interface/build/libs/TSDB_Chronix_Interface-1.0-SNAPSHOT-all.jar");
+        tsdbImpls.put("influxdb", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_InfluxDB_Interface/build/libs/TSDB_InfluxDB_Interface-1.0-SNAPSHOT-all.jar");
+
+        for(Map.Entry<String, String> entry : tsdbImpls.entrySet()){
+            File jarFile = new File(entry.getValue());
+            String implName = entry.getKey();
+
+            if (jarFile.exists()) {
+                interfaceHandler.copyTSDBInterface(jarFile, implName);
+                BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
+                if (chronix != null) {
+                    System.out.println("Client: interface " + chronix.getClass().getName() + " is working");
+                    System.out.println("Client: interface " + chronix.getClass().getName() + " storage directory is: " + chronix.getStorageDirectoryPath());
+
+                    LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
+                    for (ServerConfigRecord configRecord : readRecord) {
+                        LinkedList<String> externalImpls = configRecord.getExternalTimeSeriesDataBaseImplementations();
+                        if (!externalImpls.contains(implName)) {
+                            externalImpls.add(implName);
+                            configRecord.setExternalTimeSeriesDataBaseImplementations(externalImpls);
+                        }
+
                     }
+                    //write back to hd
+                    serverConfigAccessor.setServerConfigRecords(readRecord);
+                    // upload config to server
+                    if (configurator.uploadServerConfig(server)) {
+                        System.out.println("Config upload to server successful");
+                        // upload jarFile
+                        String[] answer = configurator.uploadJarFile(server, jarFile, implName);
+                        System.out.println("Server: jar file " + answer[0]);
+                        answer = configurator.checkInterfaceStatus(server, implName);
+                        System.out.println("Server: " + answer[0] + "\n");
 
+
+                    } else {
+                        System.out.println("Error config upload\n");
+                    }
                 }
-                //write back to hd
-                serverConfigAccessor.setServerConfigRecords(readRecord);
-                // upload config to server
-                if(configurator.uploadServerConfig(server)){
-                    System.out.println("Config upload to server successful");
-                    // upload jarFile
-                    String[] answer = configurator.uploadJarFile(server,jarFile,implName);
-                    System.out.println("Server: jar file " + answer[0]);
-                    answer = configurator.checkInterfaceStatus(server,implName);
-                    System.out.println("Server: " + answer[0]);
 
+            } else {
+                System.out.println("File not found!\n");
 
-                } else {
-                    System.out.println("Error config upload");
-                }
             }
-
-        } else {
-            System.out.println("File not found!");
         }
-
-
     }
 
 }

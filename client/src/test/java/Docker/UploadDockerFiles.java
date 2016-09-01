@@ -21,9 +21,18 @@ public class UploadDockerFiles {
             return;
         }
 
-
+        // Chronix
         String path = "/Documents/BA_workspace/docker/chronix";
+        System.out.println("Uploading: " + path);
         String[] uploadAnswers = configurator.uploadFiles(server,System.getProperty("user.home") + path);
+        for(String answer : uploadAnswers){
+            System.out.println(answer);
+        }
+
+        // InfluxDB
+        path = "/Documents/BA_workspace/docker/influxdb";
+        System.out.println("\nUploading: " + path);
+        uploadAnswers = configurator.uploadFiles(server,System.getProperty("user.home") + path);
         for(String answer : uploadAnswers){
             System.out.println(answer);
         }

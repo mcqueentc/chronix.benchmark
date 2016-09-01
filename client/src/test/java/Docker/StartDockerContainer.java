@@ -1,7 +1,11 @@
 package Docker;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
+
+import java.util.List;
 
 /**
  * Created by mcqueen666 on 31.08.16.
@@ -11,6 +15,7 @@ public class StartDockerContainer {
     public static void main(String[] args){
 
         Configurator configurator = Configurator.getInstance();
+        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
         String server = "localhost";
 
         System.out.println("\n###### Docker.StartDockerContainer ######");
@@ -23,11 +28,28 @@ public class StartDockerContainer {
         }
 
         // start test
-        DockerRunOptions chronix = new DockerRunOptions("chronix",8983,8983,"");
-        String[] start = configurator.startDockerContainer(server,chronix);
-        for(String s : start){
-            System.out.println("Server: " + s);
+
+        List<DockerRunOptions> dockerRunOptionsList = serverConfigAccessor.getServerConfigRecords().get(0).getTsdbRunRecords();
+
+        String[] answers = {"no container name given"};
+        if(args != null && args.length > 0){
+            for(String tsdbName : args){
+                for(DockerRunOptions dockerRunOptions : dockerRunOptionsList){
+                    if(dockerRunOptions.getContainerName().equals(tsdbName)){
+                        answers = configurator.startDockerContainer(server, dockerRunOptions);
+                        for(String s : answers){
+                            System.out.println("Server: " + s);
+                        }
+                    }
+                }
+            }
+        } else {
+            for(String s : answers){
+                System.out.println("Server: " + s);
+            }
         }
+
+
 
 
     }

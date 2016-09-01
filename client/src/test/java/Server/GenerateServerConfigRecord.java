@@ -20,12 +20,18 @@ public class GenerateServerConfigRecord {
 
         String server = "localhost";
         LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
-        buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
-        //buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
-
         LinkedList<DockerRunOptions> runOptionses = new LinkedList<>();
+
+        // Chronix
+
+        buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
         runOptionses.add(new DockerRunOptions("chronix", 8983, 8983, ""));
-        //runOptionses.add(new DockerRunOptions("kairos", 2003, 2003, "-v"));
+
+        //InfluxDB
+        buildOptionses.add(new DockerBuildOptions("influxdb", "-t"));
+        runOptionses.add(new DockerRunOptions("influxdb", 8083, 8083, "-p 8086:8086"));
+
+
 
         ServerConfigRecord serverConfigRecord = new ServerConfigRecord(server);
         serverConfigRecord.setTsdbBuildRecords(buildOptionses);
@@ -44,10 +50,11 @@ public class GenerateServerConfigRecord {
             tsdata2.add("p4");
             serverConfigRecord2.setTimeSeriesDataFolders(tsdata2);
 */
+
+        // write the server config record
         LinkedList<ServerConfigRecord> records = new LinkedList<>();
         records.add(serverConfigRecord);
         //records.add(serverConfigRecord2);
-
 
         ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
         serverConfigAccessor.setServerConfigRecords(records);

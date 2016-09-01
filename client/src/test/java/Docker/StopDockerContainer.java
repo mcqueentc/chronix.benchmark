@@ -23,10 +23,21 @@ public class StopDockerContainer {
 
 
         //stop test
-        String[] answers = configurator.stopDockerContainer(server,"chronix");
-        for(String s : answers){
-            System.out.println("Server: " + s);
+
+        String[] answers = {"no container name given"};
+        if(args != null && args.length > 0){
+            for(String containerName : args) {
+                answers = configurator.stopDockerContainer(server, containerName);
+                for(String s : answers){
+                    System.out.println("Server: " + s);
+                }
+            }
+        } else{
+            for(String s : answers){
+                System.out.println("Server: " + s);
+            }
         }
+
 
 
     }
