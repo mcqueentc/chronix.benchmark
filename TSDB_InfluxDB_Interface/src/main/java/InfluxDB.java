@@ -34,6 +34,7 @@ public class InfluxDB implements BenchmarkDataSource {
                 try {
                     pong = influxDB.ping();
                     if (!pong.getVersion().equalsIgnoreCase("unknown")) {
+                        influxDB.createDatabase(dbName);
                         isSetup = true;
                     } else {
                         Thread.sleep(100L);
@@ -70,13 +71,13 @@ public class InfluxDB implements BenchmarkDataSource {
                         .retentionPolicy("default")
                         .consistency(org.influxdb.InfluxDB.ConsistencyLevel.ALL);
                 for (Map.Entry<String, String> tag : timeSeries.getTagKey_tagValue().entrySet()) {
-                    builder.tag(tag.getKey(), tag.getValue());
+                    builder.tag(escapeInfluxDBMetricName(tag.getKey()), escapeInfluxDBMetricName(tag.getValue()));
                 }
                 BatchPoints batchPoints = builder.build();
 
                 for (TimeSeriesPoint timeSeriesPoint : timeSeries.getPoints()) {
                     Point point = Point
-                            .measurement(timeSeries.getMeasurementName())
+                            .measurement(escapeInfluxDBMetricName(timeSeries.getMeasurementName()))
                             .time(timeSeriesPoint.getTimeStamp(), TimeUnit.MILLISECONDS)
                             .addField(escapeInfluxDBMetricName(timeSeries.getMetricName()), timeSeriesPoint.getValue())
                             .build();
@@ -122,13 +123,13 @@ public class InfluxDB implements BenchmarkDataSource {
                 break;
         }
 
-        queryString += " FROM " + metaData.getMeasurementName()
+        queryString += " FROM " + escapeInfluxDBMetricName(metaData.getMeasurementName())
                 + " WHERE time >= " + metaData.getStart() + "ms"
                 + " AND time <= " + metaData.getEnd() + "ms";
 
         Map<String, String> tags = metaData.getTagKey_tagValue();
         for(Map.Entry<String, String> tag : tags.entrySet()){
-            queryString += " AND " + tag.getKey() + " = \'" + tag.getValue() + "\'";
+            queryString += " AND " + escapeInfluxDBMetricName(tag.getKey()) + " = \'" + escapeInfluxDBMetricName(tag.getValue()) + "\'";
         }
 
 
@@ -148,7 +149,7 @@ public class InfluxDB implements BenchmarkDataSource {
     }
 
     private String escapeInfluxDBMetricName(String metricName) {
-        return metricName.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)","_").replaceAll("_+", "_");
+        return metricName.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)","_").replaceAll("(-)", "_");
     }
 
 }
