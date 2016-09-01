@@ -42,35 +42,35 @@ public class Chronix implements BenchmarkDataSource{
 
     @Override
     public boolean setup(String ipAddress, int portNumber) {
-        SolrClient solrClient = new HttpSolrClient("http://" + ipAddress + ":" + portNumber + "/solr/chronix/");
-        try {
-            solrClient.ping();
-            this.ipAddress = ipAddress;
-            this.portNumber = portNumber;
-            this.solrClient = solrClient;
+        if(!isSetup) {
+            SolrClient solrClient = new HttpSolrClient("http://" + ipAddress + ":" + portNumber + "/solr/chronix/");
+            try {
+                solrClient.ping();
+                this.ipAddress = ipAddress;
+                this.portNumber = portNumber;
+                this.solrClient = solrClient;
 
-            //Define a group by function for the time series records
-            groupBy = MetricTimeSeries::getMetric;
+                //Define a group by function for the time series records
+                groupBy = MetricTimeSeries::getMetric;
 
-            //Define a reduce function for the grouped time series records
-            reduce = (ts1, ts2) -> {
-                ts1.addAll(ts2.getTimestampsAsArray(), ts2.getValuesAsArray());
-                return ts1;
-            };
+                //Define a reduce function for the grouped time series records
+                reduce = (ts1, ts2) -> {
+                    ts1.addAll(ts2.getTimestampsAsArray(), ts2.getValuesAsArray());
+                    return ts1;
+                };
 
 
-            chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
+                chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
 
-            isSetup = true;
-            return true;
+                isSetup = true;
 
-        } catch (SolrServerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("Chronix setup: " + e.getLocalizedMessage());
+                isSetup = false;
+            }
         }
 
-        return false;
+        return isSetup;
     }
 
     @Override
