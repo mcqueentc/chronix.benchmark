@@ -140,7 +140,7 @@ public class Chronix implements BenchmarkDataSource{
 
                     //host _ process _ metricGroup _ metric
                     for (Map.Entry<String, String> entry : tags.entrySet()) {
-                        queryString += entry.getKey() + ":" + entry.getValue() + " AND ";
+                        queryString += entry.getKey() + ":\"" + entry.getValue() + "\" AND ";
                     }
                     queryString += "metric:\"" + timeSeriesMetaData.getMetricName()
                             + "\" AND start:" + timeSeriesMetaData.getStart()
