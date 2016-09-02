@@ -1,8 +1,6 @@
 import de.qaware.chronix.database.*;
 import org.influxdb.InfluxDBFactory;
-import org.influxdb.dto.BatchPoints;
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Pong;
+import org.influxdb.dto.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -151,6 +149,18 @@ public class InfluxDB implements BenchmarkDataSource {
     public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString) {
         List<String> queryResults = new LinkedList<>();
         if(isSetup) {
+
+            try {
+                Query query = new Query(queryString, dbName);
+                QueryResult influxdbQueryResult = influxDB.query(query);
+
+                if(influxdbQueryResult != null){
+                    queryResults.add(influxdbQueryResult.toString());
+                }
+
+            } catch (Exception e){
+                queryResults.add("Error performing query: " + e.getLocalizedMessage());
+            }
 
             //TODO ERASE! JUST FOR DEBUG
             queryResults.add(queryString);
