@@ -189,6 +189,8 @@ public class Chronix implements BenchmarkDataSource{
                                 query.addFilterQuery("function=p:" + p);
                             }
                             break;
+                        case QUERY_ONLY:
+                            break;
                     }
 
 

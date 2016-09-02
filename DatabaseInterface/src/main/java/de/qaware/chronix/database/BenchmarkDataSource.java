@@ -12,14 +12,15 @@ import java.util.List;
 
 
 public interface BenchmarkDataSource {
-    public static enum QueryFunction{
+    enum QueryFunction{
         COUNT,
         MEAN,
         SUM,
         MIN,
         MAX,
         STDDEV,
-        PERCENTILE
+        PERCENTILE,
+        QUERY_ONLY
     }
 
     /**
