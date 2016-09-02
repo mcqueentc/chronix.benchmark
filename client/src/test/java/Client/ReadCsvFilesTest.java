@@ -51,7 +51,7 @@ public class ReadCsvFilesTest {
                         System.out.println("Point size without duplicates on timestamp: " + timeStamps.size());
 
                         if (checktimeSeriesList.get(i).getPoints().size() >= 20) {
-                            for (int j = 0; j <= 20; j++) {
+                            for (int j = 0; j <= 50; j++) {
 
                                 System.out.println("TimeSeries: Date: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getPoints().get(j).getTimeStamp())
                                         + " Value: " + checktimeSeriesList.get(i).getPoints().get(j).getValue());

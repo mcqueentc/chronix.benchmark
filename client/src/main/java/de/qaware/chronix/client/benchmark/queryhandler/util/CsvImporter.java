@@ -185,9 +185,26 @@ public class CsvImporter {
 
                             // sort points and set sorted list in time series as well start and end.
                             Collections.sort(allPoints);
-                            ts.setPoints(allPoints);
-                            ts.setStart(allPoints.get(0).getTimeStamp());
-                            ts.setEnd(allPoints.get(allPoints.size()-1).getTimeStamp());
+                            List<TimeSeriesPoint> retainPoints = new ArrayList<>();
+                            for(int i = 0; i < allPoints.size() ; i++){
+                                // it timestamp is equal
+                                if(retainPoints.contains(allPoints.get(i))){
+                                    TimeSeriesPoint retainedPoint = retainPoints.get(retainPoints.indexOf(allPoints.get(i)));
+                                    //retainedPoint is less and is to be replaced
+                                    if(retainedPoint.ownCompareTo(allPoints.get(i)) == -2){
+                                        retainPoints.remove(retainedPoint);
+                                        retainPoints.add(allPoints.get(i));
+                                    }
+                                } else {
+                                    retainPoints.add(allPoints.get(i));
+                                }
+
+                            }
+
+                            Collections.sort(retainPoints);
+                            ts.setPoints(retainPoints);
+                            ts.setStart(retainPoints.get(0).getTimeStamp());
+                            ts.setEnd(retainPoints.get(retainPoints.size()-1).getTimeStamp());
                             timeSeries.add(ts);
                         }
 
