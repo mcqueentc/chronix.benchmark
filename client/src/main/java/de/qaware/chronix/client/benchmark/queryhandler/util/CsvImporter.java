@@ -115,7 +115,7 @@ public class CsvImporter {
                         Map<String, String> tags = new HashMap<>();
                         tags.put("host", host);
                         tags.put("process", process);
-                        tags.put("group",metricGroup);
+                        tags.put("metricGroup",metricGroup);
 
 
                         // create metadata per metric

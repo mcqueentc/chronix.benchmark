@@ -1,10 +1,7 @@
 import de.qaware.chronix.ChronixClient;
 import de.qaware.chronix.converter.KassiopeiaSimpleConverter;
+import de.qaware.chronix.database.*;
 import de.qaware.chronix.solr.client.ChronixSolrStorage;
-import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.database.BenchmarkQuery;
-import de.qaware.chronix.database.TimeSeries;
-import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.timeseries.MetricTimeSeries;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -88,6 +85,7 @@ public class Chronix implements BenchmarkDataSource{
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
         String reply = "Error importing data points";
+        long count = 0L;
         if(timeSeries != null){
             MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(timeSeries.getMetricName());
             for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
@@ -95,7 +93,13 @@ public class Chronix implements BenchmarkDataSource{
             }
 
             //Convert points
-            timeSeries.getPoints().forEach(point -> builder.point(point.getTimeStamp(), point.getValue()));
+            //timeSeries.getPoints().forEach(point -> builder.point(point.getTimeStamp(), point.getValue()));
+
+            List<TimeSeriesPoint> pointList = timeSeries.getPoints();
+            for(TimeSeriesPoint point : pointList){
+                builder.point(point.getTimeStamp(), point.getValue());
+                count++;
+            }
 
             List<MetricTimeSeries> pointsToAdd = new ArrayList<>();
             pointsToAdd.add(builder.build());
@@ -103,7 +107,7 @@ public class Chronix implements BenchmarkDataSource{
             if(chronixClient != null) {
                 try{
                     if(chronixClient.add(pointsToAdd, solrClient)){
-                        reply =  "Import of points successful.";
+                        reply =  "Import of " + count +" points successful.";
                     } else {
                         reply = "Error importing data points on chronix.";
                     }
@@ -134,7 +138,7 @@ public class Chronix implements BenchmarkDataSource{
                 if (timeSeriesMetaData != null && function != null) {
                     // build the query string
 
-                    //host _ process _ group _ metric
+                    //host _ process _ metricGroup _ metric
                     for (Map.Entry<String, String> entry : tags.entrySet()) {
                         queryString += entry.getKey() + ":" + entry.getValue() + " AND ";
                     }

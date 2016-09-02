@@ -63,7 +63,8 @@ public class InfluxDB implements BenchmarkDataSource {
 
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
-        String reply = "Import of points successful.";
+        String reply = "";
+        long count = 0L;
         if(isSetup) {
             try {
                 BatchPoints.Builder builder = BatchPoints
@@ -82,9 +83,11 @@ public class InfluxDB implements BenchmarkDataSource {
                             .addField(escapeInfluxDBMetricName(timeSeries.getMetricName()), timeSeriesPoint.getValue())
                             .build();
                     batchPoints.point(point);
+                    count++;
                 }
 
                 influxDB.write(batchPoints);
+                reply = "Import of "+ count + " points successful.";
 
             } catch (Exception e) {
                 reply = "Influx: " + e.getLocalizedMessage();
