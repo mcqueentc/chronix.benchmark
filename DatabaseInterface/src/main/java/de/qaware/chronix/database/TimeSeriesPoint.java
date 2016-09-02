@@ -6,7 +6,7 @@ package de.qaware.chronix.database;
  *
  * Created by mcqueen666 on 25.08.16.
  */
-public class TimeSeriesPoint {
+public class TimeSeriesPoint implements Comparable<TimeSeriesPoint> {
 
     private Long timeStamp;
     private Double value;
@@ -32,5 +32,21 @@ public class TimeSeriesPoint {
 
     public void setValue(Double value) {
         this.value = value;
+    }
+
+    @Override
+    public int compareTo(TimeSeriesPoint o) {
+        return timeStamp.compareTo(o.getTimeStamp());
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof TimeSeriesPoint
+                && ((TimeSeriesPoint) o).getTimeStamp().equals(timeStamp)
+                && ((TimeSeriesPoint) o).getValue().equals(value)){
+            return true;
+        } else {
+            return false;
+        }
     }
 }

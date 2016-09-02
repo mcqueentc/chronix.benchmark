@@ -72,10 +72,11 @@ public class InfluxDB implements BenchmarkDataSource {
                         .retentionPolicy("default")
                         .consistency(org.influxdb.InfluxDB.ConsistencyLevel.ALL);
                 for (Map.Entry<String, String> tag : timeSeries.getTagKey_tagValue().entrySet()) {
-                    builder.tag(escapeInfluxDBMetricName(tag.getKey()), escapeInfluxDBMetricName(tag.getValue()));
+                    builder.tag(tag.getKey(), escapeInfluxDBMetricName(tag.getValue()));
                 }
                 BatchPoints batchPoints = builder.build();
 
+                int counter = 0;
                 for (TimeSeriesPoint timeSeriesPoint : timeSeries.getPoints()) {
                     Point point = Point
                             .measurement(escapeInfluxDBMetricName(timeSeries.getMeasurementName()))
@@ -84,7 +85,14 @@ public class InfluxDB implements BenchmarkDataSource {
                             .build();
                     batchPoints.point(point);
                     count++;
+
+                    if (++counter == 5000) {
+                        counter = 0;
+                        influxDB.write(batchPoints);
+                        batchPoints.getPoints().clear();
+                    }
                 }
+
 
                 influxDB.write(batchPoints);
                 reply = "Import of "+ count + " points successful.";

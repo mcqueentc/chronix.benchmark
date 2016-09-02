@@ -2,9 +2,11 @@ package Client;
 
 import de.qaware.chronix.client.benchmark.queryhandler.util.CsvImporter;
 import de.qaware.chronix.database.TimeSeries;
+import de.qaware.chronix.database.TimeSeriesPoint;
 
 import java.io.File;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,17 +32,30 @@ public class ReadCsvFilesTest {
             checktimeSeriesList = csvImporter.getTimeSeriesFromFiles(csvFileList);
             if(!checktimeSeriesList.isEmpty()) {
                 if(checktimeSeriesList.size() >= 3){
-                    for(int i = 0; i <= 3; i++){
+                    for(int i = 0; i < 1; i++){
+                        //DEBUG
+                        List<TimeSeriesPoint> points = checktimeSeriesList.get(i).getPoints();
+                        List<Long> timeStamps = new ArrayList<>();
+                        for(TimeSeriesPoint point : points){
+                            if(!timeStamps.contains(point.getTimeStamp())){
+                                timeStamps.add(point.getTimeStamp());
+                            }
+                        }
+
                         System.out.println("TimesSeries measurmentName: " + checktimeSeriesList.get(i).getMeasurementName());
                         System.out.println("TimeSeries: metricnName: " + checktimeSeriesList.get(i).getMetricName());
                         System.out.println("TimeSeries: start: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getStart()));
                         System.out.println("TimeSeries: end: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getEnd()));
                         checktimeSeriesList.get(i).getTagKey_tagValue().forEach((key, value) -> System.out.println("TimeSeries: tagkey: " + key + " with tagValue: " + value));
                         System.out.println("TimeSeries: points size: " + checktimeSeriesList.get(i).getPoints().size());
+                        System.out.println("Point size without duplicates on timestamp: " + timeStamps.size());
+
                         if (checktimeSeriesList.get(i).getPoints().size() >= 20) {
                             for (int j = 0; j <= 20; j++) {
+
                                 System.out.println("TimeSeries: Date: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getPoints().get(j).getTimeStamp())
                                         + " Value: " + checktimeSeriesList.get(i).getPoints().get(j).getValue());
+
                             }
                         }
                     }

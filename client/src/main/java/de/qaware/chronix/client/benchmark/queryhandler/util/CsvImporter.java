@@ -175,12 +175,19 @@ public class CsvImporter {
                         for(Map.Entry<Integer, TimeSeries> entry : timeSeriesMapPerMetric.entrySet()){
                             TimeSeries ts = entry.getValue();
                             List<TimeSeriesPoint> allPoints = ts.getPoints();
+
+                            /*
                             List<Long> timeStamps = new LinkedList<>();
                             allPoints.forEach(point -> timeStamps.add(point.getTimeStamp()));
                             Long start = Collections.min(timeStamps);
                             Long end = Collections.max(timeStamps);
-                            ts.setStart(start);
-                            ts.setEnd(end);
+                            */
+
+                            // sort points and set sorted list in time series as well start and end.
+                            Collections.sort(allPoints);
+                            ts.setPoints(allPoints);
+                            ts.setStart(allPoints.get(0).getTimeStamp());
+                            ts.setEnd(allPoints.get(allPoints.size()-1).getTimeStamp());
                             timeSeries.add(ts);
                         }
 
