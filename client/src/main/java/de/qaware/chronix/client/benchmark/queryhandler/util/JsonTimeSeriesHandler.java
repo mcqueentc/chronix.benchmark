@@ -42,11 +42,23 @@ public class JsonTimeSeriesHandler {
         return timeSeriesJsonRecordDirectoryPath;
     }
 
+    /**
+     * Checks if a TimesSeries was previously imported into chronixBenchmark directory
+     *
+     * @param measurement the measurement name of previously imported time series.
+     * @return true if measurement was previously imported.
+     */
     public boolean isMeasurementImportedAsJson(String measurement){
         File measurementDirectory = new File(timeSeriesJsonRecordDirectoryPath + File.separator + measurement);
         return measurementDirectory.exists();
     }
 
+    /**
+     * Generates a list of TimeSeries from gzipped json files.
+     *
+     * @param files the gzipped TimeSeries json files
+     * @return list of TimeSeries
+     */
     public List<TimeSeries> readTimeSeriesJson(File[] files){
         List<TimeSeries> timeSeriesList = new LinkedList<>();
         OperatingSystemMXBean oSMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -82,6 +94,12 @@ public class JsonTimeSeriesHandler {
     }
 
 
+    /**
+     * Writes a list of TimeSeries to gzipped TimeSeries json files in directory named after TimeSeries measurement.
+     *
+     * @param timeSeriesList the list of TimeSeries
+     * @return the written file names of error messages
+     */
     public List<String> writeTimeSeriesJson(List<TimeSeries> timeSeriesList){
         List<String> writtenList = new LinkedList<>();
 
