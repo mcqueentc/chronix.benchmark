@@ -1,6 +1,7 @@
 package de.qaware.chronix.database;
 
 
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -87,5 +88,10 @@ public class TimeSeriesPoint implements Comparable<TimeSeriesPoint> {
     @Override
     public int hashCode(){
         return Objects.hash(timeStamp, value);
+    }
+
+    @Override
+    public String toString(){
+        return "Date: " + Instant.ofEpochMilli(timeStamp) + " Value: " + value;
     }
 }
