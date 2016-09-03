@@ -18,6 +18,8 @@ public class ReadCsvFilesTest {
     public static List<TimeSeries> readCsv(File directory){
 
         System.out.println("\n###### Client.ReadCsvFilesTest ######");
+        long startMilliseconds = Long.MIN_VALUE;
+        long endMilliseconds = Long.MAX_VALUE;
 
         // csv importer test
         CsvImporter csvImporter = new CsvImporter();
@@ -29,7 +31,9 @@ public class ReadCsvFilesTest {
         if(directory.exists() && directory.isDirectory()) {
             File[] csvFileList = directory.listFiles();
             // read the csv files and generate times series
+            startMilliseconds = System.currentTimeMillis();
             checktimeSeriesList = csvImporter.getTimeSeriesFromFiles(csvFileList);
+            endMilliseconds = System.currentTimeMillis();
             if(!checktimeSeriesList.isEmpty()) {
                 if(checktimeSeriesList.size() >= 3){
                     for(int i = 0; i < 1; i++){
@@ -53,8 +57,7 @@ public class ReadCsvFilesTest {
                         if (checktimeSeriesList.get(i).getPoints().size() >= 20) {
                             for (int j = 0; j <= 50; j++) {
 
-                                System.out.println("TimeSeries: Date: " + Instant.ofEpochMilli(checktimeSeriesList.get(i).getPoints().get(j).getTimeStamp())
-                                        + " Value: " + checktimeSeriesList.get(i).getPoints().get(j).getValue());
+                                System.out.println("TimeSeries: Date: " + checktimeSeriesList.get(i).getPoints().get(j));
 
                             }
                         }
@@ -78,6 +81,7 @@ public class ReadCsvFilesTest {
             }
         }
         System.out.println("Read TimeSeries: " + checktimeSeriesList.size());
+        System.out.println("CSV read time: " + (endMilliseconds - startMilliseconds) + "ms");
         return checktimeSeriesList;
 
     }

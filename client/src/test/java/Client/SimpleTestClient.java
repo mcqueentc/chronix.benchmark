@@ -4,10 +4,10 @@ import Docker.*;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeries;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -19,6 +19,9 @@ public class SimpleTestClient {
 
         Configurator configurator = Configurator.getInstance();
         String server = "localhost";
+        File importFile = new File("/Users/mcqueen666/Desktop/p1/air-lasttest");
+        List<TimeSeries> timeSeriesList = new LinkedList<>();
+
         try {
             if (configurator.isServerUp(server)) {
                 System.out.println("Server is up");
@@ -39,8 +42,13 @@ public class SimpleTestClient {
         //StopDockerContainer.main(new String[]{"chronix","influxdb"});
 
 
-
-        List<TimeSeries> timeSeriesList = ReadCsvFilesTest.readCsv(new File("/Users/mcqueen666/Desktop/p1/air-lasttest"));
+        if(JsonTimesSeriesTest.canImportFromJson(importFile.getName())){
+            timeSeriesList = JsonTimesSeriesTest.readTest(new File(JsonTimesSeriesTest.getJsonTimesSeriesDirectory()
+                    + File.separator
+                    + importFile.getName()));
+        } else {
+            timeSeriesList = ReadCsvFilesTest.readCsv(importFile);
+        }
 
         // write duplicate free times series to disk
         JsonTimesSeriesTest.writeTest(timeSeriesList);
