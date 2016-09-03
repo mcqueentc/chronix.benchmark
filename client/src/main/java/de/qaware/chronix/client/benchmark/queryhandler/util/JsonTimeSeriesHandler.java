@@ -3,13 +3,16 @@ package de.qaware.chronix.client.benchmark.queryhandler.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
+import de.qaware.chronix.database.TimeSeriesPoint;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -35,6 +38,49 @@ public class JsonTimeSeriesHandler {
         return instance;
     }
 
+    public String getTimeSeriesJsonRecordDirectoryPath(){
+        return timeSeriesJsonRecordDirectoryPath;
+    }
+
+    public boolean isMeasurementImportedAsJson(String measurement){
+        File measurementDirectory = new File(timeSeriesJsonRecordDirectoryPath + File.separator + measurement);
+        return measurementDirectory.exists();
+    }
+
+    public List<TimeSeries> readTimeSeriesJson(File[] files){
+        List<TimeSeries> timeSeriesList = new LinkedList<>();
+        OperatingSystemMXBean oSMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        ExecutorService executorService = Executors.newFixedThreadPool(oSMXBean.getAvailableProcessors());
+
+        List<TimesSeriesReader> timesSeriesReaderList = new ArrayList<>();
+        for(File jsonFile : files){
+            if (jsonFile.exists() && jsonFile.isFile()){
+                timesSeriesReaderList.add(new TimesSeriesReader(jsonFile));
+            }
+        }
+
+        try {
+            List<Future<TimeSeries>> futureList = executorService.invokeAll(timesSeriesReaderList);
+
+            for(Future<TimeSeries> future : futureList){
+                timeSeriesList.add(future.get());
+            }
+
+            executorService.shutdown();
+            if(!executorService.awaitTermination(1000, TimeUnit.MILLISECONDS)){
+                executorService.shutdownNow();
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+        return timeSeriesList;
+    }
+
 
     public List<String> writeTimeSeriesJson(List<TimeSeries> timeSeriesList){
         List<String> writtenList = new LinkedList<>();
@@ -42,19 +88,21 @@ public class JsonTimeSeriesHandler {
         OperatingSystemMXBean oSMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         ExecutorService executorService = Executors.newFixedThreadPool(oSMXBean.getAvailableProcessors());
 
-        File timeSeriesJsonRecordDirecotry = new File(timeSeriesJsonRecordDirectoryPath);
+        //File timeSeriesJsonRecordDirecotry = new File(timeSeriesJsonRecordDirectoryPath);
 
-        if(!timeSeriesJsonRecordDirecotry.exists()){
-           if(!timeSeriesJsonRecordDirecotry.mkdirs()){
-               // could not make directories
-               writtenList.add("Error JsonTimeSeriesHandler: could not make directories");
-               return writtenList;
-           }
-        }
+
 
         List<TimesSeriesWriter> timesSeriesWriterList = new ArrayList<>();
         for(TimeSeries timeSeries : timeSeriesList){
-            timesSeriesWriterList.add(new TimesSeriesWriter(timeSeries, timeSeriesJsonRecordDirecotry));
+            File measurementDirectory = new File(timeSeriesJsonRecordDirectoryPath + File.separator + timeSeries.getMeasurementName());
+            if(!measurementDirectory.exists()){
+                if(!measurementDirectory.mkdirs()){
+                    // could not make directories
+                    writtenList.add("Error JsonTimeSeriesHandler: could not make directories");
+                    return writtenList;
+                }
+            }
+            timesSeriesWriterList.add(new TimesSeriesWriter(timeSeries, measurementDirectory));
         }
 
         try {
@@ -78,6 +126,36 @@ public class JsonTimeSeriesHandler {
         return writtenList;
     }
 
+    private class TimesSeriesReader implements Callable<TimeSeries>{
+
+        File jsonFile;
+        private final ObjectMapper mapper;
+
+        public TimesSeriesReader(File jsonFile){
+            this.jsonFile = jsonFile;
+            mapper = new ObjectMapper();
+        }
+
+        @Override
+        public TimeSeries call() throws Exception {
+
+            TimeSeries timeSeries = null;
+            try {
+                InputStream inputStream = new GZIPInputStream(new FileInputStream(jsonFile));
+                timeSeries = mapper.readValue(inputStream, TimeSeries.class);
+
+                List<TimeSeriesPoint> pointList = timeSeries.getPoints();
+                Collections.sort(pointList);
+                timeSeries.setPoints(pointList);
+
+
+            } catch (Exception e){
+                System.err.println("TimesSeriesReader Error: " + e.getLocalizedMessage());
+            }
+
+            return timeSeries;
+        }
+    }
 
    private class TimesSeriesWriter implements Callable<String>{
 
@@ -92,6 +170,7 @@ public class JsonTimeSeriesHandler {
            this.dirPath = dirPath;
        }
 
+       @Override
        public String call(){
 
            //host_process_metricGroup;
