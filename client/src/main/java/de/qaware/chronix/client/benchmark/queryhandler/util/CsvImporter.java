@@ -90,7 +90,7 @@ public class CsvImporter {
                     //read the first line
                     String headerLine = bufferedReader.readLine();
                     if(headerLine != null && !headerLine.isEmpty()){
-                        //host _ process _ group
+                        //host _ process _ metricGroup
                         String[] fileNameMetaData = csvFile.getName().split("_");
                         String[] metrics = headerLine.split(";");
                         //build meta data object
@@ -187,7 +187,7 @@ public class CsvImporter {
                             Collections.sort(allPoints);
                             List<TimeSeriesPoint> retainPoints = new ArrayList<>();
                             for(int i = 0; i < allPoints.size() ; i++){
-                                // it timestamp is equal
+                                // if timestamp is equal
                                 if(retainPoints.contains(allPoints.get(i))){
                                     TimeSeriesPoint retainedPoint = retainPoints.get(retainPoints.indexOf(allPoints.get(i)));
                                     //retainedPoint is less and is to be replaced

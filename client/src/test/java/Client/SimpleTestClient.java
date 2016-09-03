@@ -4,6 +4,7 @@ import Docker.*;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
+import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeries;
 
 import java.io.File;
@@ -40,6 +41,9 @@ public class SimpleTestClient {
 
 
         List<TimeSeries> timeSeriesList = ReadCsvFilesTest.readCsv(new File("/Users/mcqueen666/Desktop/p1/air-lasttest"));
+
+        // write duplicate free times series to disk
+        JsonTimesSeriesTest.writeTest(timeSeriesList);
 
         // import test
         ImportTest.importCsv(timeSeriesList);
