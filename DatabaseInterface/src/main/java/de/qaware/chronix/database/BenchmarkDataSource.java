@@ -49,6 +49,12 @@ public interface BenchmarkDataSource {
 
 
     /**
+     * Shut down established connections. (if needed)
+     */
+    void shutdown();
+
+
+    /**
      *
      * @return the absolute storage directory path to a TSDB implementation IN the docker container.
      */

@@ -78,6 +78,15 @@ public class Chronix implements BenchmarkDataSource{
     }
 
     @Override
+    public void shutdown() {
+        try {
+            solrClient.close();
+        } catch (IOException e) {
+            System.err.println("Chronix Interface shutdown: " + e.getLocalizedMessage());
+        }
+    }
+
+    @Override
     public String getStorageDirectoryPath() {
         return CHRONIX_STORAGE_DIRECTORY;
     }

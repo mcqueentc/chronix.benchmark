@@ -55,6 +55,11 @@ public class InfluxDB implements BenchmarkDataSource {
     }
 
     @Override
+    public void shutdown() {
+        // nothing to do for influxdb
+    }
+
+    @Override
     public String getStorageDirectoryPath() {
         return INFLUXDB_STORAGE_DIRECTORY;
     }

@@ -82,6 +82,7 @@ public class QueryRunnerResource {
             }
             statsCollector.addQueryRecordEditJob(queryRecord, dockerMeasurement);
 
+            tsdb.shutdown();
             if (!queryResults.isEmpty()) {
                 return Response.ok().entity(queryResults.toArray(new String[]{})).build();
             }
@@ -128,6 +129,7 @@ public class QueryRunnerResource {
             }
             statsCollector.addQueryRecordEditJob(importRecord, dockerMeasurement);
 
+            tsdb.shutdown();
             if (!importResults.isEmpty()) {
                 return Response.ok().entity(importResults.toArray(new String[]{})).build();
             }
