@@ -96,9 +96,9 @@ public class Chronix implements BenchmarkDataSource{
         long count = 0L;
         if(isSetup){
 
-            MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(timeSeries.getMetricName());
+            MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(escape(timeSeries.getMetricName()));
             for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
-                builder.attribute(entry.getKey(),entry.getValue());
+                builder.attribute(entry.getKey(), escape(entry.getValue()));
             }
 
             List<TimeSeriesPoint> pointList = timeSeries.getPoints();
@@ -115,9 +115,9 @@ public class Chronix implements BenchmarkDataSource{
                     try{
                         if(chronixClient.add(pointsToAdd, solrClient)){
                             solrClient.commit();
-                            builder = new MetricTimeSeries.Builder(timeSeries.getMetricName());
+                            builder = new MetricTimeSeries.Builder(escape(timeSeries.getMetricName()));
                             for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
-                                builder.attribute(entry.getKey(),entry.getValue());
+                                builder.attribute(entry.getKey(),escape(entry.getValue()));
                             }
                         } else {
                             return "Error importing data points on chronix.";
@@ -161,9 +161,9 @@ public class Chronix implements BenchmarkDataSource{
 
                     //host _ process _ metricGroup _ metric
                     for (Map.Entry<String, String> entry : tags.entrySet()) {
-                        queryString += entry.getKey() + ":\"" + entry.getValue() + "\" AND ";
+                        queryString += entry.getKey() + ":\"" + escape(entry.getValue()) + "\" AND ";
                     }
-                    queryString += "metric:\"" + timeSeriesMetaData.getMetricName()
+                    queryString += "metric:\"" + escape(timeSeriesMetaData.getMetricName())
                             + "\" AND start:" + timeSeriesMetaData.getStart()
                             + " AND end:" + timeSeriesMetaData.getEnd();
                 }
@@ -248,6 +248,11 @@ public class Chronix implements BenchmarkDataSource{
         }
 
         return queryResults;
+    }
+
+
+    public static String escape(String metric) {
+        return metric.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)", "_");
     }
 }
 
