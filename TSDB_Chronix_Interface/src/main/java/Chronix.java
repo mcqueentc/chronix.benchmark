@@ -93,46 +93,58 @@ public class Chronix implements BenchmarkDataSource{
 
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
-        String reply = "Error importing data points";
         long count = 0L;
-        if(timeSeries != null){
+        if(isSetup){
+
             MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(timeSeries.getMetricName());
             for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
                 builder.attribute(entry.getKey(),entry.getValue());
             }
 
-            //Convert points
-            //timeSeries.getPoints().forEach(point -> builder.point(point.getTimeStamp(), point.getValue()));
-
             List<TimeSeriesPoint> pointList = timeSeries.getPoints();
+            int counter = 0;
             for(TimeSeriesPoint point : pointList){
                 builder.point(point.getTimeStamp(), point.getValue());
+                counter++;
                 count++;
-            }
 
-            List<MetricTimeSeries> pointsToAdd = new ArrayList<>();
-            pointsToAdd.add(builder.build());
+                if(counter == NUMBER_OF_POINTS_PER_BATCH){
+                    List<MetricTimeSeries> pointsToAdd = new ArrayList<>();
+                    pointsToAdd.add(builder.build());
 
-            if(chronixClient != null) {
-                try{
-                    if(chronixClient.add(pointsToAdd, solrClient)){
-                        reply =  "Import of " + count +" points successful.";
-                    } else {
-                        reply = "Error importing data points on chronix.";
+                    try{
+                        if(chronixClient.add(pointsToAdd, solrClient)){
+                            solrClient.commit();
+                            builder = new MetricTimeSeries.Builder(timeSeries.getMetricName());
+                            for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
+                                builder.attribute(entry.getKey(),entry.getValue());
+                            }
+                        } else {
+                            return "Error importing data points on chronix.";
+                        }
+
+                    } catch (Exception e){
+                        return "Error importing data points: " + e.getLocalizedMessage();
                     }
-
-                } catch (Exception e){
-                    reply = "Error importing data points: " + e.getLocalizedMessage();
                 }
             }
-        }
-        try {
-            solrClient.commit();
-        } catch (SolrServerException | IOException e) {
-           //handle this
+
+            try {
+                List<MetricTimeSeries> pointsToAdd = new ArrayList<>();
+                pointsToAdd.add(builder.build());
+                if(chronixClient.add(pointsToAdd, solrClient)) {
+                    solrClient.commit();
+                } else {
+                    return "Error importing data points on chronix.";
+                }
+            } catch (Exception e) {
+                return "Error importing data points: " + e.getLocalizedMessage();
+            }
+
+            return "Import of " + count +" points successful.";
         }
 
-        return reply;
+        return "Chronix was not setup";
     }
 
     @Override
