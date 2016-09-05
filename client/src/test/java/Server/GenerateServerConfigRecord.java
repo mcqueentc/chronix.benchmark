@@ -31,6 +31,10 @@ public class GenerateServerConfigRecord {
         buildOptionses.add(new DockerBuildOptions("influxdb", "-t"));
         runOptionses.add(new DockerRunOptions("influxdb", 8086, 8086, "-p 8083:8083"));
 
+        //KairosDB
+        buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
+        runOptionses.add(new DockerRunOptions("kairosdb", 8080, 8080, ""));
+
 
 
         ServerConfigRecord serverConfigRecord = new ServerConfigRecord(server);

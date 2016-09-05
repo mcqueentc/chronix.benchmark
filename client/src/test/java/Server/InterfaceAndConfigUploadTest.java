@@ -38,6 +38,7 @@ public class InterfaceAndConfigUploadTest {
         Map<String,String> tsdbImpls = new HashMap<>();
         tsdbImpls.put("chronix", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_Chronix_Interface/build/libs/TSDB_Chronix_Interface-1.0-SNAPSHOT-all.jar");
         tsdbImpls.put("influxdb", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_InfluxDB_Interface/build/libs/TSDB_InfluxDB_Interface-1.0-SNAPSHOT-all.jar");
+        tsdbImpls.put("kairosdb", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_KairosDB_Interface/build/libs/TSDB_KairosDB_Interface-1.0-SNAPSHOT-all.jar");
 
         for(Map.Entry<String, String> entry : tsdbImpls.entrySet()){
             File jarFile = new File(entry.getValue());
@@ -45,10 +46,10 @@ public class InterfaceAndConfigUploadTest {
 
             if (jarFile.exists()) {
                 interfaceHandler.copyTSDBInterface(jarFile, implName);
-                BenchmarkDataSource chronix = interfaceHandler.getTSDBInstance(implName);
-                if (chronix != null) {
-                    System.out.println("Client: interface " + chronix.getClass().getName() + " is working");
-                    System.out.println("Client: interface " + chronix.getClass().getName() + " storage directory is: " + chronix.getStorageDirectoryPath());
+                BenchmarkDataSource tsdbInstance = interfaceHandler.getTSDBInstance(implName);
+                if (tsdbInstance != null) {
+                    System.out.println("Client: interface " + tsdbInstance.getClass().getName() + " is working");
+                    System.out.println("Client: interface " + tsdbInstance.getClass().getName() + " storage directory is: " + tsdbInstance.getStorageDirectoryPath());
 
                     LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
                     for (ServerConfigRecord configRecord : readRecord) {
