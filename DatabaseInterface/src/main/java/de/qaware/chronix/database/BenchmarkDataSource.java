@@ -12,6 +12,9 @@ import java.util.List;
 
 
 public interface BenchmarkDataSource {
+
+    int NUMBER_OF_POINTS_PER_BATCH = 5000;
+
     enum QueryFunction{
         COUNT,
         MEAN,
