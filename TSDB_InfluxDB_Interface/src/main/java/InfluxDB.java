@@ -89,7 +89,7 @@ public class InfluxDB implements BenchmarkDataSource {
                     batchPoints.point(point);
                     count++;
 
-                    if (++counter == 5000) {
+                    if (++counter == NUMBER_OF_POINTS_PER_BATCH) {
                         counter = 0;
                         influxDB.write(batchPoints);
                         batchPoints.getPoints().clear();
