@@ -66,7 +66,7 @@ public class InfluxDB implements BenchmarkDataSource {
 
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
-        String reply = "";
+        String reply = "Influxdb was not setup";
         long count = 0L;
         if(isSetup) {
             try {
@@ -95,7 +95,6 @@ public class InfluxDB implements BenchmarkDataSource {
                         batchPoints.getPoints().clear();
                     }
                 }
-
 
                 influxDB.write(batchPoints);
                 reply = "Import of "+ count + " points successful.";

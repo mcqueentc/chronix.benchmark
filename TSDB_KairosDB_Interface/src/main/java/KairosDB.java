@@ -111,7 +111,6 @@ public class KairosDB implements BenchmarkDataSource {
                     } catch (Exception e) {
                         return "KairosDB import error: " + e.getLocalizedMessage();
                     }
-
                 }
             }
 
@@ -122,8 +121,10 @@ public class KairosDB implements BenchmarkDataSource {
                 return "KairosDB import error: " + e.getLocalizedMessage();
             }
 
+            return "KairosDB imported points: " + count + " with status code: " + status;
         }
-        return "KairosDB imported points: " + count + " with status code: " + status;
+        return "KairosDB was not setup";
+
     }
 
     @Override
