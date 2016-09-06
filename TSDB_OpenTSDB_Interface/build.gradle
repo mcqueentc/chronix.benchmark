@@ -10,7 +10,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group 'de.qaware.chronix'
 version '1.0-SNAPSHOT'
 
-mainClassName = 'OpenTSDB'
+mainClassName = 'OpenTsdbInterface'
 
 repositories {
     mavenCentral()
