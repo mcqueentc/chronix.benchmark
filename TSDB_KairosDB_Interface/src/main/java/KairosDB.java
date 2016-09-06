@@ -68,12 +68,6 @@ public class KairosDB implements BenchmarkDataSource {
     }
 
     @Override
-    public String getQueryString(BenchmarkQuery benchmarkQuery) {
-        //not possible to return the query in a string
-        return "";
-    }
-
-    @Override
     public String importDataPoints(TimeSeries timeSeries) {
         long count = 0L;
         int status = 0;
@@ -128,71 +122,76 @@ public class KairosDB implements BenchmarkDataSource {
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString) {
-        List<String> queryResult = new LinkedList<>();
-        if(isSetup) {
+    public Object getQueryObject(BenchmarkQuery benchmarkQuery) {
+        QueryBuilder builder = null;
+        if (benchmarkQuery != null) {
             TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
             QueryFunction function = benchmarkQuery.getFunction();
-            // no pre generated queryString available.
-            if (queryString.isEmpty()) {
 
-                SamplingAggregator aggregator = null;
+            SamplingAggregator aggregator = null;
 
-                switch (function) {
-                    case COUNT:
-                        aggregator = AggregatorFactory.createCountAggregator(10, TimeUnit.YEARS);
-                        break;
-                    case MEAN:
-                        aggregator = AggregatorFactory.createAverageAggregator(10, TimeUnit.YEARS);
-                        break;
-                    case SUM:
-                        aggregator = AggregatorFactory.createSumAggregator(10, TimeUnit.YEARS);
-                        break;
-                    case MIN:
-                        aggregator = AggregatorFactory.createMinAggregator(10, TimeUnit.YEARS);
-                        break;
-                    case MAX:
-                        aggregator = AggregatorFactory.createMaxAggregator(10, TimeUnit.YEARS);
-                        break;
-                    case STDDEV:
-                        aggregator = AggregatorFactory.createStandardDeviationAggregator(10, TimeUnit.YEARS);
-                        break;
-                    case PERCENTILE:
-                        Float p = benchmarkQuery.getPercentile();
-                        if (p != null) {
-                            aggregator = AggregatorFactory.createPercentileAggregator(p.doubleValue(), 10, TimeUnit.YEARS);
-                        }
-                        break;
-                    case QUERY_ONLY:
-                        break;
-                }
+            switch (function) {
+                case COUNT:
+                    aggregator = AggregatorFactory.createCountAggregator(10, TimeUnit.YEARS);
+                    break;
+                case MEAN:
+                    aggregator = AggregatorFactory.createAverageAggregator(10, TimeUnit.YEARS);
+                    break;
+                case SUM:
+                    aggregator = AggregatorFactory.createSumAggregator(10, TimeUnit.YEARS);
+                    break;
+                case MIN:
+                    aggregator = AggregatorFactory.createMinAggregator(10, TimeUnit.YEARS);
+                    break;
+                case MAX:
+                    aggregator = AggregatorFactory.createMaxAggregator(10, TimeUnit.YEARS);
+                    break;
+                case STDDEV:
+                    aggregator = AggregatorFactory.createStandardDeviationAggregator(10, TimeUnit.YEARS);
+                    break;
+                case PERCENTILE:
+                    Float p = benchmarkQuery.getPercentile();
+                    if (p != null) {
+                        aggregator = AggregatorFactory.createPercentileAggregator(p.doubleValue(), 10, TimeUnit.YEARS);
+                    }
+                    break;
+                case QUERY_ONLY:
+                    break;
+            }
 
 
-                QueryBuilder builder = QueryBuilder.getInstance();
-                builder.setStart(Date.from(Instant.ofEpochMilli(timeSeriesMetaData.getStart())))
-                        .setEnd(Date.from(Instant.ofEpochMilli(timeSeriesMetaData.getEnd())));
-                QueryMetric queryMetric = builder.addMetric(escapeKairosDB(timeSeriesMetaData.getMetricName()));
-                for (Map.Entry<String, String> tag : timeSeriesMetaData.getTagKey_tagValue().entrySet()) {
-                    queryMetric.addTag(tag.getKey(), escapeKairosDB(tag.getValue()));
-                }
-                if (aggregator != null) {
-                    queryMetric.addAggregator(aggregator);
-                }
+            builder = QueryBuilder.getInstance();
+            builder.setStart(Date.from(Instant.ofEpochMilli(timeSeriesMetaData.getStart())))
+                    .setEnd(Date.from(Instant.ofEpochMilli(timeSeriesMetaData.getEnd())));
+            QueryMetric queryMetric = builder.addMetric(escapeKairosDB(timeSeriesMetaData.getMetricName()));
+            for (Map.Entry<String, String> tag : timeSeriesMetaData.getTagKey_tagValue().entrySet()) {
+                queryMetric.addTag(tag.getKey(), escapeKairosDB(tag.getValue()));
+            }
+            if (aggregator != null) {
+                queryMetric.addAggregator(aggregator);
+            }
+        }
+        return builder;
+    }
+
+    @Override
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+        List<String> queryResult = new LinkedList<>();
+        if(isSetup) {
+            if(queryObject != null) {
 
                 // do the query
                 try {
+                    QueryBuilder builder = ((QueryBuilder) queryObject);
                     QueryResponse response = kairosdb.query(builder);
                     queryResult.add(response.getBody());
 
-                }catch (Exception e) {
+                } catch (Exception e) {
                     queryResult.add("KairosDB: Error performing query: " + e.getLocalizedMessage());
                 }
 
 
-            } else {
-                //do query here with queryString if possible
             }
-
 
         } else {
             queryResult.add("KairosDB was not setup!");

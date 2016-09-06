@@ -70,9 +70,9 @@ public interface BenchmarkDataSource {
      * @apiNote This method will NOT be part of the benchmark measurement.
      *
      * @param benchmarkQuery the query representation.
-     * @return the query string.
+     * @return the query object which is need for performing the query.
      */
-    String getQueryString(BenchmarkQuery benchmarkQuery);
+    Object getQueryObject(BenchmarkQuery benchmarkQuery);
 
     /**
      * Generates a complete import query string to import a time series.
@@ -91,9 +91,9 @@ public interface BenchmarkDataSource {
      * @apiNote This method WILL be part of the benchmark measurement.
      *
      * @param benchmarkQuery the query representation.
-     * @param queryString the query string generated from getQueryString().
+     * @param queryObject the query object generated from getQueryObject().
      * @return the result strings from the database.
      */
-    List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString);
+    List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject);
 
 }

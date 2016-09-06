@@ -148,8 +148,9 @@ public class Chronix implements BenchmarkDataSource{
     }
 
     @Override
-    public String getQueryString(BenchmarkQuery benchmarkQuery){
+    public Object getQueryObject(BenchmarkQuery benchmarkQuery){
         String queryString = "";
+        SolrQuery query = null;
         if(isSetup) {
             if (benchmarkQuery != null) {
                 QueryFunction function = benchmarkQuery.getFunction();
@@ -166,22 +167,9 @@ public class Chronix implements BenchmarkDataSource{
                     queryString += "metric:\"" + escape(timeSeriesMetaData.getMetricName())
                             + "\" AND start:" + timeSeriesMetaData.getStart()
                             + " AND end:" + timeSeriesMetaData.getEnd();
-                }
-            }
-        }
-        return queryString;
-    }
-
-    @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString) {
-        List<String> queryResults = new LinkedList<>();
-        if(isSetup) {
-            if (benchmarkQuery != null) {
-                QueryFunction function = benchmarkQuery.getFunction();
-                TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
 
 
-                    SolrQuery query = new SolrQuery(queryString);
+                    query = new SolrQuery(queryString);
                     //query.setRows(Integer.MAX_VALUE);
 
 
@@ -213,11 +201,25 @@ public class Chronix implements BenchmarkDataSource{
                         case QUERY_ONLY:
                             break;
                     }
+                }
+            }
+        }
+        return query;
+    }
+
+    @Override
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+        List<String> queryResults = new LinkedList<>();
+        if(isSetup) {
+            if (benchmarkQuery != null) {
+                QueryFunction function = benchmarkQuery.getFunction();
+                TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
 
 
                     // do the query
-                    if (chronixClient != null) {
+                    if (chronixClient != null && queryObject != null) {
                         try{
+                            SolrQuery query = ((SolrQuery) queryObject);
                             Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, query);
                             List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
                             if (!resultList.isEmpty()) {
@@ -225,7 +227,7 @@ public class Chronix implements BenchmarkDataSource{
                                 // debug //TODO erase
                                 queryResults.add("start: " + timeSeriesMetaData.getStart());
                                 queryResults.add("end: " + timeSeriesMetaData.getEnd());
-                                queryResults.add("Query: " + queryString);
+                                queryResults.add("Query: " + query);
                                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                                 queryResults.add("Chronix Solr Server date: " + formatter.format(new Date(Instant.now().toEpochMilli())));
 

@@ -107,7 +107,7 @@ public class InfluxDB implements BenchmarkDataSource {
     }
 
     @Override
-    public String getQueryString(BenchmarkQuery benchmarkQuery){
+    public Object getQueryObject(BenchmarkQuery benchmarkQuery){
         String queryString = "";
 
         QueryFunction function = benchmarkQuery.getFunction();
@@ -151,11 +151,13 @@ public class InfluxDB implements BenchmarkDataSource {
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString) {
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
         List<String> queryResults = new LinkedList<>();
         if(isSetup) {
 
+
             try {
+                String queryString = ((String) queryObject);
                 Query query = new Query(queryString, dbName);
                 QueryResult influxdbQueryResult = influxDB.query(query);
 
@@ -163,13 +165,15 @@ public class InfluxDB implements BenchmarkDataSource {
                     queryResults.add(influxdbQueryResult.toString());
                 }
 
+                //TODO ERASE! JUST FOR DEBUG
+                queryResults.add(queryString);
+
             } catch (Exception e){
                 queryResults.add("Error performing query: " + e.getLocalizedMessage());
             }
 
-            //TODO ERASE! JUST FOR DEBUG
-            queryResults.add(queryString);
-
+        } else {
+            queryResults.add("InfluxDB was not setup!");
         }
         return queryResults;
     }

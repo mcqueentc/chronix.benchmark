@@ -47,10 +47,10 @@ public class QueryRunnerResource {
             List<String> queryResults = new LinkedList<>();
 
             //get the query strings
-            Map<String, BenchmarkQuery> queryBenchmarkQueryMap = new HashMap<>();
+            Map<Object, BenchmarkQuery> queryBenchmarkQueryMap = new HashMap<>();
             for(BenchmarkQuery benchmarkQuery : queryList){
                 if(benchmarkQuery != null) {
-                    queryBenchmarkQueryMap.put(tsdb.getQueryString(benchmarkQuery), benchmarkQuery);
+                    queryBenchmarkQueryMap.put(tsdb.getQueryObject(benchmarkQuery), benchmarkQuery);
                 }
             }
 
@@ -60,7 +60,7 @@ public class QueryRunnerResource {
             long startMilliseconds = System.currentTimeMillis();
 
             //perform the query mix
-            for (Map.Entry<String, BenchmarkQuery> entry : queryBenchmarkQueryMap.entrySet()) {
+            for (Map.Entry<Object, BenchmarkQuery> entry : queryBenchmarkQueryMap.entrySet()) {
 
                 List<String> results = tsdb.performQuery(entry.getValue(), entry.getKey());
                 if(results != null && !results.isEmpty()){

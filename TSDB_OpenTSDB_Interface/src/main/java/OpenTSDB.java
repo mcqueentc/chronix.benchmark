@@ -2,6 +2,7 @@ import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -31,18 +32,19 @@ public class OpenTSDB implements BenchmarkDataSource {
     }
 
     @Override
-    public String getQueryString(BenchmarkQuery benchmarkQuery) {
-        return null;
+    public Object getQueryObject(BenchmarkQuery benchmarkQuery) {
+        return new Object();
     }
 
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
-        return null;
+        return "";
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString) {
-        return null;
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+        List<String> queryResults = new LinkedList<>();
+        return queryResults;
     }
 
     public static String openTSDBEscapeValue(String value) {
