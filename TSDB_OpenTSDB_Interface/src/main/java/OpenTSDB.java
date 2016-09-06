@@ -44,4 +44,24 @@ public class OpenTSDB implements BenchmarkDataSource {
     public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryString) {
         return null;
     }
+
+    public static String openTSDBEscapeValue(String value) {
+        String escapedString = escape(value, ".").replaceAll("\\.\\.", ".").trim();
+        escapedString = escapedString.replaceAll("%", "Percent").trim();
+        escapedString = escapedString.replaceAll(":", "").trim();
+        escapedString = escapedString.replaceAll("\"", "").trim();
+        //Remove point if it is the first character
+        if (escapedString.indexOf(".") == 0) {
+            escapedString = escapedString.substring(1);
+        }
+        if (escapedString.lastIndexOf(".") == escapedString.length() - 1) {
+            escapedString = escapedString.substring(0, escapedString.length() - 1);
+        }
+        escapedString = escapedString.replaceAll("\\.+", ".");
+        return escapedString;
+    }
+
+    public static String escape(String metric, String replacement) {
+        return metric.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)", replacement);
+    }
 }
