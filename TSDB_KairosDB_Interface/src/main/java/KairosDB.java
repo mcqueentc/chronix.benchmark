@@ -115,7 +115,7 @@ public class KairosDB implements BenchmarkDataSource {
                 return "KairosDB import error: " + e.getLocalizedMessage();
             }
 
-            return "KairosDB imported points: " + count + " with status code: " + status;
+            return "KairosDB imported points: " + count + " with metric name: " + escapedMetricName + " and status code: " + status;
         }
         return "KairosDB was not setup";
 

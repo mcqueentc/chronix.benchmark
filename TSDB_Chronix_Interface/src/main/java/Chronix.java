@@ -96,7 +96,8 @@ public class Chronix implements BenchmarkDataSource{
         long count = 0L;
         if(isSetup){
 
-            MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(escape(timeSeries.getMetricName()));
+            String escapedMetricName = escape(timeSeries.getMetricName());
+            MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(escapedMetricName);
             for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
                 builder.attribute(entry.getKey(), escape(entry.getValue()));
             }
@@ -115,7 +116,7 @@ public class Chronix implements BenchmarkDataSource{
                     try{
                         if(chronixClient.add(pointsToAdd, solrClient)){
                             solrClient.commit();
-                            builder = new MetricTimeSeries.Builder(escape(timeSeries.getMetricName()));
+                            builder = new MetricTimeSeries.Builder(escapedMetricName);
                             for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
                                 builder.attribute(entry.getKey(),escape(entry.getValue()));
                             }
@@ -141,7 +142,7 @@ public class Chronix implements BenchmarkDataSource{
                 return "Error importing data points: " + e.getLocalizedMessage();
             }
 
-            return "Import of " + count +" points successful.";
+            return "Import of " + count +" points successful. Metric name: " + escapedMetricName;
         }
 
         return "Chronix was not setup";

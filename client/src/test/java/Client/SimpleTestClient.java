@@ -57,7 +57,7 @@ public class SimpleTestClient {
         ImportTest.importCsv(timeSeriesList);
 
         // query test
-        QueryTest.query(timeSeriesList);
+        //QueryTest.query(timeSeriesList);
 
 
 
