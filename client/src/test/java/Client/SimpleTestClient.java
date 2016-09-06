@@ -35,9 +35,9 @@ public class SimpleTestClient {
         GenerateServerConfigRecord.main(null);
         UploadDockerFiles.main(null);
         InterfaceAndConfigUploadTest.main(null);
-        //BuildDockerContainer.main(new String[]{"chronix","influxdb","kairosdb"});
-        //StartDockerContainer.main(new String[]{"chronix","influxdb","kairosdb"});
-        RunningTestDockerContainer.main(new String[]{"chronix","influxdb","kairosdb"});
+        //BuildDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb"});
+        //StartDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb"});
+        RunningTestDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb"});
 
         //StopDockerContainer.main(new String[]{"chronix","influxdb","kairosdb"});
 

@@ -45,5 +45,13 @@ public class UploadDockerFiles {
             System.out.println(answer);
         }
 
+        // OpenTSDB
+        path = "/Documents/BA_workspace/docker/opentsdb";
+        System.out.println("\nUploading: " + path);
+        uploadAnswers = configurator.uploadFiles(server, System.getProperty("user.home") + path);
+        for(String answer : uploadAnswers){
+            System.out.println(answer);
+        }
+
     }
 }

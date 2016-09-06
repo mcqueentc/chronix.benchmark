@@ -35,6 +35,10 @@ public class GenerateServerConfigRecord {
         buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
         runOptionses.add(new DockerRunOptions("kairosdb", 8080, 8080, ""));
 
+        //OpenTSDB
+        buildOptionses.add(new DockerBuildOptions("opentsdb", "-t"));
+        runOptionses.add(new DockerRunOptions("opentsdb", 4242, 4242, "-h localHost"));
+
 
 
         ServerConfigRecord serverConfigRecord = new ServerConfigRecord(server);
