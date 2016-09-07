@@ -4,7 +4,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by mcqueen666 on 06.09.16.
@@ -114,8 +117,8 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
         tagString.deleteCharAt(tagString.length()-1);
         tagString.append("}");
 
-        String startDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getStart()));
-        String endDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getEnd()));
+        String startDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS));
+        String endDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6, ChronoUnit.HOURS));
 
         long timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toMillis();
         String aggregatedTimeSpan = timespan + "ms";
@@ -167,9 +170,15 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
             OpenTsdbQuery query = ((OpenTsdbQuery) queryObject);
             queryResults.add(openTsdb.query(query.getStartDate(),query.getEndDate(),query.getAggregatedMetric(),query.getTagString()));
 
+            // TODO erase, only for debug
+            queryResults.add("OpenTsdb aggregatedMetric: " + query.getAggregatedMetric());
+            queryResults.add("OpenTsdb tagString: " + query.getTagString());
+            queryResults.add("OpenTsdb startDate: " + query.getStartDate());
+            queryResults.add("OpenTsdb endData: " + query.getEndDate());
         } catch (Exception e){
             queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());
         }
+
 
         return queryResults;
     }
