@@ -35,11 +35,11 @@ public class SimpleTestClient {
         GenerateServerConfigRecord.main(null);
         UploadDockerFiles.main(null);
         InterfaceAndConfigUploadTest.main(null);
-        //BuildDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb"});
-        //StartDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb"});
-        RunningTestDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb"});
+        //BuildDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //StartDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        RunningTestDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
-        //StopDockerContainer.main(new String[]{"chronix","influxdb","kairosdb"});
+        //StopDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
 
         if(JsonTimesSeriesTest.canImportFromJson(importFile.getName())){
@@ -57,7 +57,7 @@ public class SimpleTestClient {
         //ImportTest.importCsv(timeSeriesList);
 
         // query test
-        QueryTest.query(timeSeriesList);
+        //QueryTest.query(timeSeriesList);
 
 
 

@@ -39,6 +39,10 @@ public class GenerateServerConfigRecord {
         buildOptionses.add(new DockerBuildOptions("opentsdb", "-t"));
         runOptionses.add(new DockerRunOptions("opentsdb", 4242, 4242, "-h localHost"));
 
+        //Graphite
+        buildOptionses.add(new DockerBuildOptions("graphite", "-t"));
+        runOptionses.add(new DockerRunOptions("graphite", 2003, 2003, "-p 80:80"));
+
 
 
         ServerConfigRecord serverConfigRecord = new ServerConfigRecord(server);

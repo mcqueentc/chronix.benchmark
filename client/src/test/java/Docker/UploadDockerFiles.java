@@ -53,5 +53,14 @@ public class UploadDockerFiles {
             System.out.println(answer);
         }
 
+        // Graphite
+        path = "/Documents/BA_workspace/docker/graphite";
+        System.out.println("\nUploading: " + path);
+        uploadAnswers = configurator.uploadFiles(server, System.getProperty("user.home") + path);
+        for(String answer : uploadAnswers){
+            System.out.println(answer);
+        }
+
+
     }
 }

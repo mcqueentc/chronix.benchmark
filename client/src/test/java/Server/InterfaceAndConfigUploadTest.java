@@ -40,6 +40,7 @@ public class InterfaceAndConfigUploadTest {
         tsdbImpls.put("influxdb", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_InfluxDB_Interface/build/libs/TSDB_InfluxDB_Interface-1.0-SNAPSHOT-all.jar");
         tsdbImpls.put("kairosdb", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_KairosDB_Interface/build/libs/TSDB_KairosDB_Interface-1.0-SNAPSHOT-all.jar");
         tsdbImpls.put("opentsdb", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_OpenTSDB_Interface/build/libs/TSDB_OpenTSDB_Interface-1.0-SNAPSHOT-all.jar");
+        tsdbImpls.put("graphite", "/Users/mcqueen666/Documents/BA_workspace/chronix.benchmark/TSDB_Graphite_Interface/build/libs/TSDB_Graphite_Interface-1.0-SNAPSHOT-all.jar");
 
         for(Map.Entry<String, String> entry : tsdbImpls.entrySet()){
             File jarFile = new File(entry.getValue());
