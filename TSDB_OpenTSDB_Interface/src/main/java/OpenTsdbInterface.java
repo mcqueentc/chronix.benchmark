@@ -126,8 +126,6 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
         long timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toDays();
         String aggregatedTimeSpan = timespan + "d";
 
-        //aggregatedTimeSpan = "1ms";
-
         //if equals or less zero we try hours
         if(timespan <= 0){
             timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toHours();
@@ -145,39 +143,40 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
             timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toMillis();
             aggregatedTimeSpan = timespan + "ms";
         }
-
 */
+
+        String aggregatedTimeSpan = "1ms"; // full resolution
         String defaultAggregatedMetric = "";
         switch (function) {
-            case COUNT:     defaultAggregatedMetric = "count";// + aggregatedTimeSpan + "-count"; //only for downsampling
+            case COUNT:     defaultAggregatedMetric = "count:" + aggregatedTimeSpan + "-count";
                 break;
-            case MEAN:      defaultAggregatedMetric = "avg";// + aggregatedTimeSpan + "-avg";
+            case MEAN:      defaultAggregatedMetric = "avg:" + aggregatedTimeSpan + "-avg";
                 break;
-            case SUM:       defaultAggregatedMetric = "sum";// + aggregatedTimeSpan + "-sum";
+            case SUM:       defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-sum";
                 break;
-            case MIN:       defaultAggregatedMetric = "min";// + aggregatedTimeSpan + "-min";
+            case MIN:       defaultAggregatedMetric = "min:" + aggregatedTimeSpan + "-min";
                 break;
-            case MAX:       defaultAggregatedMetric = "max";// + aggregatedTimeSpan + "-max";
+            case MAX:       defaultAggregatedMetric = "max:" + aggregatedTimeSpan + "-max";
                 break;
-            case STDDEV:    defaultAggregatedMetric = "dev";// + aggregatedTimeSpan + "-dev";
+            case STDDEV:    defaultAggregatedMetric = "dev:" + aggregatedTimeSpan + "-dev";
                 break;
             case PERCENTILE:
                 Float p = benchmarkQuery.getPercentile();
                 if (p != null) {
                     if(p <= 0.5){
-                        defaultAggregatedMetric = "p50";// + aggregatedTimeSpan + "-p50";
+                        defaultAggregatedMetric = "p50:" + aggregatedTimeSpan + "-p50";
                     } else if(p > 0.5 && p <= 0.75){
-                        defaultAggregatedMetric = "p75";// + aggregatedTimeSpan + "-p75";
+                        defaultAggregatedMetric = "p75:" + aggregatedTimeSpan + "-p75";
                     } else if(p > 0.75 && p <= 0.9){
-                        defaultAggregatedMetric = "p90";// + aggregatedTimeSpan + "-p90";
+                        defaultAggregatedMetric = "p90:" + aggregatedTimeSpan + "-p90";
                     } else if(p > 0.9 && p <= 0.95){
-                        defaultAggregatedMetric = "p95";// + aggregatedTimeSpan + "-p95";
+                        defaultAggregatedMetric = "p95:" + aggregatedTimeSpan + "-p95";
                     } else {
-                        defaultAggregatedMetric = "p99";// + aggregatedTimeSpan + "-p99";
+                        defaultAggregatedMetric = "p99:" + aggregatedTimeSpan + "-p99";
                     }
                 }
                 break;
-            case QUERY_ONLY: defaultAggregatedMetric = "sum";// + aggregatedTimeSpan;
+            case QUERY_ONLY: defaultAggregatedMetric = "sum:" + aggregatedTimeSpan;
         }
 
         defaultAggregatedMetric = defaultAggregatedMetric + ":" + escapedMetricName + "{tags}";
