@@ -167,7 +167,7 @@ public class Chronix implements BenchmarkDataSource{
                     }
                     queryString += "metric:\"" + escape(timeSeriesMetaData.getMetricName())
                             + "\" AND start:" + timeSeriesMetaData.getStart()
-                            + " AND end:" + timeSeriesMetaData.getEnd();
+                            + " AND end:" + timeSeriesMetaData.getEnd() + 1;
 
 
                     query = new SolrQuery(queryString);
