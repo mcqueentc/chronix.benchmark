@@ -79,7 +79,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
             for(TimeSeriesPoint point : timeSeries.getPoints()){
                 OpenTsdbMetric openTsdbMetric = OpenTsdbMetric.named(metricName)
                         .withTags(metaData)
-                        .withTimestamp(point.getTimeStamp()) // TODO maybe wrong time unit
+                        .withTimestamp(Instant.ofEpochMilli(point.getTimeStamp()).getEpochSecond()) // TODO maybe wrong time unit
                         .withValue(point.getValue())
                         .build();
 
@@ -119,42 +119,62 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
 
         String startDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS));
         String endDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6, ChronoUnit.HOURS));
+/*
+        long timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toDays();
+        String aggregatedTimeSpan = timespan + "d";
 
-        long timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toMillis();
-        String aggregatedTimeSpan = timespan + "ms";
+        //aggregatedTimeSpan = "1ms";
 
+        //if equals or less zero we try hours
+        if(timespan <= 0){
+            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toHours();
+            aggregatedTimeSpan = timespan + "h";
+        }
 
+        //if equals or less zero we try minutes
+        if(timespan <= 0){
+            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toMinutes();
+            aggregatedTimeSpan = timespan + "m";
+        }
+
+        //if equals or less zero we try millis
+        if(timespan <= 0){
+            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toMillis();
+            aggregatedTimeSpan = timespan + "ms";
+        }
+
+*/
         String defaultAggregatedMetric = "";
         switch (function) {
-            case COUNT:     defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-count";
+            case COUNT:     defaultAggregatedMetric = "count";// + aggregatedTimeSpan + "-count";
                 break;
-            case MEAN:      defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-avg";
+            case MEAN:      defaultAggregatedMetric = "avg";// + aggregatedTimeSpan + "-avg";
                 break;
-            case SUM:       defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-sum";
+            case SUM:       defaultAggregatedMetric = "sum";// + aggregatedTimeSpan + "-sum";
                 break;
-            case MIN:       defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-min";
+            case MIN:       defaultAggregatedMetric = "min";// + aggregatedTimeSpan + "-min";
                 break;
-            case MAX:       defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-max";
+            case MAX:       defaultAggregatedMetric = "max";// + aggregatedTimeSpan + "-max";
                 break;
-            case STDDEV:    defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-dev";
+            case STDDEV:    defaultAggregatedMetric = "dev";// + aggregatedTimeSpan + "-dev";
                 break;
             case PERCENTILE:
                 Float p = benchmarkQuery.getPercentile();
                 if (p != null) {
                     if(p <= 0.5){
-                        defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-p50";
+                        defaultAggregatedMetric = "p50";// + aggregatedTimeSpan + "-p50";
                     } else if(p > 0.5 && p <= 0.75){
-                        defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-p75";
+                        defaultAggregatedMetric = "p75";// + aggregatedTimeSpan + "-p75";
                     } else if(p > 0.75 && p <= 0.9){
-                        defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-p90";
+                        defaultAggregatedMetric = "p90";// + aggregatedTimeSpan + "-p90";
                     } else if(p > 0.9 && p <= 0.95){
-                        defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-p95";
+                        defaultAggregatedMetric = "p95";// + aggregatedTimeSpan + "-p95";
                     } else {
-                        defaultAggregatedMetric = "sum:" + aggregatedTimeSpan + "-p99";
+                        defaultAggregatedMetric = "p99";// + aggregatedTimeSpan + "-p99";
                     }
                 }
                 break;
-            case QUERY_ONLY: defaultAggregatedMetric = "sum:" + aggregatedTimeSpan;
+            case QUERY_ONLY: defaultAggregatedMetric = "sum";// + aggregatedTimeSpan;
         }
 
         defaultAggregatedMetric = defaultAggregatedMetric + ":" + escapedMetricName + "{tags}";
@@ -168,13 +188,15 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
         List<String> queryResults = new LinkedList<>();
         try{
             OpenTsdbQuery query = ((OpenTsdbQuery) queryObject);
-            queryResults.add(openTsdb.query(query.getStartDate(),query.getEndDate(),query.getAggregatedMetric(),query.getTagString()));
+            String result = openTsdb.query(query.getStartDate(),query.getEndDate(),query.getAggregatedMetric(),query.getTagString());
+            queryResults.add(result);
 
             // TODO erase, only for debug
             queryResults.add("OpenTsdb aggregatedMetric: " + query.getAggregatedMetric());
             queryResults.add("OpenTsdb tagString: " + query.getTagString());
             queryResults.add("OpenTsdb startDate: " + query.getStartDate());
             queryResults.add("OpenTsdb endData: " + query.getEndDate());
+            queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result));
         } catch (Exception e){
             queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());
         }
@@ -230,5 +252,11 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
         } else {
             return "" + value;
         }
+    }
+
+    private int getDataPointCount(String openTsdbResultString){
+        String result = openTsdbResultString.substring(openTsdbResultString.indexOf("dps"));
+        String[] splits = result.split(",");
+        return splits.length;
     }
 }

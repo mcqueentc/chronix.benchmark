@@ -54,7 +54,7 @@ public class SimpleTestClient {
         JsonTimesSeriesTest.writeTest(timeSeriesList);
 
         // import test
-        ImportTest.importCsv(timeSeriesList);
+        //ImportTest.importCsv(timeSeriesList);
 
         // query test
         QueryTest.query(timeSeriesList);
