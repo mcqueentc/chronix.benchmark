@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by mcqueen666 on 01.09.16.
  */
-public class InfluxDB implements BenchmarkDataSource {
+public class InfluxDB implements BenchmarkDataSource<String> {
 
     private final String INFLUXDB_STORAGE_DIRECTORY = "/var/lib/influxdb/";
     private String ipAddress;
@@ -108,7 +108,7 @@ public class InfluxDB implements BenchmarkDataSource {
     }
 
     @Override
-    public Object getQueryObject(BenchmarkQuery benchmarkQuery){
+    public String getQueryObject(BenchmarkQuery benchmarkQuery){
         String queryString = "";
 
         QueryFunction function = benchmarkQuery.getFunction();
@@ -152,14 +152,13 @@ public class InfluxDB implements BenchmarkDataSource {
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryObject) {
         List<String> queryResults = new LinkedList<>();
         if(isSetup) {
 
 
             try {
-                String queryString = ((String) queryObject);
-                Query query = new Query(queryString, dbName);
+                Query query = new Query(queryObject, dbName);
                 QueryResult influxdbQueryResult = influxDB.query(query);
 
                 if(influxdbQueryResult != null){
@@ -167,7 +166,7 @@ public class InfluxDB implements BenchmarkDataSource {
                 }
 
                 //TODO ERASE! JUST FOR DEBUG
-                queryResults.add(queryString);
+                queryResults.add(queryObject);
 
             } catch (Exception e){
                 queryResults.add("Error performing query: " + e.getLocalizedMessage());

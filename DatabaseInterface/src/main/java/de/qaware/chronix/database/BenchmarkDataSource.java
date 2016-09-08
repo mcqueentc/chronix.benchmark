@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 
-public interface BenchmarkDataSource {
+public interface BenchmarkDataSource<T> {
 
     int NUMBER_OF_POINTS_PER_BATCH = 500;
 
@@ -70,9 +70,9 @@ public interface BenchmarkDataSource {
      * @apiNote This method will NOT be part of the benchmark measurement.
      *
      * @param benchmarkQuery the query representation.
-     * @return the query object which is need for performing the query.
+     * @return the query object which is needed for performing the query.
      */
-    Object getQueryObject(BenchmarkQuery benchmarkQuery);
+    T getQueryObject(BenchmarkQuery benchmarkQuery);
 
     /**
      * Generates a complete import query string to import a time series.
@@ -94,6 +94,6 @@ public interface BenchmarkDataSource {
      * @param queryObject the query object generated from getQueryObject().
      * @return the result strings from the database.
      */
-    List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject);
+    List<String> performQuery(BenchmarkQuery benchmarkQuery, T queryObject);
 
 }

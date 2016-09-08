@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by mcqueen666 on 08.09.16.
  */
-public class GraphiteInterface implements BenchmarkDataSource {
+public class GraphiteInterface implements BenchmarkDataSource<String>{
     private final String GRAPHITE_STORAGE_DIRECTORY = "/opt/graphite/storage";
 
     @Override
@@ -31,7 +31,7 @@ public class GraphiteInterface implements BenchmarkDataSource {
     }
 
     @Override
-    public Object getQueryObject(BenchmarkQuery benchmarkQuery) {
+    public String getQueryObject(BenchmarkQuery benchmarkQuery) {
         return null;
     }
 
@@ -41,7 +41,7 @@ public class GraphiteInterface implements BenchmarkDataSource {
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryObject) {
         return null;
     }
 }

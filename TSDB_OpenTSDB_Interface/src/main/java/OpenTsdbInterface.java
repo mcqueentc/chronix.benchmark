@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by mcqueen666 on 06.09.16.
  */
-public class OpenTsdbInterface implements BenchmarkDataSource {
+public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     private final String OPENTSDB_STORAGE_DIRECTORY = "/tmp/hadoop-root/dfs/";
     private final int OPENTSDB_NUMBER_OF_POINTS_PER_BATCH = 10;
     private String ipAddress;
@@ -102,7 +102,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
     }
 
     @Override
-    public Object getQueryObject(BenchmarkQuery benchmarkQuery) {
+    public OpenTsdbQuery getQueryObject(BenchmarkQuery benchmarkQuery) {
         TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
         QueryFunction function = benchmarkQuery.getFunction();
         Map<String, String> tags = timeSeriesMetaData.getTagKey_tagValue();
@@ -186,18 +186,17 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, OpenTsdbQuery queryObject) {
         List<String> queryResults = new LinkedList<>();
         try{
-            OpenTsdbQuery query = ((OpenTsdbQuery) queryObject);
-            String result = openTsdb.query(query.getStartDate(),query.getEndDate(),query.getAggregatedMetric(),query.getTagString());
+            String result = openTsdb.query(queryObject.getStartDate(),queryObject.getEndDate(),queryObject.getAggregatedMetric(),queryObject.getTagString());
             queryResults.add(result);
 
             // TODO erase, only for debug
-            queryResults.add("OpenTsdb aggregatedMetric: " + query.getAggregatedMetric());
-            queryResults.add("OpenTsdb tagString: " + query.getTagString());
-            queryResults.add("OpenTsdb startDate: " + query.getStartDate());
-            queryResults.add("OpenTsdb endData: " + query.getEndDate());
+            queryResults.add("OpenTsdb aggregatedMetric: " + queryObject.getAggregatedMetric());
+            queryResults.add("OpenTsdb tagString: " + queryObject.getTagString());
+            queryResults.add("OpenTsdb startDate: " + queryObject.getStartDate());
+            queryResults.add("OpenTsdb endData: " + queryObject.getEndDate());
             queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result));
         } catch (Exception e){
             queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());

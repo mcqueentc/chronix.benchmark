@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by mcqueen666 on 05.09.16.
  */
-public class KairosDB implements BenchmarkDataSource {
+public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
 
     private final String KAIROSDB_STORAGE_DIRECTORY = "/var/lib/cassandra";
     private String ipAddress;
@@ -122,7 +122,7 @@ public class KairosDB implements BenchmarkDataSource {
     }
 
     @Override
-    public Object getQueryObject(BenchmarkQuery benchmarkQuery) {
+    public QueryBuilder getQueryObject(BenchmarkQuery benchmarkQuery) {
         QueryBuilder builder = null;
         if (benchmarkQuery != null) {
             TimeSeriesMetaData timeSeriesMetaData = benchmarkQuery.getTimeSeriesMetaData();
@@ -175,15 +175,14 @@ public class KairosDB implements BenchmarkDataSource {
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, QueryBuilder queryObject) {
         List<String> queryResult = new LinkedList<>();
         if(isSetup) {
             if(queryObject != null) {
 
                 // do the query
                 try {
-                    QueryBuilder builder = ((QueryBuilder) queryObject);
-                    QueryResponse response = kairosdb.query(builder);
+                    QueryResponse response = kairosdb.query(queryObject);
                     queryResult.add(response.getBody());
 
                 } catch (Exception e) {

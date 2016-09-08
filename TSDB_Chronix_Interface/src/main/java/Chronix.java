@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  *
  */
 
-public class Chronix implements BenchmarkDataSource{
+public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
     private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data";
     private String ipAddress;
@@ -149,7 +149,7 @@ public class Chronix implements BenchmarkDataSource{
     }
 
     @Override
-    public Object getQueryObject(BenchmarkQuery benchmarkQuery){
+    public SolrQuery getQueryObject(BenchmarkQuery benchmarkQuery){
         String queryString = "";
         SolrQuery query = null;
         if(isSetup) {
@@ -209,7 +209,7 @@ public class Chronix implements BenchmarkDataSource{
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, Object queryObject) {
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, SolrQuery queryObject) {
         List<String> queryResults = new LinkedList<>();
         if(isSetup) {
             if (benchmarkQuery != null) {
@@ -220,21 +220,20 @@ public class Chronix implements BenchmarkDataSource{
                     // do the query
                     if (chronixClient != null && queryObject != null) {
                         try{
-                            SolrQuery query = ((SolrQuery) queryObject);
-                            Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, query);
+                            Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, queryObject);
                             List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
                             if (!resultList.isEmpty()) {
                                 resultList.forEach(ts -> queryResults.add(ts.toString()));
                                 // debug //TODO erase
                                 queryResults.add("start: " + timeSeriesMetaData.getStart());
                                 queryResults.add("end: " + timeSeriesMetaData.getEnd());
-                                queryResults.add("Query: " + query);
+                                queryResults.add("Query: " + queryObject);
                                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                                 queryResults.add("Chronix Solr Server date: " + formatter.format(new Date(Instant.now().toEpochMilli())));
 
                                 // debug // TODO erase
-                                queryResults.add("Fields: " + query.getFields());
-                                queryResults.add("SolrQuery: " + query.toQueryString());
+                                queryResults.add("Fields: " + queryObject.getFields());
+                                queryResults.add("SolrQuery: " + queryObject.toQueryString());
 
                             }
                         } catch (Exception e){
