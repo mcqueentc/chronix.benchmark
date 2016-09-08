@@ -117,13 +117,12 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
         tagString.deleteCharAt(tagString.length()-1);
         tagString.append("}");
 
-        //String startDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minusSeconds(1)); // openTsdb l
-        //String endDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).plusSeconds(1));
-
+        // millisecond precision
         String startDate = openTsdbTimeString(timeSeriesMetaData.getStart());
         String endDate = openTsdbTimeString(timeSeriesMetaData.getEnd());
 
 /*
+        // Downsampling
         long timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toDays();
         String aggregatedTimeSpan = timespan + "d";
 
@@ -150,7 +149,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
 */
         String defaultAggregatedMetric = "";
         switch (function) {
-            case COUNT:     defaultAggregatedMetric = "count";// + aggregatedTimeSpan + "-count";
+            case COUNT:     defaultAggregatedMetric = "count";// + aggregatedTimeSpan + "-count"; //only for downsampling
                 break;
             case MEAN:      defaultAggregatedMetric = "avg";// + aggregatedTimeSpan + "-avg";
                 break;
@@ -251,7 +250,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
     }
 
     private String openTsdbTimeString(Long epochMillis){
-        // first 10 or less digits are treaded as seconds, milliseconds only with 3 digits precision.
+        // first 10 or less digits are treated as seconds, milliseconds only with 3 digits precision.
         String result = epochMillis.toString();
         if(result.length() >= 10){
             String seconds = result.substring(0, 10);
