@@ -8,6 +8,8 @@ import java.util.List;
  * Created by mcqueen666 on 08.09.16.
  */
 public class GraphiteInterface implements BenchmarkDataSource {
+    private final String GRAPHITE_STORAGE_DIRECTORY = "/opt/graphite/storage";
+
     @Override
     public boolean setup(String ipAddress, int portNumber) {
         return false;

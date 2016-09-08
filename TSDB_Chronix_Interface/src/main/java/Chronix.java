@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 public class Chronix implements BenchmarkDataSource{
 
-    private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.3/";
+    private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data";
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;

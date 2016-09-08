@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * Created by mcqueen666 on 06.09.16.
  */
 public class OpenTsdbInterface implements BenchmarkDataSource {
-    private final String OPENTSDB_STORAGE_DIRECTORY = "/opt/data";
+    private final String OPENTSDB_STORAGE_DIRECTORY = "/tmp/hadoop-root/dfs/";
     private final int OPENTSDB_NUMBER_OF_POINTS_PER_BATCH = 10;
     private String ipAddress;
     private int portNumber;
