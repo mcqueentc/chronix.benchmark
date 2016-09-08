@@ -79,7 +79,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
             for(TimeSeriesPoint point : timeSeries.getPoints()){
                 OpenTsdbMetric openTsdbMetric = OpenTsdbMetric.named(metricName)
                         .withTags(metaData)
-                        .withTimestamp(Instant.ofEpochMilli(point.getTimeStamp()).getEpochSecond()) // TODO maybe wrong time unit
+                        .withTimestamp(point.getTimeStamp()) // TODO maybe wrong time unit
                         .withValue(point.getValue())
                         .build();
 
@@ -117,29 +117,33 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
         tagString.deleteCharAt(tagString.length()-1);
         tagString.append("}");
 
-        String startDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS));
-        String endDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6, ChronoUnit.HOURS));
+        //String startDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minusSeconds(1)); // openTsdb l
+        //String endDate = opentTSDBDate(Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).plusSeconds(1));
+
+        String startDate = openTsdbTimeString(timeSeriesMetaData.getStart());
+        String endDate = openTsdbTimeString(timeSeriesMetaData.getEnd());
+
 /*
-        long timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toDays();
+        long timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toDays();
         String aggregatedTimeSpan = timespan + "d";
 
         //aggregatedTimeSpan = "1ms";
 
         //if equals or less zero we try hours
         if(timespan <= 0){
-            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toHours();
+            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toHours();
             aggregatedTimeSpan = timespan + "h";
         }
 
         //if equals or less zero we try minutes
         if(timespan <= 0){
-            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toMinutes();
+            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toMinutes();
             aggregatedTimeSpan = timespan + "m";
         }
 
         //if equals or less zero we try millis
         if(timespan <= 0){
-            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()).minus(6,ChronoUnit.HOURS), Instant.ofEpochMilli(timeSeriesMetaData.getEnd()).minus(6,ChronoUnit.HOURS)).toMillis();
+            timespan = Duration.between(Instant.ofEpochMilli(timeSeriesMetaData.getStart()), Instant.ofEpochMilli(timeSeriesMetaData.getEnd())).toMillis();
             aggregatedTimeSpan = timespan + "ms";
         }
 
@@ -244,6 +248,24 @@ public class OpenTsdbInterface implements BenchmarkDataSource {
                 .append(addDateSplit(localDateTime.getSecond()));
 
         return sb.toString();
+    }
+
+    private String openTsdbTimeString(Long epochMillis){
+        // first 10 or less digits are treaded as seconds, milliseconds only with 3 digits precision.
+        String result = epochMillis.toString();
+        if(result.length() >= 10){
+            String seconds = result.substring(0, 10);
+            String millis = result.substring(10);
+
+            if(millis.length() > 0 && millis.length() <= 3){
+                result = seconds + "." + millis;
+            }
+            else if (millis.length() > 3){
+                result = seconds + "." + millis.substring(0,3);
+            }
+        }
+
+        return result;
     }
 
     private String addDateSplit(int value) {
