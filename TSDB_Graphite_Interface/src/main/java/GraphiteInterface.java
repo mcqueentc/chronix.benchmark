@@ -5,6 +5,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -13,13 +14,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by mcqueen666 on 08.09.16.
  */
-public class GraphiteInterface implements BenchmarkDataSource<String>{
+public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     private final String GRAPHITE_STORAGE_DIRECTORY = "/opt/graphite/storage";
     private String ipAddress;
     private int portNumber;
@@ -90,7 +92,7 @@ public class GraphiteInterface implements BenchmarkDataSource<String>{
             int counter = 0;
             for(TimeSeriesPoint point : timeSeries.getPoints()){
                 // the graphite metric string to be send
-                String metricToSend = metric + " " + point.getValue() + " " + point.getTimeStamp() + " \n";
+                String metricToSend = metric + " " + point.getValue() + " " + (point.getTimeStamp() / 1000L) + " \n";
 
                 try {
                     writer.write(metricToSend);
@@ -113,8 +115,8 @@ public class GraphiteInterface implements BenchmarkDataSource<String>{
     }
 
     @Override
-    public String getQueryObject(BenchmarkQuery benchmarkQuery) {
-        String query = "";
+    public GraphiteQuery getQueryObject(BenchmarkQuery benchmarkQuery) {
+        GraphiteQuery graphiteQuery = null;
         if(isSetup){
             TimeSeriesMetaData metaData = benchmarkQuery.getTimeSeriesMetaData();
             QueryFunction function = benchmarkQuery.getFunction();
@@ -149,20 +151,20 @@ public class GraphiteInterface implements BenchmarkDataSource<String>{
 
             //[{"target": "summarize(cache.database.Global.win.global.metrics.srv.mmm.Prozessor.Total.Prozessorzeit.Percent.metric, \"1y\", \"stddev\")", "datapoints": [[113266.18400000047, 1419120000]]}]
 
-
-            String summerize = "summarize(" + metric + "\"" + aggregatedTimeSpan + "\"";
+            String query = "";
+            String summerizeMetric = "summarize(" + metric + "\"" + aggregatedTimeSpan + "\"";
             //String interval = "\"1y\"";
 
             switch (function) {
-                case COUNT:
+                case COUNT: query = "integral(" + metric + ")";
                     break;
-                case MEAN:  query = "averageSeries(" + metric + ")";
+                case MEAN:  query = summerizeMetric + ", \"avg\", \"true\")";
                     break;
-                case SUM:   query = summerize + ", \"sum\")";
+                case SUM:   query = summerizeMetric + ", \"sum\", \"true\")";
                     break;
-                case MIN:   query = summerize +  ", \"min\")";
+                case MIN:   query = summerizeMetric +  ", \"min\", \"true\")";
                     break;
-                case MAX:   query = summerize +  ", \"max\")";
+                case MAX:   query = summerizeMetric +  ", \"max\", \"true\")";
                     break;
                 case STDDEV: query = "stddevSeries(" + metric + ")";
                     break;
@@ -174,14 +176,38 @@ public class GraphiteInterface implements BenchmarkDataSource<String>{
                     break;
                 case QUERY_ONLY:
             }
+            graphiteQuery = new GraphiteQuery(query, startDate, endDate);
 
         }
-        return query;
+        return graphiteQuery;
     }
 
     @Override
-    public List<String> performQuery(BenchmarkQuery benchmarkQuery, String queryObject) {
-        return null;
+    public List<String> performQuery(BenchmarkQuery benchmarkQuery, GraphiteQuery queryObject) {
+        List<String> queryResults = new LinkedList<>();
+        if(isSetup && queryObject != null){
+            try {
+                String result = graphiteClient.path("/render")
+                        .queryParam("target", queryObject.getQuery())
+                        .queryParam("from", queryObject.getStartDate())
+                        .queryParam("until", queryObject.getEndDate())
+                        .queryParam("format", "json")
+                        .request(MediaType.TEXT_PLAIN)
+                        .get(String.class);
+
+                queryResults.add(result);
+
+                //TODO EREASE: DEBUG ONLY
+                queryResults.add("Graphite query string: " + queryObject.getQuery());
+                queryResults.add("Graphite query startDate: " + queryObject.getStartDate());
+                queryResults.add("Graphite query endDate: " + queryObject.getEndDate());
+
+            } catch (Exception e){
+                queryResults.add("Error performing graphite query: " + e.getLocalizedMessage());
+            }
+        }
+
+        return queryResults;
     }
 
     private String getGraphiteMetricWithTags(String metricName, Map<String, String> tags){
