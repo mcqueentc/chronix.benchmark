@@ -1,13 +1,9 @@
 import de.qaware.chronix.database.*;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by mcqueen666 on 06.09.16.
@@ -27,13 +23,20 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
         if(!isSetup){
             try {
                 openTsdb = new OpenTsdb.Builder("http://" + ipAddress + ":" + portNumber).create();
-                //TODO wait until openTsdb is up and ready
+
+                //wait until openTsdb is up and ready
+                while(!openTsdb.isResponding()){
+                    Thread.sleep(250);
+                }
+
+
                // openTsdb.setBatchSizeLimit(NUMBER_OF_POINTS_PER_BATCH);
                 // openTsdb cannot handle many points at once (o.0)
                 openTsdb.setBatchSizeLimit(OPENTSDB_NUMBER_OF_POINTS_PER_BATCH);
 
                 this.ipAddress = ipAddress;
                 this.portNumber = portNumber;
+                isSetup = true;
 
             } catch (Exception e){
                 isSetup = false;
@@ -51,7 +54,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
 
     @Override
     public void shutdown() {
-
+        openTsdb.close();
     }
 
     @Override
@@ -62,7 +65,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     @Override
     public String importDataPoints(TimeSeries timeSeries) {
         String reply = "Error importing data points to openTsdb.";
-        if(timeSeries != null) {
+        if(isSetup && timeSeries != null) {
             Map<String, String> tags = timeSeries.getTagKey_tagValue();
             openTsdb.preAssignDimensions(tags.keySet());
             // create escapted metricName
@@ -188,21 +191,22 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     @Override
     public List<String> performQuery(BenchmarkQuery benchmarkQuery, OpenTsdbQuery queryObject) {
         List<String> queryResults = new LinkedList<>();
-        try{
-            String result = openTsdb.query(queryObject.getStartDate(),queryObject.getEndDate(),queryObject.getAggregatedMetric(),queryObject.getTagString());
-            queryResults.add(result);
+        if(isSetup) {
+            try {
+                String result = openTsdb.query(queryObject.getStartDate(), queryObject.getEndDate(), queryObject.getAggregatedMetric(), queryObject.getTagString());
+                queryResults.add(result);
 
-            // TODO erase, only for debug
-            queryResults.add("OpenTsdb aggregatedMetric: " + queryObject.getAggregatedMetric());
-            queryResults.add("OpenTsdb tagString: " + queryObject.getTagString());
-            queryResults.add("OpenTsdb startDate: " + queryObject.getStartDate());
-            queryResults.add("OpenTsdb endData: " + queryObject.getEndDate());
-            queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result));
-        } catch (Exception e){
-            queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());
+                // TODO erase, only for debug
+                queryResults.add("OpenTsdb aggregatedMetric: " + queryObject.getAggregatedMetric());
+                queryResults.add("OpenTsdb tagString: " + queryObject.getTagString());
+                queryResults.add("OpenTsdb startDate: " + queryObject.getStartDate());
+                queryResults.add("OpenTsdb endData: " + queryObject.getEndDate());
+                queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result));
+            } catch (Exception e) {
+                queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());
+            }
+
         }
-
-
         return queryResults;
     }
 
