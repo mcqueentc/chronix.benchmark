@@ -18,6 +18,8 @@ public class InfluxDB implements BenchmarkDataSource<String> {
 
     private final String INFLUXDB_STORAGE_DIRECTORY = "/var/lib/influxdb/";
     private final Logger logger = LoggerFactory.getLogger(InfluxDB.class);
+    private final int WAIT_TIME_SLICE = 250;
+    private final int MAX_WAIT_TIME = 180_000;
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -30,6 +32,7 @@ public class InfluxDB implements BenchmarkDataSource<String> {
         if(!isSetup) {
             influxDB = InfluxDBFactory.connect("http://" + ipAddress + ":" + portNumber, "root", "root");
 
+            int elapsedTime = 0;
             do {
                 Pong pong;
                 try {
@@ -38,15 +41,23 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                         influxDB.createDatabase(dbName);
                         isSetup = true;
                     } else {
-                        Thread.sleep(100L);
+                        logger.info("Influx not responding -> waiting...");
+                        Thread.sleep(WAIT_TIME_SLICE);
+                        elapsedTime += WAIT_TIME_SLICE;
                     }
 
                 } catch (Exception e) {
                     logger.error("Error InfluxDB setup: " + e.getLocalizedMessage());
+                    try {
+                        Thread.sleep(WAIT_TIME_SLICE);
+                    } catch (InterruptedException e1) {
+                        //
+                    }
+                    elapsedTime += WAIT_TIME_SLICE;
                     isSetup = false;
 
                 }
-            } while (!isSetup);
+            } while (!isSetup && elapsedTime < MAX_WAIT_TIME);
         }
 
         return isSetup;
