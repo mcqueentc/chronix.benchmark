@@ -128,7 +128,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
             // Downsampling
             long timespan = Duration.between(Instant.ofEpochMilli(metaData.getStart()), Instant.ofEpochMilli(metaData.getEnd())).toDays() + 1;
             String aggregatedTimeSpan = timespan + "d";
-
+/*
             //if equals or less zero we try hours
             if(timespan <= 0){
                 timespan = Duration.between(Instant.ofEpochMilli(metaData.getStart()), Instant.ofEpochMilli(metaData.getEnd())).toHours() + 1;
@@ -147,16 +147,16 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                 aggregatedTimeSpan = timespan + "ms";
             }
 
-
+*/
 
             //[{"target": "summarize(cache.database.Global.win.global.metrics.srv.mmm.Prozessor.Total.Prozessorzeit.Percent.metric, \"1y\", \"stddev\")", "datapoints": [[113266.18400000047, 1419120000]]}]
 
             String query = "";
-            String summerizeMetric = "summarize(" + metric + "\"" + aggregatedTimeSpan + "\"";
+            String summerizeMetric = "summarize(" + metric + ",\"" + aggregatedTimeSpan + "\"";
             //String interval = "\"1y\"";
 
             switch (function) {
-                case COUNT: query = "integral(" + metric + ")";
+                case COUNT: query = "alias(sumSeries(offset(scale(" + metric + ", 0),1)), \"points\")";   //"integral(" + metric + ")";
                     break;
                 case MEAN:  query = summerizeMetric + ", \"avg\", \"true\")";
                     break;
@@ -213,10 +213,17 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     private String getGraphiteMetricWithTags(String metricName, Map<String, String> tags){
         String escapedMetric = escapeGraphiteMetricName(metricName);
         StringBuilder metricBuilder = new StringBuilder();
+
         //add tags
+        metricBuilder.append(escapeGraphiteMetricName(tags.get("host"))).append(".")
+                .append(escapeGraphiteMetricName(tags.get("process"))).append(".")
+                .append(escapeGraphiteMetricName(tags.get("metricGroup"))).append(".");
+
+   /*     //add tags
         for(Map.Entry<String, String> tag : tags.entrySet()){
             metricBuilder.append(escapeGraphiteMetricName(tag.getValue())).append(".");
         }
+   */
         // add metricName
         return metricBuilder.append(escapedMetric).toString();
     }
