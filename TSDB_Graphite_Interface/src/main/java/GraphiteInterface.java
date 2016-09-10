@@ -8,6 +8,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -26,6 +27,8 @@ import java.util.Map;
 public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     private final String GRAPHITE_STORAGE_DIRECTORY = "/opt/graphite/storage";
     private final Logger logger = LoggerFactory.getLogger(GraphiteInterface.class);
+    private final int WAIT_TIME_SLICE = 250;
+    private final int MAX_WAIT_TIME = 180_000;
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -37,22 +40,32 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     @Override
     public boolean setup(String ipAddress, int portNumber) {
         if(!isSetup){
-            try {
-                client = ClientBuilder.newBuilder()
-                        .register(JacksonFeature.class)
-                        .property(ClientProperties.CONNECT_TIMEOUT, 30_000)
-                        .property(ClientProperties.READ_TIMEOUT, 30_000)
-                        .build();
-                graphiteClient = client.target("http://" + ipAddress + "/");
-                socket = new Socket(ipAddress, portNumber);
-                writer = new OutputStreamWriter(socket.getOutputStream());
-                this.ipAddress = ipAddress;
-                this.portNumber = portNumber;
-                isSetup = true;
+            int elapsedTime = 0;
+            while(!isSetup && elapsedTime < MAX_WAIT_TIME) {
+                try {
+                    client = ClientBuilder.newBuilder()
+                            .register(JacksonFeature.class)
+                            .property(ClientProperties.CONNECT_TIMEOUT, 30_000)
+                            .property(ClientProperties.READ_TIMEOUT, 30_000)
+                            .build();
+                    graphiteClient = client.target("http://" + ipAddress + "/");
+                    socket = new Socket(ipAddress, portNumber);
+                    writer = new OutputStreamWriter(socket.getOutputStream());
+                    this.ipAddress = ipAddress;
+                    this.portNumber = portNumber;
 
-            } catch (IOException e){
-                logger.error("Error initializing graphite interface: " + e.getLocalizedMessage());
-                isSetup = false;
+                    isSetup = true;
+
+                } catch (Exception e) {
+                    logger.error("Error initializing graphite interface: " + e.getLocalizedMessage());
+                    isSetup = false;
+                    try {
+                        Thread.sleep(WAIT_TIME_SLICE);
+                    } catch (InterruptedException e1) {
+                        //
+                    }
+                    elapsedTime += WAIT_TIME_SLICE;
+                }
             }
         }
         return isSetup;
@@ -270,5 +283,19 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
         } else {
             return "" + value;
         }
+    }
+
+    private boolean isResponding(){
+        try {
+            Response response = graphiteClient.path("/").request().get();
+            if(response.getStatus() == 200){
+                return true;
+            }
+
+        } catch (Exception e){
+            logger.error("GraphiteClient not responding!");
+            return false;
+        }
+        return false;
     }
 }
