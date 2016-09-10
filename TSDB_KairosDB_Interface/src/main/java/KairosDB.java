@@ -34,14 +34,12 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
             try {
                 HttpClient client = new HttpClient("http://" + ipAddress + ":" + portNumber);
                 // test if client is responding
-                int retryCount = Integer.MIN_VALUE;
-                retryCount = client.getRetryCount();
-                if( retryCount != Integer.MIN_VALUE){
+
                     this.ipAddress = ipAddress;
                     this.portNumber = portNumber;
                     this.kairosdb = client;
                     isSetup = true;
-                }
+
 
             } catch (Exception e) {
                 logger.error("KairosDB Interface: " + e.getLocalizedMessage());
