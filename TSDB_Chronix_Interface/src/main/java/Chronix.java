@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.SolrPingResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,6 +33,8 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
     private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data";
     private final Logger logger = LoggerFactory.getLogger(Chronix.class);
+    private final int WAIT_TIME_SLICE = 250;
+    private final int MAX_WAIT_TIME = 180_000;
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -45,10 +49,20 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
         if(!isSetup) {
             SolrClient solrClient = new HttpSolrClient("http://" + ipAddress + ":" + portNumber + "/solr/chronix/");
             try {
-                solrClient.ping();
+                //solrClient.ping();
                 this.ipAddress = ipAddress;
                 this.portNumber = portNumber;
                 this.solrClient = solrClient;
+
+                int elapsedMillis = 0;
+                while(!isSolrResponding()){
+                    if(elapsedMillis < MAX_WAIT_TIME) {
+                        Thread.sleep(WAIT_TIME_SLICE);
+                        elapsedMillis += WAIT_TIME_SLICE;
+                    } else {
+                        return false;
+                    }
+                }
 
                 //Define a group by function for the time series records
                 groupBy = MetricTimeSeries::getMetric;
@@ -61,6 +75,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
 
                 chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
+
 
                 isSetup = true;
 
@@ -261,6 +276,17 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
     public static String escape(String metric) {
         return metric.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)", "_");
+    }
+
+    private boolean isSolrResponding(){
+        try {
+            SolrPingResponse pingResponse = solrClient.ping();
+            return true;
+
+        } catch (Exception e){
+            logger.info("Solr not responding");
+            return false;
+        }
     }
 }
 
