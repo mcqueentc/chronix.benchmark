@@ -1,6 +1,8 @@
 import de.qaware.chronix.database.*;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,6 +25,7 @@ import java.util.Map;
  */
 public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     private final String GRAPHITE_STORAGE_DIRECTORY = "/opt/graphite/storage";
+    private final Logger logger = LoggerFactory.getLogger(GraphiteInterface.class);
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -48,7 +51,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                 isSetup = true;
 
             } catch (IOException e){
-                System.err.println("Error initializing graphite interface: " + e.getLocalizedMessage());
+                logger.error("Error initializing graphite interface: " + e.getLocalizedMessage());
                 isSetup = false;
             }
         }
@@ -70,7 +73,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                 isSetup = false;
 
             } catch (IOException e) {
-                System.err.println("Error shutting down graphite interface: " + e.getLocalizedMessage());
+                logger.error("Error shutting down graphite interface: " + e.getLocalizedMessage());
             }
         }
     }
@@ -104,7 +107,8 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                         counter = 0;
                     }
                 } catch (IOException e) {
-                    reply = "Error importing points to graphite: " + e.getLocalizedMessage();
+                    logger.error("Error importing points to graphite: " + e.getLocalizedMessage());
+                    return "Error importing points to graphite: " + e.getLocalizedMessage();
                 }
 
             }
@@ -203,6 +207,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                 queryResults.add("Graphite query endDate: " + queryObject.getEndDate());
 
             } catch (Exception e){
+                logger.error("Error performing graphite query: " + e.getLocalizedMessage());
                 queryResults.add("Error performing graphite query: " + e.getLocalizedMessage());
             }
         }

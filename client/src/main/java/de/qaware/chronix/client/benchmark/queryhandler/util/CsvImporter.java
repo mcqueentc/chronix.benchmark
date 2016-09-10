@@ -3,6 +3,8 @@ package de.qaware.chronix.client.benchmark.queryhandler.util;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -16,6 +18,8 @@ import java.util.zip.GZIPInputStream;
  * Created by mcqueen666 on 29.08.16.
  */
 public class CsvImporter {
+
+    private final Logger logger = LoggerFactory.getLogger(CsvImporter.class);
 
     /**
      * Creates time series for each metricName from a csv file.
@@ -51,10 +55,8 @@ public class CsvImporter {
                     executorService.shutdownNow();
                 }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Error CsvImporter getTimeSeriesFromFiles: " + e.getLocalizedMessage());
             }
 
         }
@@ -104,7 +106,7 @@ public class CsvImporter {
                             process = fileNameMetaData[1];
                             metricGroup = fileNameMetaData[2];
                         } catch (Exception e){
-                            System.err.println("Ignoring file: " + csvFile.getAbsolutePath());
+                            logger.info("Ignoring file: " + csvFile.getAbsolutePath());
                             return new LinkedList<>();
                         }
 
@@ -210,10 +212,8 @@ public class CsvImporter {
 
                     }
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                   logger.error("Error CsvImporter TimeSeriesFileReader: " + e.getLocalizedMessage());
                 }
             }
 

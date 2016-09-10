@@ -3,6 +3,8 @@ package de.qaware.chronix.server.util;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.DataModels.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.util.LinkedList;
@@ -12,6 +14,7 @@ import java.util.List;
  * Created by mcqueen666 on 19.08.16.
  */
 public class DockerStatsUtil {
+    private final Logger logger = LoggerFactory.getLogger(DockerStatsUtil.class);
     private static final long MEASURE_INTERVAL_MILLISECONDS = 100;
     private static final long DOCKER_STATS_REACTION_MILLISECONDS = 1000;
 
@@ -46,7 +49,7 @@ public class DockerStatsUtil {
                 try {
                     Thread.sleep(DOCKER_STATS_REACTION_MILLISECONDS / threads.length);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("Error DockerStatsUtil startDockerContainerMeasurement: " + e.getLocalizedMessage());
                 }
 
             }
@@ -67,7 +70,7 @@ public class DockerStatsUtil {
                 completeMeasures.addAll(threads[i].getMeasures());
 
             } catch (InterruptedException e) {
-                e.printStackTrace();
+               logger.error("Error DockerStatsUtil stopDockerContainerMeasurement: " + e.getLocalizedMessage());
             }
         }
 

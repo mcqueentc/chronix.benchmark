@@ -3,6 +3,8 @@ package de.qaware.chronix.shared.ServerConfig;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.util.LinkedList;
 public class ServerConfigAccessor {
 
     private static ServerConfigAccessor instance;
+    private final Logger logger = LoggerFactory.getLogger(ServerConfigAccessor.class);
     private final String configDirectory = System.getProperty("user.home") + File.separator + ".chronixBenchmark_conf" + File.separator;
     private final String serverConfigFileName = "serverConfig.json";
     private LinkedList<ServerConfigRecord> serverConfigRecords;
@@ -88,7 +91,7 @@ public class ServerConfigAccessor {
         try {
             serverConfigRecords = mapper.readValue(file, new TypeReference<LinkedList<ServerConfigRecord>>() {});
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error ServerConfigAccessor: " + e.getLocalizedMessage());
         }
     }
 
@@ -101,7 +104,7 @@ public class ServerConfigAccessor {
         try {
             mapper.writeValue(file, serverConfigRecords);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error ServerConfigAccessor: " + e.getLocalizedMessage());
         }
     }
 

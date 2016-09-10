@@ -12,6 +12,8 @@ import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -28,6 +30,7 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class QueryRunnerResource {
 
+    private final Logger logger = LoggerFactory.getLogger(QueryRunnerResource.class);
     private final TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
     private final DockerStatsUtil dockerStatsUtil = DockerStatsUtil.getInstance();
     private final StatsCollector statsCollector = StatsCollector.getInstance();
@@ -39,6 +42,7 @@ public class QueryRunnerResource {
         if(queryRecord != null) {
             BenchmarkDataSource tsdb = tsdbInterfaceHandler.getTSDBInstance(queryRecord.getTsdbName());
             if (tsdb == null) {
+                logger.error("No TSDB implementation with name " + queryRecord.getTsdbName() + " found on.");
                 return Response.serverError().entity(new String[]{"No TSDB implementation with name " + queryRecord.getTsdbName() + " found on server!"}).build();
             }
 
@@ -88,6 +92,7 @@ public class QueryRunnerResource {
             }
 
         }
+        logger.error("Error performing queries!");
         return Response.serverError().entity(new String[]{"Error performing queries!"}).build();
 
     }
@@ -99,6 +104,7 @@ public class QueryRunnerResource {
         if(importRecord != null) {
             BenchmarkDataSource tsdb = tsdbInterfaceHandler.getTSDBInstance(importRecord.getTsdbName());
             if (tsdb == null) {
+                logger.error("No TSDB implementation with name " + importRecord.getTsdbName() + " found on.");
                 return Response.serverError().entity("No TSDB implementation with name " + importRecord.getTsdbName() + " found on server!").build();
             }
 
@@ -136,6 +142,7 @@ public class QueryRunnerResource {
 
 
         }
+        logger.error("Error performing import!");
         return Response.serverError().entity(new String[]{"Error performing import!"}).build();
     }
 

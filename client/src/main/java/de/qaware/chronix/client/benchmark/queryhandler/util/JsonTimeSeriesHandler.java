@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -21,6 +23,7 @@ import java.util.zip.GZIPOutputStream;
 public class JsonTimeSeriesHandler {
 
     private static JsonTimeSeriesHandler instance;
+    private  final Logger logger = LoggerFactory.getLogger(JsonTimeSeriesHandler.class);
     private String timeSeriesJsonRecordDirectoryPath = System.getProperty("user.home")
             + File.separator
             + "chronixBenchmark"
@@ -83,10 +86,8 @@ public class JsonTimeSeriesHandler {
                 executorService.shutdownNow();
             }
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error JsonTimeSeriesHandler readTimeSeriesJson: " + e.getLocalizedMessage());
         }
 
 
@@ -98,7 +99,7 @@ public class JsonTimeSeriesHandler {
      * Writes a list of TimeSeries to gzipped TimeSeries json files in directory named after TimeSeries measurement.
      *
      * @param timeSeriesList the list of TimeSeries
-     * @return the written file names of error messages
+     * @return the written file names.
      */
     public List<String> writeTimeSeriesJson(List<TimeSeries> timeSeriesList){
         List<String> writtenList = new LinkedList<>();
@@ -135,10 +136,8 @@ public class JsonTimeSeriesHandler {
                 executorService.shutdownNow();
             }
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error JsonTimeSeriesHandler writeTimeSeriesJson: " + e.getLocalizedMessage());
         }
 
         return writtenList;
@@ -168,7 +167,7 @@ public class JsonTimeSeriesHandler {
 
 
             } catch (Exception e){
-                System.err.println("TimesSeriesReader Error: " + e.getLocalizedMessage());
+                logger.error("TimesSeriesReader Error: " + e.getLocalizedMessage());
             }
 
             return timeSeries;
@@ -212,7 +211,8 @@ public class JsonTimeSeriesHandler {
                fileOutputStream.close();
 
            } catch (IOException e) {
-               return "Error: " + e.getLocalizedMessage() + " fileName: " +fileName;
+               logger.error("Error TimeSeriesWriter: " + e.getLocalizedMessage() + " fileName: " +fileName);
+               return "";
            }
             return fileName;
        }

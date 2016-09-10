@@ -7,6 +7,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.util.stream.Stream;
 public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
     private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data";
+    private final Logger logger = LoggerFactory.getLogger(Chronix.class);
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -62,7 +65,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                 isSetup = true;
 
             } catch (Exception e) {
-                System.err.println("Chronix setup: " + e.getLocalizedMessage());
+                logger.error("Chronix setup: " + e.getLocalizedMessage());
                 isSetup = false;
             }
         }
@@ -82,7 +85,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
         try {
             solrClient.close();
         } catch (IOException e) {
-            System.err.println("Chronix Interface shutdown: " + e.getLocalizedMessage());
+            logger.error("Chronix Interface shutdown: " + e.getLocalizedMessage());
         }
     }
 
@@ -125,6 +128,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                         }
 
                     } catch (Exception e){
+                        logger.error("Error importing data points: " + e.getLocalizedMessage());
                         return "Error importing data points: " + e.getLocalizedMessage();
                     }
                 }
@@ -139,6 +143,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                     return "Error importing data points on chronix.";
                 }
             } catch (Exception e) {
+                logger.error("Error importing data points: " + e.getLocalizedMessage());
                 return "Error importing data points: " + e.getLocalizedMessage();
             }
 
@@ -237,7 +242,8 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
                             }
                         } catch (Exception e){
-                            queryResults.add(e.getLocalizedMessage());
+                            logger.error("Error Chronix performing query: " + e.getLocalizedMessage());
+                            queryResults.add("Error Chronix performing query: " + e.getLocalizedMessage());
                         }
 
                     } else {

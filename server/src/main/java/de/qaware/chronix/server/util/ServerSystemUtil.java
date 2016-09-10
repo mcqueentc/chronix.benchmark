@@ -1,5 +1,7 @@
 package de.qaware.chronix.server.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.awt.OSInfo;
 
 import java.io.BufferedReader;
@@ -21,6 +23,7 @@ import java.util.stream.Stream;
 public class ServerSystemUtil {
 
     static final String benchmarkUtilPath = "chronixBenchmark" + File.separator + "docker";
+    private static final Logger logger = LoggerFactory.getLogger(ServerSystemUtil.class);
 
     private ServerSystemUtil(){
         //Avoid instances
@@ -61,8 +64,7 @@ public class ServerSystemUtil {
                 reader.close();
 
             } catch (Exception e) {
-                e.printStackTrace();
-                result.add(e.getLocalizedMessage());
+                logger.error("Error ServerSystemUtil executeCommand: " + e.getLocalizedMessage());
             }
         }
         return result;
@@ -85,7 +87,7 @@ public class ServerSystemUtil {
                 p.waitFor();
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error ServerSystemUtil executeCommand: " + e.getLocalizedMessage());
             }
         }
     }
@@ -154,7 +156,7 @@ public class ServerSystemUtil {
             });
             return "Direcotry " + directory.getFileName() + " has been deleted.";
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error ServerSystemUtil deleteDirectory: " + e.getLocalizedMessage());
             return "Directory " + directory.getFileName() + " could not be deleted.";
         }
     }

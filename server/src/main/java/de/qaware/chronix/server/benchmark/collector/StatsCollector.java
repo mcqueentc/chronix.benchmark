@@ -8,6 +8,8 @@ import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.IgnoreTimesSeriesForJSON;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class StatsCollector {
 
     private static StatsCollector instance;
+    private final Logger logger = LoggerFactory.getLogger(StatsCollector.class);
     private final String recordDirectory = System.getProperty("user.home") + File.separator
             + "chronixBenchmark" + File.separator
             + "queryRecords" + File.separator;
@@ -79,7 +82,7 @@ public class StatsCollector {
         try {
             blockingDequeEditJobs.put(Pair.of(benchmarkRecord,dockerMeasurement));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Error StatsCollector: " + e.getLocalizedMessage());
         }
     }
 
@@ -115,12 +118,8 @@ public class StatsCollector {
                     }
 
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.error("Error StatsCollector: " + e.getLocalizedMessage());
                 }
             }
         }
@@ -185,7 +184,7 @@ public class StatsCollector {
                     blockingDequeWriteJobs.put(benchmarkRecord);
 
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("Error StatsCollector: " + e.getLocalizedMessage());
                 }
             }
 

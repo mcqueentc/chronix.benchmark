@@ -2,6 +2,8 @@ package de.qaware.chronix.shared.ServerConfig;
 
 import de.qaware.chronix.database.BenchmarkDataSource;
 import org.apache.commons.compress.utils.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -21,6 +23,7 @@ import static java.nio.file.StandardCopyOption.*;
 public class TSDBInterfaceHandler {
 
     private static TSDBInterfaceHandler instance;
+    private final Logger logger = LoggerFactory.getLogger(TSDBInterfaceHandler.class);
     private String interfaceDirectoryName = "interfaces";
     private String interfaceDirectory;
     private ServerConfigAccessor serverConfigAccessor;
@@ -91,7 +94,7 @@ public class TSDBInterfaceHandler {
                     }
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error TSDBInterfaceHandler: " + e.getLocalizedMessage());
                 }
                 return classes;
             }
@@ -122,10 +125,8 @@ public class TSDBInterfaceHandler {
                         return className;
                     }
 
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.error("Error TSDBInterfaceHandler: " + e.getLocalizedMessage());
                 }
             }
         }
@@ -150,7 +151,7 @@ public class TSDBInterfaceHandler {
                 Files.copy(jarFile.toPath(), target.toPath(), REPLACE_EXISTING);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Error TSDBInterfaceHandler: " + e.getLocalizedMessage());
                 return false;
             }
 
@@ -177,11 +178,8 @@ public class TSDBInterfaceHandler {
                 IOUtils.copy(fileInputStream, outputStream);
                 outputStream.close();
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                return false;
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Error TSDBInterfaceHandler: " + e.getLocalizedMessage());
                 return false;
             }
 
@@ -217,7 +215,7 @@ public class TSDBInterfaceHandler {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Error TSDBInterfaceHandler: " + e.getLocalizedMessage());
                     return null;
                 }
             }

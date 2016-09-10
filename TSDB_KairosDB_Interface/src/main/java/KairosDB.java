@@ -4,6 +4,8 @@ import org.kairosdb.client.builder.*;
 import org.kairosdb.client.builder.aggregator.SamplingAggregator;
 import org.kairosdb.client.response.QueryResponse;
 import org.kairosdb.client.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -18,6 +20,7 @@ import java.util.Map;
 public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
 
     private final String KAIROSDB_STORAGE_DIRECTORY = "/var/lib/cassandra";
+    private final Logger logger = LoggerFactory.getLogger(KairosDB.class);
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -41,7 +44,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
                 }
 
             } catch (Exception e) {
-                System.err.println("KairosDB Interface: " + e.getLocalizedMessage());
+                logger.error("KairosDB Interface: " + e.getLocalizedMessage());
                 isSetup = false;
             }
         }
@@ -58,7 +61,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
         try {
             kairosdb.shutdown();
         } catch (IOException e) {
-            System.err.println("KairosDB Interface shutdown: " + e.getLocalizedMessage());
+            logger.error("KairosDB Interface shutdown: " + e.getLocalizedMessage());
         }
     }
 
@@ -103,6 +106,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
                         }
 
                     } catch (Exception e) {
+                        logger.error("KairosDB import error: " + e.getLocalizedMessage());
                         return "KairosDB import error: " + e.getLocalizedMessage();
                     }
                 }
@@ -112,6 +116,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
                 Response response = kairosdb.pushMetrics(builder);
                 status = response.getStatusCode();
             } catch (Exception e) {
+                logger.error("KairosDB import error: " + e.getLocalizedMessage());
                 return "KairosDB import error: " + e.getLocalizedMessage();
             }
 
@@ -186,6 +191,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
                     queryResult.add(response.getBody());
 
                 } catch (Exception e) {
+                    logger.error("KairosDB: Error performing query: " + e.getLocalizedMessage());
                     queryResult.add("KairosDB: Error performing query: " + e.getLocalizedMessage());
                 }
 

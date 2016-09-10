@@ -1,6 +1,8 @@
 import de.qaware.chronix.database.*;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class InfluxDB implements BenchmarkDataSource<String> {
 
     private final String INFLUXDB_STORAGE_DIRECTORY = "/var/lib/influxdb/";
+    private final Logger logger = LoggerFactory.getLogger(InfluxDB.class);
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -39,6 +42,7 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                     }
 
                 } catch (Exception e) {
+                    logger.error("Error InfluxDB setup: " + e.getLocalizedMessage());
                     isSetup = false;
 
                 }
@@ -101,7 +105,8 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                 reply = "Import of "+ count + " points successful. Metric Name: " + escapedMetricName;
 
             } catch (Exception e) {
-                reply = "Influx: " + e.getLocalizedMessage();
+                logger.error("Error Influx: " + e.getLocalizedMessage());
+                reply = "Error Influx: " + e.getLocalizedMessage();
             }
         }
         return reply;
@@ -169,6 +174,7 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                 queryResults.add(queryObject);
 
             } catch (Exception e){
+                logger.error("Error performing InfluxDB query: " + e.getLocalizedMessage());
                 queryResults.add("Error performing query: " + e.getLocalizedMessage());
             }
 

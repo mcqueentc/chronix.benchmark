@@ -16,6 +16,8 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 //import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.Path;
@@ -33,6 +35,7 @@ import java.util.List;
 public class BenchmarkConfiguratorResource {
 
     private ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
+    private final Logger logger = LoggerFactory.getLogger(BenchmarkConfiguratorResource.class);
 
 
     // JUST FOR TESTING
@@ -118,6 +121,7 @@ public class BenchmarkConfiguratorResource {
             return Response.ok().entity(tsdbName + " interface is up. storage directory is: " + impl.getStorageDirectoryPath()).build();
         }
 
+        logger.info(tsdbName + " interface not responding");
         return Response.serverError().entity(tsdbName + " interface not responding").build();
 
     }
@@ -132,8 +136,8 @@ public class BenchmarkConfiguratorResource {
         if(interfaceHandler.copyTSDBInterface(fileInputStream, tsdbName)){
             return Response.ok().entity("copy successful").build();
         }
-
-        return Response.serverError().entity("copy error").build();
+        logger.info(tsdbName + ": copy error");
+        return Response.serverError().entity(tsdbName + ": copy error").build();
     }
 
 
@@ -171,7 +175,7 @@ public class BenchmarkConfiguratorResource {
                 outputStream.close();
 
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Could not write file <" + reconstructedFilePath + filename + ">");
                 return Response.serverError().entity("Server could not write file <" + reconstructedFilePath + filename + ">" ).build();
             }
 
@@ -209,20 +213,23 @@ public class BenchmarkConfiguratorResource {
                                 return Response.ok().entity(startResult.toArray()).build();
                             }
                             startResult.add("Docker container " + containerName + " is not running");
+                            logger.info("Docker container " + containerName + " is not running");
                             return Response.serverError().entity(startResult.toArray()).build();
                         }
                         String[] response = {"Wrong docker command."};
+                        logger.info("Wrong docker command.");
                         return Response.serverError().entity(response).build();
                 }
                 String[] response = {"docker container " + containerName + " already running."};
                 return Response.ok().entity(response).build();
 
             }
-            String[] response = {"docker files missing",
-                                "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName};
+            String[] response = {"docker files missing", "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName};
+            logger.error("docker files missing", "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
             return Response.serverError().entity(response).build();
         }
         String[] response = {"docker not installed or daemon not running"};
+        logger.error("docker not installed or daemon not running");
         return Response.serverError().entity(response).build();
     }
 
@@ -247,13 +254,15 @@ public class BenchmarkConfiguratorResource {
                             return Response.ok().entity(buildResult.toArray()).build();
                     }
                     String[] response = {"Wrong docker command."};
+                    logger.error("Wrong docker command.");
                     return Response.serverError().entity(response).build();
             }
-            String[] response = {"docker files missing",
-                    "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName};
+            String[] response = {"docker files missing", "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName};
+            logger.error("docker files missing", "directory = " + ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
             return Response.serverError().entity(response).build();
         }
         String[] response = {"docker not installed or daemon not running"};
+        logger.error("docker not installed or daemon not running");
         return Response.serverError().entity(response).build();
     }
 
@@ -264,6 +273,7 @@ public class BenchmarkConfiguratorResource {
             List<String> stopResult = DockerCommandLineUtil.stopContainer(containerName);
             if (DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
                 stopResult.add("Docker container " + containerName + " is still running");
+                logger.error("Docker container " + containerName + " is still running");
                 return Response.serverError().entity(stopResult.toArray()).build();
             }
             // all went good
@@ -271,6 +281,7 @@ public class BenchmarkConfiguratorResource {
             return Response.ok().entity(stopResult.toArray()).build();
         }
         String[] result = {"Docker is not installed or running."};
+        logger.error("Docker is not installed or running.");
         return Response.serverError().entity(result).build();
     }
 
@@ -307,6 +318,7 @@ public class BenchmarkConfiguratorResource {
 
             } else {
                 result.add("No directory named " + imageName + " found.");
+                logger.warn("No directory named " + imageName + " found.");
             }
         }
 

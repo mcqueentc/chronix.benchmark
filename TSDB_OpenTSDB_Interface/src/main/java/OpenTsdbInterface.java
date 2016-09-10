@@ -1,4 +1,6 @@
 import de.qaware.chronix.database.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -11,6 +13,7 @@ import java.util.*;
 public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     private final String OPENTSDB_STORAGE_DIRECTORY = "/tmp/hadoop-root/dfs/";
     private final int OPENTSDB_NUMBER_OF_POINTS_PER_BATCH = 10;
+    private final Logger logger = LoggerFactory.getLogger(OpenTsdbInterface.class);
     private String ipAddress;
     private int portNumber;
     private boolean isSetup = false;
@@ -40,7 +43,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
 
             } catch (Exception e){
                 isSetup = false;
-                System.err.println("Error OpenTSDB setup: " + e.getLocalizedMessage());
+                logger.error("Error OpenTSDB setup: " + e.getLocalizedMessage());
             }
 
         }
@@ -96,6 +99,8 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
                     reply = "Import of " + openTsdbMetricSet.size() + " points successful. Metric name: " + metricName;
                 }
             } catch (Exception e){
+                logger.error("Error importing data points to openTsdb: " + e.getLocalizedMessage());
+                // TODO DEBUG remove!
                 reply = "Error importing data points to openTsdb: " + e.getLocalizedMessage();
             }
 
@@ -203,6 +208,8 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
                 queryResults.add("OpenTsdb endData: " + queryObject.getEndDate());
                 queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result));
             } catch (Exception e) {
+                logger.error("OpenTSDB error performing query: " + e.getLocalizedMessage());
+                // TODO erase, only for debug
                 queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());
             }
 
