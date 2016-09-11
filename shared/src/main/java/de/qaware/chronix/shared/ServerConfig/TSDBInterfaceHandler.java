@@ -199,7 +199,7 @@ public class TSDBInterfaceHandler {
      * @param tsdbName the name of the implemented time series database
      * @return instance of implemented interface as BenchmarkDataSource
      */
-    public BenchmarkDataSource getTSDBInstance(String tsdbName){
+    public BenchmarkDataSource<Object> getTSDBInstance(String tsdbName){
         if(interfaces.containsKey(tsdbName)){
             File classFile = interfaces.get(tsdbName);
             if(classFile.exists()){
@@ -210,7 +210,7 @@ public class TSDBInterfaceHandler {
                         URLClassLoader classLoader = new URLClassLoader(new URL[] {classFile.toURI().toURL()},TSDBInterfaceHandler.class.getClassLoader());
                         Class<?> tsdbInterface = classLoader.loadClass(className);
                         Class<? extends BenchmarkDataSource> castedTsdbInterface = tsdbInterface.asSubclass(BenchmarkDataSource.class);
-                        BenchmarkDataSource castedTsdbInterfaceInstance = castedTsdbInterface.newInstance();
+                        BenchmarkDataSource<Object> castedTsdbInterfaceInstance = castedTsdbInterface.newInstance();
                         return  castedTsdbInterfaceInstance;
                     }
 

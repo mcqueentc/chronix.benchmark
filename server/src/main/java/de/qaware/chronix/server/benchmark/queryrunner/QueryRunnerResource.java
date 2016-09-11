@@ -104,7 +104,7 @@ public class QueryRunnerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response performImport(ImportRecord importRecord){
         if(importRecord != null) {
-            BenchmarkDataSource tsdb = tsdbInterfaceHandler.getTSDBInstance(importRecord.getTsdbName());
+            BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(importRecord.getTsdbName());
             if (tsdb == null) {
                 logger.error("No TSDB implementation with name " + importRecord.getTsdbName() + " found on.");
                 return Response.serverError().entity(new String[]{"No TSDB implementation with name " + importRecord.getTsdbName() + " found on server!"}).build();
