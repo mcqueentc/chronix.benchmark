@@ -4,6 +4,7 @@ import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandle
 import de.qaware.chronix.database.TimeSeries;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,40 +14,43 @@ public class JsonTimesSeriesTest {
 
     private static JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
 
-    public static void writeTest(List<TimeSeries> timeSeriesList){
-        System.out.println("\n###### Client.JsonTimeSeriesTest.writeTest ######");
-        System.out.println("Number of TimeSeries: " + timeSeriesList.size());
-        List<String> results = jsonTimeSeriesHandler.writeTimeSeriesJson(timeSeriesList);
-        //results.forEach(System.out::println);
-
-    }
-
-    public static List<TimeSeries> readTest(File directory){
+    public static void main(String[] args){
         System.out.println("\n###### Client.JsonTimeSeriesTest.readTest ######");
 
-        if(directory != null && directory.exists() && directory.isDirectory()){
-            File[] files = directory.listFiles();
-            if(files != null) {
-                System.out.println("Number of Files: " + files.length);
-                long startMilliseconds = System.currentTimeMillis();
-                List<TimeSeries> timeSeriesList = jsonTimeSeriesHandler.readTimeSeriesJson(files);
-                long endMilliseconds = System.currentTimeMillis();
-                if(timeSeriesList.get(0).getPoints().size() >= 20) {
-                    for (int i = 0; i <= 20; i++) {
+        List<File> directories = new ArrayList<>();
+        directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "air-lasttest"));
+        directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "shd"));
+        directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "promt"));
 
-                        System.out.println("JSON TimeSeries: " + timeSeriesList.get(0).getPoints().get(i));
-
+        for(File directory : directories) {
+            if (directory != null) {
+                if(directory.exists() && directory.isDirectory() && canImportFromJson(directory.getName())) {
+                    File[] files = directory.listFiles();
+                    if (files != null) {
+                        List<TimeSeries> timeSeriesList = new ArrayList<>();
+                        System.out.println("\nNumber of Files: " + files.length);
+                        long startMilliseconds = System.currentTimeMillis();
+                        List<File> fileParts = new ArrayList<>();
+                        for (int i = 0; i < files.length; i++) {
+                            fileParts.add(files[i]);
+                            if (i != 0 && i % 500 == 0) {
+                                jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
+                                fileParts.clear();
+                                System.out.println(directory.getName() + ": " + i + " files read.");
+                            }
+                        }
+                        jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
+                        System.out.println(directory.getName() + ": " + files.length + " files read.");
+                        long endMilliseconds = System.currentTimeMillis();
+                        System.out.println("JSON read time: " + (endMilliseconds - startMilliseconds) + "ms");
                     }
-                    System.out.println("Number of points in " + timeSeriesList.get(0).getMetricName() + " = " + timeSeriesList.get(0).getPoints().size());
+                } else {
+                    System.out.println(directory.getName() + " could not be imported with json importer");
                 }
-
-                System.out.println("Number of TimeSeries: " + timeSeriesList.size());
-                System.out.println("JSON read time: " + (endMilliseconds - startMilliseconds) + "ms");
-                return timeSeriesList;
             }
+
         }
 
-        return null;
     }
 
     public static boolean canImportFromJson(String measurement){
