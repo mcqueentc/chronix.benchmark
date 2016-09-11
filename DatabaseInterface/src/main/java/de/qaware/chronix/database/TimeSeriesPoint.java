@@ -87,7 +87,7 @@ public class TimeSeriesPoint implements Comparable<TimeSeriesPoint> {
 
     @Override
     public int hashCode(){
-        return Objects.hash(timeStamp, value);
+        return timeStamp.hashCode();
     }
 
     @Override
