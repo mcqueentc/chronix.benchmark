@@ -196,7 +196,7 @@ public class JsonTimeSeriesHandler {
                    + escapeString(timeSeries.getTagKey_tagValue().get("process")) + "_"
                    + escapeString(timeSeries.getTagKey_tagValue().get("metricGroup")) + "_"
                    + escapeString(timeSeries.getMetricName())
-                   + ".tsjson";
+                   + ".json";
 
            try {
 
