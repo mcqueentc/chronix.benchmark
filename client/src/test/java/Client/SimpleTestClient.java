@@ -7,6 +7,7 @@ import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.database.TimeSeries;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +20,12 @@ public class SimpleTestClient {
 
         Configurator configurator = Configurator.getInstance();
         String server = "localhost";
-        File importFile = new File("/Users/mcqueen666/Desktop/p1/air-lasttest");
+        List<File> directories = new ArrayList<>();
+        directories.add(new File("/Users/mcqueen666/Desktop/p1/air-lasttest"));
+        directories.add(new File("/Users/mcqueen666/Desktop/p2/shd"));
+        directories.add(new File("/Users/mcqueen666/Desktop/p3/promt"));
+
+        //File importFile = new File("/Users/mcqueen666/Desktop/p1/air-lasttest");
         List<TimeSeries> timeSeriesList = new LinkedList<>();
 
         try {
@@ -42,22 +48,17 @@ public class SimpleTestClient {
         //StopDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
 
-        if(JsonTimesSeriesTest.canImportFromJson(importFile.getName())){
-            timeSeriesList = JsonTimesSeriesTest.readTest(new File(JsonTimesSeriesTest.getJsonTimesSeriesDirectory()
-                    + File.separator
-                    + importFile.getName()));
-        } else {
-            timeSeriesList = ReadCsvFilesTest.readCsv(importFile);
-        }
+
+
 
         // write duplicate free times series to disk
-        JsonTimesSeriesTest.writeTest(timeSeriesList);
+        //JsonTimesSeriesTest.writeTest(timeSeriesList);
 
         // import test
-        ImportTest.importCsv(timeSeriesList);
+        //ImportTest.importTimeSeries(timeSeriesList);
 
         // query test
-        QueryTest.query(timeSeriesList);
+        //QueryTest.query(timeSeriesList);
 
 
 
