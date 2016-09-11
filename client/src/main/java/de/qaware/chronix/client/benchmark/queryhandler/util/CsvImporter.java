@@ -21,6 +21,40 @@ public class CsvImporter {
 
     private final Logger logger = LoggerFactory.getLogger(CsvImporter.class);
 
+
+    /**
+     * Converts time series in each given directory to json into chronixBenchmark directory.
+     *
+     * @apiNote File format: /measurement/host_process_group_metric.csv.(gz)
+     *          file header line: Date;metricName1;metricName2;...
+     *          file data:        2015-03-04T13:59:46.673Z;0.0;0.0;...
+     *
+     * @param directories the directories containing the time series csv files.
+     */
+    public void convertCsvToJson(List<File> directories){
+
+        JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
+        for(File directory : directories){
+            if(directory.exists() && directory.isDirectory()){
+                File[] files = directory.listFiles();
+                List<File> fileParts = new ArrayList<>();
+                for(int i = 0; i < files.length; i++){
+                    fileParts.add(files[i]);
+                    if(i != 0 && i % 500 == 0){
+                        jsonTimeSeriesHandler.writeTimeSeriesJson(getTimeSeriesFromFiles(fileParts.toArray(new File[]{})));
+                        fileParts.clear();
+                        System.out.println(directory.getName() + ": " + i + " files converted.");
+                    }
+                }
+                jsonTimeSeriesHandler.writeTimeSeriesJson(getTimeSeriesFromFiles(fileParts.toArray(new File[]{})));
+                System.out.println(directory.getName() + ": " + files.length + " files converted.");
+            }
+        }
+    }
+
+
+
+
     /**
      * Creates time series for each metricName from a csv file.
      *
@@ -186,7 +220,7 @@ public class CsvImporter {
                             */
 
                             // sort points and set sorted list in time series as well start and end.
-                            Collections.sort(allPoints);
+                            /*Collections.sort(allPoints);
                             List<TimeSeriesPoint> retainPoints = new ArrayList<>();
                             for(int i = 0; i < allPoints.size() ; i++){
                                 // if timestamp is equal
@@ -202,6 +236,14 @@ public class CsvImporter {
                                 }
 
                             }
+                            */
+
+                            List<TimeSeriesPoint> retainPoints = new ArrayList<>(new LinkedHashSet<>(allPoints));
+
+
+
+
+
 
                             Collections.sort(retainPoints);
                             ts.setPoints(retainPoints);
