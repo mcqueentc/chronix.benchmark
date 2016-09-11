@@ -2,6 +2,7 @@ package de.qaware.chronix.server.benchmark.collector;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.qaware.chronix.server.util.DockerStatsRecord;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
@@ -35,7 +36,7 @@ public class StatsCollector {
     private final String recordFile = "queryRecords.json";
     private final ObjectMapper mapper;
     private volatile BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs;
-    private volatile BlockingDeque<Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs;
+    private volatile BlockingDeque<Pair<BenchmarkRecord, List<DockerStatsRecord>>> blockingDequeEditJobs;
 
     private StatsWriter statsWriter;
     private QueryRecordEditor queryRecordEditor;
@@ -78,7 +79,7 @@ public class StatsCollector {
      * @param benchmarkRecord the BenchmarkRecord to be edited and written.
      * @param dockerMeasurement the list of measurement pairs.
      */
-    public void addQueryRecordEditJob(BenchmarkRecord benchmarkRecord, List<Tuple<Double,Double,Long,Long>> dockerMeasurement){
+    public void addQueryRecordEditJob(BenchmarkRecord benchmarkRecord, List<DockerStatsRecord> dockerMeasurement){
         try {
             blockingDequeEditJobs.put(Pair.of(benchmarkRecord,dockerMeasurement));
         } catch (InterruptedException e) {
@@ -132,10 +133,10 @@ public class StatsCollector {
      */
     private class QueryRecordEditor extends Thread{
         private volatile BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs;
-        private volatile BlockingDeque<Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs;
+        private volatile BlockingDeque<Pair<BenchmarkRecord, List<DockerStatsRecord>>> blockingDequeEditJobs;
 
         public QueryRecordEditor(BlockingDeque<BenchmarkRecord> blockingDequeWriteJobs,
-                                 BlockingDeque<Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>>> blockingDequeEditJobs){
+                                 BlockingDeque<Pair<BenchmarkRecord, List<DockerStatsRecord>>> blockingDequeEditJobs){
             this.blockingDequeWriteJobs = blockingDequeWriteJobs;
             this.blockingDequeEditJobs = blockingDequeEditJobs;
 
@@ -144,17 +145,17 @@ public class StatsCollector {
         public void run(){
             while(true){
                 try {
-                    Pair<BenchmarkRecord, List<Tuple<Double,Double,Long,Long>>> queryRecordListPair = blockingDequeEditJobs.take();
+                    Pair<BenchmarkRecord, List<DockerStatsRecord>> queryRecordListPair = blockingDequeEditJobs.take();
                     List<Double> cpuUsage = new LinkedList<>();
                     List<Double> memoryUsage = new LinkedList<>();
                     List<Long> readBytes = new LinkedList<>();
                     List<Long> writtenBytes = new LinkedList<>();
                     BenchmarkRecord benchmarkRecord = queryRecordListPair.getFirst();
-                    for(Tuple<Double,Double,Long,Long> measurePair : queryRecordListPair.getSecond()){
-                        cpuUsage.add(measurePair.getFirst());
-                        memoryUsage.add(measurePair.getSecond());
-                        readBytes.add(measurePair.getThird());
-                        writtenBytes.add(measurePair.getFourth());
+                    for(DockerStatsRecord dockerStatsRecord : queryRecordListPair.getSecond()){
+                        cpuUsage.add(dockerStatsRecord.getCpuUsage());
+                        memoryUsage.add(dockerStatsRecord.getMemoryUsage());
+                        readBytes.add(dockerStatsRecord.getReadBytes());
+                        writtenBytes.add(dockerStatsRecord.getWrittenBytes());
 
 
                     }

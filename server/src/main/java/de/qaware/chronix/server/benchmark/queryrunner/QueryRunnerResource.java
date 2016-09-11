@@ -6,6 +6,7 @@ import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.server.benchmark.collector.StatsCollector;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
+import de.qaware.chronix.server.util.DockerStatsRecord;
 import de.qaware.chronix.server.util.DockerStatsUtil;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
@@ -40,7 +41,7 @@ public class QueryRunnerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response performQuery(QueryRecord queryRecord){
         if(queryRecord != null) {
-            BenchmarkDataSource tsdb = tsdbInterfaceHandler.getTSDBInstance(queryRecord.getTsdbName());
+            BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(queryRecord.getTsdbName());
             if (tsdb == null) {
                 logger.error("No TSDB implementation with name " + queryRecord.getTsdbName() + " found on.");
                 return Response.serverError().entity(new String[]{"No TSDB implementation with name " + queryRecord.getTsdbName() + " found on server!"}).build();
@@ -74,7 +75,7 @@ public class QueryRunnerResource {
 
                 // end measurement
                 long endMilliseconds = System.currentTimeMillis();
-                List<Tuple<Double, Double, Long, Long>> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
+                List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
                 Long endDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
 
 
@@ -125,7 +126,7 @@ public class QueryRunnerResource {
 
                 // end measurement
                 long endMilliseconds = System.currentTimeMillis();
-                List<Tuple<Double, Double, Long, Long>> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
+                List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
                 Long endDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
 
                 // edit and write the queryrecord to json file (threaded)

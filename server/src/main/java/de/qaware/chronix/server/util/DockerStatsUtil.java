@@ -15,16 +15,17 @@ import java.util.List;
  */
 public class DockerStatsUtil {
     private final Logger logger = LoggerFactory.getLogger(DockerStatsUtil.class);
-    private static final long MEASURE_INTERVAL_MILLISECONDS = 100;
-    private static final long DOCKER_STATS_REACTION_MILLISECONDS = 1000;
+    private final long MEASURE_INTERVAL_MILLISECONDS = 100;
+    private final long DOCKER_STATS_REACTION_MILLISECONDS = 1000;
+    private final int NUMBER_OF_THREADS = 4;
 
     private static DockerStatsUtil instance;
     private MeasureRunner[] threads;
 
 
     private DockerStatsUtil(){
-        OperatingSystemMXBean oSMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        threads = new MeasureRunner[oSMXBean.getAvailableProcessors()];
+       // OperatingSystemMXBean oSMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        threads = new MeasureRunner[NUMBER_OF_THREADS];
 
     }
 
@@ -61,8 +62,8 @@ public class DockerStatsUtil {
      *
      * @return A list of Pairs containing as Pair.first the cpu usage in % and as Pair.second the memory usage in %
      */
-    public List<Tuple<Double,Double, Long, Long>> stopDockerContainerMeasurement(){
-        List<Tuple<Double,Double, Long, Long>> completeMeasures = new LinkedList<>();
+    public List<DockerStatsRecord> stopDockerContainerMeasurement(){
+        List<DockerStatsRecord> completeMeasures = new LinkedList<>();
         for(int i = 0; i < threads.length; i++){
             threads[i].stopRunning();
             try {
@@ -107,7 +108,7 @@ public class DockerStatsUtil {
 
 
     private class MeasureRunner extends Thread{
-        private List<Tuple<Double,Double,Long,Long>> measures = new LinkedList<>();
+        private List<DockerStatsRecord> measures = new LinkedList<>();
         private String containerID;
         private String[] command;
         private volatile boolean running;
@@ -123,7 +124,7 @@ public class DockerStatsUtil {
             this.running = running;
         }
 
-        public List<Tuple<Double,Double,Long,Long>> getMeasures(){
+        public List<DockerStatsRecord> getMeasures(){
             return measures;
         }
 
@@ -136,12 +137,12 @@ public class DockerStatsUtil {
                 List<String> answers = ServerSystemUtil.executeCommand(command);
                 String[] splits = answers.get(0).split("%");
                 if(splits.length == 4) {
-                    Tuple<Double, Double, Long, Long> record = Tuple.of(
-                            Double.valueOf(splits[0]),
-                            Double.valueOf(splits[1]),
-                            getBytesCountFromString(splits[2]),
-                            getBytesCountFromString(splits[3]));
-                    measures.add(record);
+                    Double cpuUsage = Double.valueOf(splits[0]);
+                    Double memoryUsage = Double.valueOf(splits[1]);
+                    Long readBytes = getBytesCountFromString(splits[2]);
+                    Long writtenBytes = getBytesCountFromString(splits[3]);
+
+                    measures.add(new DockerStatsRecord(cpuUsage, memoryUsage, readBytes, writtenBytes));
                 }
             }
 
