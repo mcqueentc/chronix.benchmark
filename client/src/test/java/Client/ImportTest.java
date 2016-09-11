@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class ImportTest {
 
-    public static void importCsv(List<TimeSeries> checktimeSeriesList) {
+    public static void importTimeSeries(List<TimeSeries> checktimeSeriesList) {
 
         Configurator configurator = Configurator.getInstance();
         String server = "localhost";
