@@ -19,8 +19,8 @@ public class ReadMetaDataFromJsonTest {
 
         List<String> measurements = new ArrayList<>();
         measurements.add("air-lasttest");
-        measurements.add("shd");
-        measurements.add("promt");
+        //measurements.add("shd");
+        //measurements.add("promt");
 
         for(String measurement : measurements){
             List<TimeSeriesMetaData> timeSeriesMetaDataList = jsonTimeSeriesHandler.readTimeSeriesMetaDatafromJson(measurement);
@@ -28,8 +28,10 @@ public class ReadMetaDataFromJsonTest {
             System.out.println("Number of TimesSeriesMetaData: " + timeSeriesMetaDataList.size());
             int count = 10;
             System.out.println("First " + count + " metricNames: ...");
-            for(int i = 0; i < count; i++){
-                System.out.println(timeSeriesMetaDataList.get(i).getMetricName());
+            if(!timeSeriesMetaDataList.isEmpty()) {
+                for (int i = 0; i < count; i++) {
+                    System.out.println(timeSeriesMetaDataList.get(i).getMetricName());
+                }
             }
         }
     }

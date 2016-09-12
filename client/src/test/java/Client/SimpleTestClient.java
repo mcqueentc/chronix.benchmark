@@ -4,6 +4,7 @@ import Docker.*;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
+import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeries;
 
 import java.io.File;
@@ -19,14 +20,10 @@ public class SimpleTestClient {
     public static void main(String[] args){
 
         Configurator configurator = Configurator.getInstance();
-        String server = "localhost";
-        List<File> directories = new ArrayList<>();
-        directories.add(new File("/Users/mcqueen666/Desktop/p1/air-lasttest"));
-        directories.add(new File("/Users/mcqueen666/Desktop/p2/shd"));
-        directories.add(new File("/Users/mcqueen666/Desktop/p3/promt"));
 
-        //File importFile = new File("/Users/mcqueen666/Desktop/p1/air-lasttest");
-        List<TimeSeries> timeSeriesList = new LinkedList<>();
+        long startMillis;
+        long endMillis;
+        String server = "localhost";
 
         try {
             if (configurator.isServerUp(server)) {
@@ -48,14 +45,13 @@ public class SimpleTestClient {
         //StopDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
 
-
-
-
-        // write duplicate free times series to disk
-        //JsonTimesSeriesToMetaDataTest.writeTest(timeSeriesList);
-
+        startMillis = System.currentTimeMillis();
         // import test
-        //ImportTest.importTimeSeries(timeSeriesList);
+        ImportTest.importTimeSeriesHeavy();
+        endMillis = System.currentTimeMillis();
+        System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
+
+
 
         // query test
         //QueryTest.query(timeSeriesList);
