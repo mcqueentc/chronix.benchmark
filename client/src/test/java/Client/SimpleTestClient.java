@@ -52,7 +52,7 @@ public class SimpleTestClient {
 
 
         // write duplicate free times series to disk
-        //JsonTimesSeriesTest.writeTest(timeSeriesList);
+        //JsonTimesSeriesToMetaDataTest.writeTest(timeSeriesList);
 
         // import test
         //ImportTest.importTimeSeries(timeSeriesList);

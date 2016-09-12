@@ -1,4 +1,4 @@
-package Client;
+package Client.data;
 
 import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeries;
@@ -34,7 +34,7 @@ public class JsonTimesSeriesToMetaDataTest {
                         List<File> fileParts = new ArrayList<>();
                         for (int i = 0; i < files.length; i++) {
                             fileParts.add(files[i]);
-                            if (i != 0 && i % 500 == 0) {
+                            if (i != 0 && i % 250 == 0) {
                                 List<TimeSeries> readList = jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
                                 jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(readList);
                                 fileParts.clear();

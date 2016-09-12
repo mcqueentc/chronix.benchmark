@@ -1,4 +1,4 @@
-package Client;
+package Client.data;
 
 import de.qaware.chronix.client.benchmark.queryhandler.util.CsvImporter;
 import de.qaware.chronix.database.TimeSeries;
@@ -17,7 +17,7 @@ public class ReadCsvFilesTest {
 
     public static List<TimeSeries> readCsv(File directory){
 
-        System.out.println("\n###### Client.ReadCsvFilesTest ######");
+        System.out.println("\n###### Client.data.ReadCsvFilesTest ######");
         long startMilliseconds = Long.MIN_VALUE;
         long endMilliseconds = Long.MAX_VALUE;
 
