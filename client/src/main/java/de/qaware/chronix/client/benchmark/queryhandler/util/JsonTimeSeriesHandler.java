@@ -64,6 +64,23 @@ public class JsonTimeSeriesHandler {
         return measurementDirectory.exists();
     }
 
+    /**
+     * Deletes the previously saved meta data for a given measurement name.
+     *
+     * @param measurementName the measurement name for which to delete the meta data.
+     * @return true if success.
+     */
+    public boolean deleteTimeSeriesMetaDataJsonFile(String measurementName){
+            File recordFile = new File(timeSeriesMetaDataRecordDirectoryPath + File.separator + measurementName + ".json");
+            try {
+                Files.deleteIfExists(recordFile.toPath());
+
+            } catch (IOException e) {
+                logger.error("Could not delete json file for measurement: " + measurementName + " -> " + e.getLocalizedMessage());
+                return false;
+            }
+            return true;
+    }
 
     /**
      * Writes a list of TimeSeriesMetaData to timeseries_metadata_records.json file
