@@ -20,6 +20,7 @@ import java.util.zip.GZIPInputStream;
 public class CsvImporter {
 
     private final Logger logger = LoggerFactory.getLogger(CsvImporter.class);
+    private final int PARALLEL_BATCH_SIZE = 250;
 
 
     /**
@@ -40,7 +41,7 @@ public class CsvImporter {
                 List<File> fileParts = new ArrayList<>();
                 for(int i = 0; i < files.length; i++){
                     fileParts.add(files[i]);
-                    if(i != 0 && i % 500 == 0){
+                    if(i != 0 && i % PARALLEL_BATCH_SIZE == 0){
                         jsonTimeSeriesHandler.writeTimeSeriesJson(getTimeSeriesFromFiles(fileParts.toArray(new File[]{})));
                         fileParts.clear();
                         System.out.println(directory.getName() + ": " + i + " files converted.");
