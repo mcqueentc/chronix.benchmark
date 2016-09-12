@@ -22,6 +22,7 @@ public class JsonTimesSeriesToMetaDataTest {
         directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "air-lasttest"));
         directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "shd"));
         directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "promt"));
+        directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "swl"));
 
         for(File directory : directories) {
             if (directory != null) {
@@ -34,7 +35,7 @@ public class JsonTimesSeriesToMetaDataTest {
                         List<File> fileParts = new ArrayList<>();
                         for (int i = 0; i < files.length; i++) {
                             fileParts.add(files[i]);
-                            if (i != 0 && i % 250 == 0) {
+                            if (i != 0 && i % 100 == 0) {
                                 List<TimeSeries> readList = jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
                                 jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(readList);
                                 fileParts.clear();

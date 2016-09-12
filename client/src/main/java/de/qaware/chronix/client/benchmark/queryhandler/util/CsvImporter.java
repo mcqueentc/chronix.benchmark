@@ -20,7 +20,7 @@ import java.util.zip.GZIPInputStream;
 public class CsvImporter {
 
     private final Logger logger = LoggerFactory.getLogger(CsvImporter.class);
-    private final int PARALLEL_BATCH_SIZE = 250;
+    private final int PARALLEL_BATCH_SIZE = 100;
 
 
     /**
