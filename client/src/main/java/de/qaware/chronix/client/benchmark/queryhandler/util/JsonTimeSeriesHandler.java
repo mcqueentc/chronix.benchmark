@@ -3,17 +3,20 @@ package de.qaware.chronix.client.benchmark.queryhandler.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
+import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.database.TimeSeriesPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -29,6 +32,11 @@ public class JsonTimeSeriesHandler {
             + "chronixBenchmark"
             + File.separator
             + "timeseries_records";
+    private String timeSeriesMetaDataRecordDirectoryPath = System.getProperty("user.home")
+            + File.separator
+            + "chronixBenchmark"
+            + File.separator
+            + "timeseries_metadata";
 
 
     private JsonTimeSeriesHandler(){
@@ -55,6 +63,74 @@ public class JsonTimeSeriesHandler {
         File measurementDirectory = new File(timeSeriesJsonRecordDirectoryPath + File.separator + measurement);
         return measurementDirectory.exists();
     }
+
+
+    /**
+     * Writes a list of TimeSeriesMetaData to timeseries_metadata_records.json file
+     *
+     * @param timeSeriesList the list of TimeSeriesMetaData
+     */
+    public void writeTimeSeriesMetaDataJson(List<TimeSeries> timeSeriesList){
+        if(timeSeriesList != null && !timeSeriesList.isEmpty()){
+
+            ObjectMapper mapper = new ObjectMapper();
+            List<TimeSeriesMetaData> timeSeriesMetaDataList = convertTimeSeriesToMetaData(timeSeriesList);
+            for (TimeSeriesMetaData metaData : timeSeriesMetaDataList) {
+                File recordFile = new File(timeSeriesMetaDataRecordDirectoryPath + File.separator + metaData.getMeasurementName() + ".json");
+                if(!recordFile.getParentFile().exists()){
+                    recordFile.getParentFile().mkdirs();
+                }
+                try {
+                    final String timeSeriesMetaDataRecord = mapper.writeValueAsString(metaData);
+                    if(recordFile.exists()) {
+                        Files.write(recordFile.toPath(), Arrays.asList(timeSeriesMetaDataRecord), StandardOpenOption.APPEND);
+                    } else {
+                        Files.write(recordFile.toPath(), Arrays.asList(timeSeriesMetaDataRecord), StandardOpenOption.CREATE);
+                    }
+
+
+                } catch (Exception e) {
+                    logger.error("Could not write meta data to json: " + e.getLocalizedMessage());
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Reads the TimeSeriesMetaData for given measurement name from TimeSeriesMetaDataRecord json file.
+     *
+     * @param measurementName the measurement name which meta data should be read.
+     * @return a list of TimeSeriesMetaData for the given measurement name.
+     */
+    public List<TimeSeriesMetaData> readTimeSeriesMetaDatafromJson(String measurementName){
+        List<TimeSeriesMetaData> timeSeriesMetaDataList = new ArrayList<>();
+        if(measurementName != null){
+            ObjectMapper mapper = new ObjectMapper();
+            File recordFile = new File(timeSeriesMetaDataRecordDirectoryPath + File.separator + measurementName + ".json");
+            if(recordFile.exists()){
+                try  {
+                    Stream<String> lines = Files.lines(recordFile.toPath());
+                    lines.forEach(line -> {
+                        try {
+                            timeSeriesMetaDataList.add(mapper.readValue(line, TimeSeriesMetaData.class));
+                        } catch (IOException e) {
+                            logger.error("Could not generate object from json: " + e.getLocalizedMessage());
+                        }
+                    });
+
+                } catch (IOException e) {
+                    logger.error("Could not read from json file: " + e.getLocalizedMessage());
+                }
+            } else {
+                logger.error("Json record file does not exist for the measurement: " + measurementName);
+            }
+        }
+
+
+        return timeSeriesMetaDataList;
+    }
+
 
     /**
      * Generates a list of TimeSeries from gzipped json files.
@@ -217,6 +293,17 @@ public class JsonTimeSeriesHandler {
             return fileName;
        }
    }
+
+    private List<TimeSeriesMetaData> convertTimeSeriesToMetaData(List<TimeSeries> timeSeriesList){
+        List<TimeSeriesMetaData> timeSeriesMetaDataList = new ArrayList<>();
+        if(timeSeriesList != null && !timeSeriesList.isEmpty()){
+            for(TimeSeries timeSeries : timeSeriesList){
+                timeSeriesMetaDataList.add(new TimeSeriesMetaData(timeSeries));
+            }
+        }
+
+        return timeSeriesMetaDataList;
+    }
 
     private String escapeString(String s) {
         return s.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)","_").replaceAll("(-)", "_");
