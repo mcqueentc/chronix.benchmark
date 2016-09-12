@@ -153,7 +153,7 @@ public class OpenTsdb {
                     .request(MediaType.APPLICATION_JSON)
                     .get(String.class);
         } catch (Exception e) {
-            logger.info("Exception occurred while pre-assign dimensions", e);
+            logger.info("Exception occurred while pre-assign dimensions: " + e.getLocalizedMessage());
         }
         return "";
 

@@ -19,6 +19,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     private boolean isSetup = false;
     private String dbName = "chronixBenchmark";
     OpenTsdb openTsdb;
+    private boolean dimensionsSet = false;
 
 
     @Override
@@ -70,10 +71,13 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
         String reply = "Error importing data points to openTsdb.";
         if(isSetup && timeSeries != null) {
             Map<String, String> tags = timeSeries.getTagKey_tagValue();
-            try {
-                openTsdb.preAssignDimensions(tags.keySet());
-            } catch (Exception e){
-                logger.info("OpenTSDB: Dimensions already set.");
+            if(!dimensionsSet) {
+                try {
+                    openTsdb.preAssignDimensions(tags.keySet());
+                    dimensionsSet = true;
+                } catch (Exception e) {
+                    logger.info("OpenTSDB: Dimensions already set.");
+                }
             }
             // create escapted metricName
             String metricName = openTSDBEscapeValue(timeSeries.getMetricName());
