@@ -10,12 +10,13 @@ import java.util.List;
 /**
  * Created by mcqueen666 on 03.09.16.
  */
-public class JsonTimesSeriesTest {
+public class JsonTimesSeriesToMetaDataTest {
 
     private static JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
 
     public static void main(String[] args){
         System.out.println("\n###### Client.JsonTimeSeriesTest.readTest ######");
+
 
         List<File> directories = new ArrayList<>();
         directories.add(new File(jsonTimeSeriesHandler.getTimeSeriesJsonRecordDirectoryPath() + File.separator + "air-lasttest"));
@@ -34,12 +35,14 @@ public class JsonTimesSeriesTest {
                         for (int i = 0; i < files.length; i++) {
                             fileParts.add(files[i]);
                             if (i != 0 && i % 500 == 0) {
-                                jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
+                                List<TimeSeries> readList = jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
+                                jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(readList);
                                 fileParts.clear();
                                 System.out.println(directory.getName() + ": " + i + " files read.");
                             }
                         }
-                        jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
+                        List<TimeSeries> readList = jsonTimeSeriesHandler.readTimeSeriesJson(fileParts.toArray(new File[]{}));
+                        jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(readList);
                         System.out.println(directory.getName() + ": " + files.length + " files read.");
                         long endMilliseconds = System.currentTimeMillis();
                         System.out.println("JSON read time: " + (endMilliseconds - startMilliseconds) + "ms");
