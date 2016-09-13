@@ -1,4 +1,5 @@
 import de.qaware.chronix.database.*;
+import de.qaware.chronix.database.util.DockerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +29,13 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
             try {
                 openTsdb = new OpenTsdb.Builder("http://" + ipAddress + ":" + portNumber).create();
 
+                boolean once = false;
                 //wait until openTsdb is up and ready
                 while(!openTsdb.isResponding()){
+                    if(!once){
+                        logger.info("OpenTsdb is setting up ... waiting ...");
+                        once = true;
+                    }
                     Thread.sleep(250);
                 }
 
@@ -53,6 +59,13 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
 
     @Override
     public boolean clean() {
+        DockerUtil dockerUtil = new DockerUtil();
+        List<String> result = dockerUtil.executeCommandOnDockerContainer("opentsdb", "./opt/cleanseDatabase.sh");
+        if(!result.isEmpty()){
+            logger.error("OpenTsdb: Performing command on docker container: {}", result);
+            return true;
+        }
+        logger.error("OpenTsdb: Error performing command on docker.");
         return false;
     }
 
