@@ -47,7 +47,9 @@ public class SimpleTestClient {
 
         startMillis = System.currentTimeMillis();
         // import test
-        ImportTest.importTimeSeriesHeavy();
+        //ImportTest.importTimeSeriesHeavy();
+        ImportTest.importNumberOfTimeSeries(10);
+
         endMillis = System.currentTimeMillis();
         System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
 

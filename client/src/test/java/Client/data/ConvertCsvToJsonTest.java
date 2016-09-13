@@ -19,7 +19,7 @@ public class ConvertCsvToJsonTest {
         long endMilliseconds;
 
         List<File> directories = new ArrayList<>();
-        //directories.add(new File("/Volumes/MyPassport(RED)/BA/data_csv/p1/air-lasttest"));
+        directories.add(new File("/Volumes/MyPassport(RED)/BA/data_csv/p1/air-lasttest"));
         //directories.add(new File("/Volumes/MyPassport(RED)/BA/data_csv/p2/shd"));
         //directories.add(new File("/Volumes/MyPassport(RED)/BA/data_csv/p3/promt"));
         //directories.add(new File("/Volumes/MyPassport(RED)/BA/data_csv/p4/swl"));

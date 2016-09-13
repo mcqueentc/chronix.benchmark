@@ -25,7 +25,7 @@ public class ImportTest {
         Configurator configurator = Configurator.getInstance();
         String server = "localhost";
 
-        System.out.println("\n###### Client.ImportTest ######");
+        System.out.println("\n###### Client.ImportTest.importTimesSeries ######");
 
         if (configurator.isServerUp(server)) {
             System.out.println("Server is up");
@@ -43,7 +43,6 @@ public class ImportTest {
             for (ServerConfigRecord r : readRecord) {
                 LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
                 for (String externalImpl : externalImpls) {
-                        BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(externalImpl);
                         String ip = r.getServerAddress();
                         String port = serverConfigAccessor.getHostPortForTSDB(ip, externalImpl);
 
@@ -110,6 +109,56 @@ public class ImportTest {
             }
         }
     }
+
+    public static void importNumberOfTimeSeries(int number){
+        JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
+        List<File> directories = new ArrayList<>();
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
+
+
+        for(File directory : directories){
+            if(directory.exists()){
+                File[] files = directory.listFiles();
+                if(files != null) {
+                    List<File> fileList = new ArrayList<>();
+                    // as if was not imported previously
+                    jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
+
+                    for (int i = 0; i < number; i++) {
+                        if (i != 0 && i % 500 == 0) {
+                            //read timeseries from json
+                            List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+                            fileList.clear();
+                            System.out.println("Number of TimeSeries to import: " + timeSeries.size());
+                            System.out.println("Number of TimeSeries left: " + (files.length - i));
+                            // import to tsdbs
+                            String queryID = directory.getName() + ":" + i;
+                            ImportTest.importTimeSeries(timeSeries, queryID);
+                            // generate meta data
+                            jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
+                        }
+
+                        fileList.add(files[i]);
+                    }
+                    //read timeseries from json
+                    List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+                    fileList.clear();
+                    System.out.println("Number of TimesSeries to import: " + timeSeries.size());
+                    for(TimeSeries ts : timeSeries){
+                        System.out.println("Measurement: "+ ts.getMeasurementName() + " -> Metric name to be imported: " + ts.getMetricName());
+                    }
+                    // import to tsdbs
+                    String queryID = directory.getName() + ":" + number;
+                    ImportTest.importTimeSeries(timeSeries, queryID);
+                    // generate meta data
+                    jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
+                }
+            }
+        }
+    }
+
 
 
 }
