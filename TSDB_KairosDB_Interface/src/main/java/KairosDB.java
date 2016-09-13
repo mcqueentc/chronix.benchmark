@@ -2,6 +2,7 @@ import de.qaware.chronix.database.*;
 import org.kairosdb.client.HttpClient;
 import org.kairosdb.client.builder.*;
 import org.kairosdb.client.builder.aggregator.SamplingAggregator;
+import org.kairosdb.client.response.GetResponse;
 import org.kairosdb.client.response.QueryResponse;
 import org.kairosdb.client.response.Response;
 import org.slf4j.Logger;
@@ -51,6 +52,21 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
 
     @Override
     public boolean clean() {
+        try {
+            GetResponse metricNameResponse = kairosdb.getMetricNames();
+            if(metricNameResponse.getStatusCode() == 200){
+                List<String> metricNames = metricNameResponse.getResults();
+                for(String metric : metricNames){
+                    Response deleteResult = kairosdb.deleteMetric(metric);
+                    if(deleteResult.getStatusCode() != 204){
+                        logger.info("Could not delete metric {} due to {}", metric, deleteResult.getErrors());
+                    }
+                }
+                return true;
+            }
+        } catch (IOException e) {
+           logger.error("Error deleting metris: " + e.getLocalizedMessage());
+        }
         return false;
     }
 
@@ -58,6 +74,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
     public void shutdown() {
         try {
             kairosdb.shutdown();
+            isSetup = false;
         } catch (IOException e) {
             logger.error("KairosDB Interface shutdown: " + e.getLocalizedMessage());
         }
@@ -118,7 +135,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
                 return "KairosDB import error: " + e.getLocalizedMessage();
             }
 
-            return "KairosDB imported points: " + count + " with metric name: " + escapedMetricName + " and status code: " + status;
+            return "Status: " + status + " -> KairosDB imported points: " + count + " with metric name: " + escapedMetricName;
         }
         return "KairosDB was not setup";
 
@@ -214,6 +231,9 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
         //Remove point if it is the first character
         if (escapedString.indexOf(".") == 0) {
             escapedString = escapedString.substring(1);
+        }
+        if(escapedString.charAt(escapedString.length() -1 ) == '.'){
+            escapedString = escapedString.substring(0, escapedString.length() -1 );
         }
         return escapedString;
     }
