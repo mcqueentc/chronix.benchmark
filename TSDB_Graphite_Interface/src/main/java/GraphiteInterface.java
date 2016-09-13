@@ -1,4 +1,5 @@
 import de.qaware.chronix.database.*;
+import de.qaware.chronix.database.util.DockerUtil;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -73,6 +75,13 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
 
     @Override
     public boolean clean() {
+        DockerUtil dockerUtil = new DockerUtil();
+        List<String> result = dockerUtil.executeCommandOnDockerContainer("graphite", "/opt/graphite/bin/cleanseDatabase.sh");
+        if(result.isEmpty()){
+            logger.info("Graphite: Deleted storage directory successful.");
+            return true;
+        }
+        logger.error("Graphite: Error deleting storage directory: {}",result);
         return false;
     }
 
@@ -101,7 +110,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
         String reply = "Error: graphite was not setup!";
         if(isSetup && timeSeries != null){
 
-            String metric = getGraphiteMetricWithTags(timeSeries.getMetricName(), timeSeries.getTagKey_tagValue());
+            String metric = getGraphiteMetricWithTags(timeSeries.getMetricName(), timeSeries.getTagKey_tagValue()) + ".metric";
 
             // write data
             int count = 0;
@@ -251,6 +260,9 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
         //String prefix = escape(metadata.joinWithoutMetric(), ".");
         String metric = escape(metricName, ".").replaceAll("%", "Percent").replaceAll("-", ".").replaceAll("\\.+", ".");
 
+        if(metric.charAt(metric.length() -1 ) == '.'){
+            metric = metric.substring(0, metric.length() - 1 );
+        }
         //String escapedMetric = (prefix + "." + metric).replaceAll("-", ".").replaceAll("\\.+", ".");
         return metric;
     }
