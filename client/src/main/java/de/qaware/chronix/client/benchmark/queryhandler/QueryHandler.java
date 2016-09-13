@@ -2,6 +2,7 @@ package de.qaware.chronix.client.benchmark.queryhandler;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.shared.QueryUtil.CleanCommand;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 
@@ -11,6 +12,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -101,18 +103,18 @@ public class QueryHandler {
         return new String[]{"Server status code: " + statusCode};
     }
 
-
-
-    //test
-    public String[] getMeasurement(String serverAddress){
+    public String[] cleanDatabasesOnServer(String serverAddress, List<CleanCommand> cleanCommandList){
         final Client client = ClientBuilder.newBuilder().build();
         final WebTarget target = client.target("http://"
                 + serverAddress
                 + ":"
                 + configurator.getApplicationPort()
-                + "/queryrunner/measurement");
-        final Response response = target.request().get();
-        return  response.readEntity(String[].class);
+                + "/queryrunner/cleanDatabases");
+
+        final Response response = target.request().post(Entity.json(cleanCommandList));
+        String[] results = response.readEntity(String[].class);
+        client.close();
+        return results;
     }
 
 }

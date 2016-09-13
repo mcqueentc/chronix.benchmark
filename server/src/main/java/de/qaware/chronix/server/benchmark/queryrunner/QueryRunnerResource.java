@@ -10,6 +10,7 @@ import de.qaware.chronix.server.util.DockerStatsRecord;
 import de.qaware.chronix.server.util.DockerStatsUtil;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.shared.QueryUtil.CleanCommand;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
@@ -19,10 +20,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by mcqueen666 on 15.06.16.
@@ -152,5 +150,39 @@ public class QueryRunnerResource {
         return Response.serverError().entity(new String[]{"Error performing import!"}).build();
     }
 
+    @POST
+    @Path("cleanDatabases")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response cleanDatabases(List<CleanCommand> cleanCommandList){
+        List<String> results = new ArrayList<>();
+        if(cleanCommandList != null && !cleanCommandList.isEmpty()){
+            for(CleanCommand cleanCommand : cleanCommandList){
+                BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(cleanCommand.getTsdbName());
+                if(tsdb != null){
+                    if(tsdb.setup(cleanCommand.getIpAddress(), cleanCommand.getPortNumber())){
+                        if(tsdb.clean()){
+                            results.add(cleanCommand.getTsdbName() + " was cleaned.");
+                        }
+                        else {
+                            results.add(cleanCommand.getTsdbName() + " was not cleaned.");
+                        }
+                    }
+                    else {
+                        results.add(cleanCommand.getTsdbName() + " could not be setup.");
+                    }
+                    tsdb.shutdown();
+                }
+                else {
+                    results.add(cleanCommand.getTsdbName() + " not found on server.");
+                }
+
+            }
+        }
+        else {
+            results.add("No instructions given!");
+        }
+
+        return Response.ok().entity(results.toArray(new String[]{})).build();
+    }
     
 }
