@@ -8,6 +8,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.SolrPingResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +49,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
     @Override
     public boolean setup(String ipAddress, int portNumber) {
         if(!isSetup) {
-            SolrClient solrClient = new HttpSolrClient("http://" + ipAddress + ":" + portNumber + "/solr/chronix/");
+            SolrClient solrClient = new HttpSolrClient.Builder("http://" + ipAddress + ":" + portNumber + "/solr/chronix/").build();
             try {
                 //solrClient.ping();
                 this.ipAddress = ipAddress;
@@ -90,7 +92,15 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
     @Override
     public boolean clean() {
-        //TODO
+        try {
+            solrClient.deleteByQuery("*:*");
+            UpdateResponse response = solrClient.commit();
+            logger.info("chronix cleaning: status = {} ", response.getStatus());
+            return true;
+
+        } catch (Exception e) {
+           logger.error("Chronix: Could not clean database: {}", e.getLocalizedMessage());
+        }
 
         return false;
     }
@@ -99,6 +109,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
     public void shutdown() {
         try {
             solrClient.close();
+            isSetup = false;
         } catch (IOException e) {
             logger.error("Chronix Interface shutdown: " + e.getLocalizedMessage());
         }
@@ -118,6 +129,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
             MetricTimeSeries.Builder builder = new MetricTimeSeries.Builder(escapedMetricName);
             for(Map.Entry<String, String> entry : timeSeries.getTagKey_tagValue().entrySet()){
                 builder.attribute(entry.getKey(), escape(entry.getValue()));
+                //logger.info("chronix: unescaped tag: {}, escaped tag: {}",entry.getValue(), escape(entry.getValue()));
             }
 
             List<TimeSeriesPoint> pointList = timeSeries.getPoints();
@@ -275,7 +287,13 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
 
     public static String escape(String metric) {
-        return metric.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)", "_");
+        String result = metric.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#|-)", "_");
+        result = ClientUtils.escapeQueryChars(result);
+        result = result.replaceAll("\\\\\\*", "*");
+        if(result.charAt(result.length() -1 ) == '_'){
+            result = result.substring(0, result.length() -1 );
+        }
+        return result;
     }
 
     private boolean isSolrResponding(){
