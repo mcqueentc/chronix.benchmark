@@ -65,13 +65,18 @@ public class InfluxDB implements BenchmarkDataSource<String> {
 
     @Override
     public boolean clean() {
-        influxDB.deleteDatabase(dbName);
-        return true;
+        if(isSetup){
+            influxDB.deleteDatabase(dbName);
+            influxDB.createDatabase(dbName);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void shutdown() {
         // nothing to do for influxdb
+        isSetup = false;
     }
 
     @Override
@@ -196,7 +201,11 @@ public class InfluxDB implements BenchmarkDataSource<String> {
     }
 
     private String escapeInfluxDBMetricName(String metricName) {
-        return metricName.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)","_").replaceAll("(-)", "_");
+        String result = metricName.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)","_").replaceAll("(-)", "_");
+        if(result.charAt(result.length() -1 ) == '_'){
+            result = result.substring(0, result.length() -1 );
+        }
+        return result;
     }
 
 }
