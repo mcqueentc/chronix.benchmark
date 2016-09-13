@@ -175,7 +175,7 @@ public class JsonTimeSeriesHandler {
             }
 
             executorService.shutdown();
-            if(!executorService.awaitTermination(1000, TimeUnit.MILLISECONDS)){
+            if(!executorService.awaitTermination(10000, TimeUnit.MILLISECONDS)){
                 executorService.shutdownNow();
             }
 
