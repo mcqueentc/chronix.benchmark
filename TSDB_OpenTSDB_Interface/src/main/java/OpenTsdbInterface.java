@@ -14,6 +14,8 @@ import java.util.*;
 public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     private final String OPENTSDB_STORAGE_DIRECTORY = "/tmp/hadoop-root/dfs/";
     private final int OPENTSDB_NUMBER_OF_POINTS_PER_BATCH = 10;
+    private final int WAIT_TIME_SLICE = 250;
+    private final int MAX_WAIT_TIME = 180_000;
     private final Logger logger = LoggerFactory.getLogger(OpenTsdbInterface.class);
     private String ipAddress;
     private int portNumber;
@@ -29,14 +31,15 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
             try {
                 openTsdb = new OpenTsdb.Builder("http://" + ipAddress + ":" + portNumber).create();
 
-                boolean once = false;
+                int elapsedTime = 0;
                 //wait until openTsdb is up and ready
-                while(!openTsdb.isResponding()){
-                    if(!once){
-                        logger.info("OpenTsdb is setting up ... waiting ...");
-                        once = true;
+                while(!openTsdb.isResponding() && elapsedTime < MAX_WAIT_TIME){
+                    if(elapsedTime % 10000 == 0) {
+                        logger.info("OpenTsdb is setting up ... waiting ... {}s", elapsedTime / 1000);
                     }
-                    Thread.sleep(250);
+
+                    Thread.sleep(WAIT_TIME_SLICE);
+                    elapsedTime += WAIT_TIME_SLICE;
                 }
 
 
@@ -46,7 +49,12 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
 
                 this.ipAddress = ipAddress;
                 this.portNumber = portNumber;
-                isSetup = true;
+                if(elapsedTime < MAX_WAIT_TIME) {
+                    isSetup = true;
+                } else {
+                    isSetup = false;
+                    logger.error("OpenTsdb max setup time exceeded.");
+                }
 
             } catch (Exception e){
                 isSetup = false;
