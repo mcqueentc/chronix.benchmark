@@ -151,7 +151,7 @@ public class ImportTest {
                         System.out.println("Measurement: "+ ts.getMeasurementName() + " -> Metric name to be imported: " + ts.getMetricName());
                     }
                     // import to tsdbs
-                    String queryID = directory.getName() + ":" + number;
+                    String queryID = "import:" + directory.getName() + ":" + number;
                     ImportTest.importTimeSeries(timeSeries, queryID);
                     // generate meta data
                     importedTimeSeriesMetaData.addAll(jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries));
