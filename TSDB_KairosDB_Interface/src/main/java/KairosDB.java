@@ -1,4 +1,5 @@
 import de.qaware.chronix.database.*;
+import de.qaware.chronix.database.util.DockerUtil;
 import org.kairosdb.client.HttpClient;
 import org.kairosdb.client.builder.*;
 import org.kairosdb.client.builder.aggregator.SamplingAggregator;
@@ -83,6 +84,14 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
     @Override
     public String getStorageDirectoryPath() {
         return KAIROSDB_STORAGE_DIRECTORY;
+    }
+
+    @Override
+    public void writeCachesToDisk(){
+        DockerUtil dockerUtil = new DockerUtil();
+        List<String> result = dockerUtil.executeCommandOnDockerContainer("kairosdb", "/forceWritingOnDisk.sh");
+        logger.info("KairosDB: writing caches to disk: {}",result);
+
     }
 
     @Override

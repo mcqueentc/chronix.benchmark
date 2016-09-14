@@ -70,7 +70,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
         DockerUtil dockerUtil = new DockerUtil();
         List<String> result = dockerUtil.executeCommandOnDockerContainer("opentsdb", "./opt/cleanseDatabase.sh");
         if(!result.isEmpty()){
-            logger.error("OpenTsdb: Performing command on docker container: {}", result);
+            logger.info("OpenTsdb: Performing command on docker container: {}", result);
             return true;
         }
         logger.error("OpenTsdb: Error performing command on docker.");
@@ -85,6 +85,15 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     @Override
     public String getStorageDirectoryPath() {
         return OPENTSDB_STORAGE_DIRECTORY;
+    }
+
+    @Override
+    public void writeCachesToDisk(){
+       /* logger.info("OpenTsdb: writing caches to disk ...");
+        DockerUtil dockerUtil = new DockerUtil();
+        List<String> result = dockerUtil.executeCommandOnDockerContainer("opentsdb", "./opt/forceWritingOnDisk.sh");
+        logger.info("OpenTsdb: Result for writing caches to disk: {}",result);*/
+
     }
 
     @Override
