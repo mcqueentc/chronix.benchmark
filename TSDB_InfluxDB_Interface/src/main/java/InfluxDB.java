@@ -187,7 +187,7 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                 }
 
                 //TODO ERASE! JUST FOR DEBUG
-                queryResults.add(queryObject);
+                queryResults.add(queryObject + "\n");
 
             } catch (Exception e){
                 logger.error("Error performing InfluxDB query: " + e.getLocalizedMessage());

@@ -225,9 +225,8 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
                 // TODO erase, only for debug
                 queryResults.add("OpenTsdb aggregatedMetric: " + queryObject.getAggregatedMetric());
                 queryResults.add("OpenTsdb tagString: " + queryObject.getTagString());
-                queryResults.add("OpenTsdb startDate: " + queryObject.getStartDate());
-                queryResults.add("OpenTsdb endData: " + queryObject.getEndDate());
-                queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result));
+                queryResults.add("OpenTsdb time range: " + queryObject.getStartDate() + " -> " + queryObject.getEndDate());
+                queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result) + "\n");
             } catch (Exception e) {
                 logger.error("OpenTSDB error performing query: " + e.getLocalizedMessage());
                 // TODO erase, only for debug

@@ -257,15 +257,11 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                             if (!resultList.isEmpty()) {
                                 resultList.forEach(ts -> queryResults.add(ts.toString()));
                                 // debug //TODO erase
-                                queryResults.add("start: " + timeSeriesMetaData.getStart());
-                                queryResults.add("end: " + timeSeriesMetaData.getEnd());
-                                queryResults.add("Query: " + queryObject);
-                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                                queryResults.add("Chronix Solr Server date: " + formatter.format(new Date(Instant.now().toEpochMilli())));
+                                queryResults.add("Chronix time range millis: " + timeSeriesMetaData.getStart() + " -> " + timeSeriesMetaData.getEnd() + "\n");
+                                //queryResults.add("Query: " + queryObject);
+                                //SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                                //queryResults.add("Chronix Solr Server date: " + formatter.format(new Date(Instant.now().toEpochMilli())));
 
-                                // debug // TODO erase
-                                queryResults.add("Fields: " + queryObject.getFields());
-                                queryResults.add("SolrQuery: " + queryObject.toQueryString());
 
                             }
                         } catch (Exception e){
