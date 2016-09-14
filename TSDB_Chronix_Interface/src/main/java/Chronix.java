@@ -121,6 +121,11 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
     }
 
     @Override
+    public void writeCachesToDisk(){
+
+    }
+
+    @Override
     public String importDataPoints(TimeSeries timeSeries) {
         long count = 0L;
         if(isSetup){

@@ -106,6 +106,11 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     }
 
     @Override
+    public void writeCachesToDisk(){
+
+    }
+
+    @Override
     public String importDataPoints(TimeSeries timeSeries) {
         String reply = "Error: graphite was not setup!";
         if(isSetup && timeSeries != null){

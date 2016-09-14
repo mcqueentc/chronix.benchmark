@@ -85,6 +85,11 @@ public class InfluxDB implements BenchmarkDataSource<String> {
     }
 
     @Override
+    public void writeCachesToDisk(){
+
+    }
+
+    @Override
     public String importDataPoints(TimeSeries timeSeries) {
         String reply = "Influxdb was not setup";
         long count = 0L;
