@@ -46,6 +46,7 @@ public class QueryRunnerResource {
             }
 
             if(tsdb.setup(queryRecord.getIpAddress(),Integer.valueOf(queryRecord.getPortNumber()))) {
+                logger.info("Performing query on {}",tsdb.getClass().getName());
                 List<BenchmarkQuery> queryList = queryRecord.getQueryList();
                 List<String> queryResults = new LinkedList<>();
 
@@ -73,6 +74,7 @@ public class QueryRunnerResource {
 
                 // end measurement
                 long endMilliseconds = System.currentTimeMillis();
+                tsdb.writeCachesToDisk();
                 List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
                 Long endDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
 
@@ -109,6 +111,7 @@ public class QueryRunnerResource {
             }
 
             if(tsdb.setup(importRecord.getIpAddress(),Integer.valueOf(importRecord.getPortNumber()))) {
+                logger.info("Performing query on {}",tsdb.getClass().getName());
                 List<TimeSeries> importList = importRecord.getTimeSeriesList();
                 List<String> importResults = new LinkedList<>();
 
@@ -124,6 +127,7 @@ public class QueryRunnerResource {
 
                 // end measurement
                 long endMilliseconds = System.currentTimeMillis();
+                tsdb.writeCachesToDisk();
                 List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
                 Long endDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
 
