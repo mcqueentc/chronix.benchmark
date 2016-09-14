@@ -87,11 +87,12 @@ public class JsonTimeSeriesHandler {
      *
      * @param timeSeriesList the list of TimeSeriesMetaData
      */
-    public void writeTimeSeriesMetaDataJson(List<TimeSeries> timeSeriesList){
+    public List<TimeSeriesMetaData> writeTimeSeriesMetaDataJson(List<TimeSeries> timeSeriesList){
+        List<TimeSeriesMetaData> timeSeriesMetaDataList = new ArrayList<>();
         if(timeSeriesList != null && !timeSeriesList.isEmpty()){
 
             ObjectMapper mapper = new ObjectMapper();
-            List<TimeSeriesMetaData> timeSeriesMetaDataList = convertTimeSeriesToMetaData(timeSeriesList);
+            timeSeriesMetaDataList = convertTimeSeriesToMetaData(timeSeriesList);
             for (TimeSeriesMetaData metaData : timeSeriesMetaDataList) {
                 File recordFile = new File(timeSeriesMetaDataRecordDirectoryPath + File.separator + metaData.getMeasurementName() + ".json");
                 if(!recordFile.getParentFile().exists()){
@@ -111,6 +112,7 @@ public class JsonTimeSeriesHandler {
                 }
             }
         }
+        return timeSeriesMetaDataList;
 
     }
 
