@@ -63,6 +63,15 @@ public interface BenchmarkDataSource<T> {
      */
     String getStorageDirectoryPath();
 
+    /**
+     * Writes cached data to disk.
+     *
+     * @apiNote This method will be called just before the disk usage will be estimated
+     *          after a series of queries was performed.
+     *
+     */
+    void writeCachesToDisk();
+
 
     /**
      * Generates the query string that will be performed with performQuery().
