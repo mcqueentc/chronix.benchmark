@@ -110,7 +110,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
         String reply = "Error: graphite was not setup!";
         if(isSetup && timeSeries != null){
 
-            String metric = getGraphiteMetricWithTags(timeSeries.getMetricName(), timeSeries.getTagKey_tagValue()) + ".metric";
+            String metric = getGraphiteMetricWithTags(timeSeries.getMetricName(), timeSeries.getTagKey_tagValue());
 
             // write data
             int count = 0;
@@ -225,8 +225,8 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
 
                 //TODO EREASE: DEBUG ONLY
                 queryResults.add("Graphite query string: " + queryObject.getQuery());
-                queryResults.add("Graphite query startDate: " + queryObject.getStartDate());
-                queryResults.add("Graphite query endDate: " + queryObject.getEndDate());
+                queryResults.add("Graphite query time range: " + queryObject.getStartDate() + " -> " + queryObject.getEndDate() + "\n");
+
 
             } catch (Exception e){
                 logger.error("Error performing graphite query: " + e.getLocalizedMessage());
@@ -252,7 +252,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
         }
    */
         // add metricName
-        return metricBuilder.append(escapedMetric).toString();
+        return metricBuilder.append(escapedMetric).toString() + ".metric";
     }
 
 
