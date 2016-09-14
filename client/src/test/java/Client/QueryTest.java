@@ -19,9 +19,9 @@ import java.util.List;
  */
 public class QueryTest {
 
-    public static void query(List<TimeSeries> checktimeSeriesList) {
+    public static void queryCount(List<TimeSeriesMetaData> metaDataList) {
 
-        if (checktimeSeriesList != null && !checktimeSeriesList.isEmpty()){
+        if (metaDataList != null && !metaDataList.isEmpty()){
             Configurator configurator = Configurator.getInstance();
             String server = "localhost";
 
@@ -46,13 +46,14 @@ public class QueryTest {
                     BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(externalImpl);
                     String ip = r.getServerAddress();
                     String port = serverConfigAccessor.getHostPortForTSDB(ip, externalImpl);
-                    String queryID = "air-lasttest:sum:1";
+                    String queryID = "query_number_of_imported:count:" + metaDataList.size();
 
-                    // make benchmarkquery list with entries
                     List<BenchmarkQuery> querys = new LinkedList<>();
-                    // entry
-                    TimeSeriesMetaData timeSeriesMetaData = new TimeSeriesMetaData(checktimeSeriesList.get(0));
-                    querys.add(new BenchmarkQuery(timeSeriesMetaData, null, BenchmarkDataSource.QueryFunction.COUNT));
+                    for(TimeSeriesMetaData metaData : metaDataList) {
+                        // make benchmarkquery list with entries
+                        // entry
+                        querys.add(new BenchmarkQuery(metaData, null, BenchmarkDataSource.QueryFunction.COUNT));
+                    }
 
                     // make queryRecord with the benchmarkquery list
                     QueryRecord queryRecord = new QueryRecord(queryID, ip, port, externalImpl, querys);

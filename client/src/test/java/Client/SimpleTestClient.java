@@ -6,6 +6,7 @@ import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeries;
+import de.qaware.chronix.database.TimeSeriesMetaData;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,10 +46,11 @@ public class SimpleTestClient {
         //StopDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
 
-        startMillis = System.currentTimeMillis();
+
         // import test
+        startMillis = System.currentTimeMillis();
         //ImportTest.importTimeSeriesHeavy();
-        ImportTest.importNumberOfTimeSeries(10);
+        List<TimeSeriesMetaData> importedTimeSeriesMetaData = ImportTest.importNumberOfTimeSeries(10);
 
         endMillis = System.currentTimeMillis();
         System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
@@ -56,7 +58,10 @@ public class SimpleTestClient {
 
 
         // query test
-        //QueryTest.query(timeSeriesList);
+        startMillis = System.currentTimeMillis();
+        QueryTest.queryCount(importedTimeSeriesMetaData);
+        endMillis = System.currentTimeMillis();
+        System.out.println("\nQuery test total time: " + (endMillis - startMillis) + "ms");
 
 
 
