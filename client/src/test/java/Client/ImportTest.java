@@ -1,5 +1,6 @@
 package Client;
 
+import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
@@ -32,26 +33,20 @@ public class ImportTest {
             System.out.println("Server is up");
         } else {
             System.out.println("Server not responding");
+            return;
         }
         // import test
-        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
-        LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
-        TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
+        BenchmarkRunnerHelper benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
         QueryHandler queryHandler = QueryHandler.getInstance();
 
         if (!checktimeSeriesList.isEmpty()) {
+                List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(checktimeSeriesList,queryID,server);
+                for (ImportRecord importRecord : importRecordList) {
 
-            for (ServerConfigRecord r : readRecord) {
-                LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
-                for (String externalImpl : externalImpls) {
-                        String ip = r.getServerAddress();
-                        String port = serverConfigAccessor.getHostPortForTSDB(ip, externalImpl);
-
-                        ImportRecord importRecord = new ImportRecord(queryID, ip, port, externalImpl, checktimeSeriesList);
-                        String[] results = queryHandler.doImportOnServer(ip, importRecord);
+                        String[] results = queryHandler.doImportOnServer(importRecord.getIpAddress(), importRecord);
                         Long latency = queryHandler.getLatencyForQueryID(queryID);
                         if (latency != null) {
-                            System.out.println("\nTSDB: " + externalImpl);
+                            System.out.println("\nTSDB: " + importRecord.getTsdbName());
                             System.out.println("QueryID: " + queryID);
                             System.out.println("Latency: " + latency + " milliseconds");
                             for (String result : results) {
@@ -61,7 +56,7 @@ public class ImportTest {
                             System.out.println("Error: " + results[0]);
                         }
                 }
-            }
+
         }
     }
 
@@ -82,7 +77,7 @@ public class ImportTest {
                     jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
 
                     for (int i = 0; i < files.length; i++) {
-                        if (i != 0 && i % 500 == 0) {
+                        if (i != 0 && i % 100 == 0) {
                             //read timeseries from json
                             List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
                             fileList.clear();
@@ -128,7 +123,7 @@ public class ImportTest {
                     jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
 
                     for (int i = 0; i < number; i++) {
-                        if (i != 0 && i % 500 == 0) {
+                        if (i != 0 && i % 100 == 0) {
                             //read timeseries from json
                             List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
                             fileList.clear();
