@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by mcqueen666 on 05.08.16.
@@ -58,6 +59,39 @@ public class ServerConfigAccessor {
         this.serverConfigRecords = serverConfigRecords;
         writeRecordFile();
     }
+
+    public synchronized void addServerConfigRecord(ServerConfigRecord serverConfigRecord){
+        readRecordFile();
+        serverConfigRecords.add(serverConfigRecord);
+        writeRecordFile();
+    }
+
+    public synchronized void removeServerConfigRecord(ServerConfigRecord serverConfigRecord){
+        readRecordFile();
+        if(serverConfigRecords.remove(serverConfigRecord)){
+            writeRecordFile();
+        }
+    }
+
+
+    /**
+     * Returns ServerConfigRecord for given server address.
+     *
+     * @param serverAddress the server address or ip.
+     * @return the ServerConfigRecord or null if not contained.
+     */
+    public ServerConfigRecord getServerConfigRecord(String serverAddress){
+        readRecordFile();
+        if(!serverConfigRecords.isEmpty()){
+            for(ServerConfigRecord serverConfigRecord : serverConfigRecords){
+                if(serverConfigRecord.getServerAddress().equals(serverAddress)){
+                    return serverConfigRecord;
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Returns the host port on given server where given tsdb is available.
