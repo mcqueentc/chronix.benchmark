@@ -26,7 +26,7 @@ import java.util.zip.GZIPOutputStream;
 public class JsonTimeSeriesHandler {
 
     private static JsonTimeSeriesHandler instance;
-    private  final Logger logger = LoggerFactory.getLogger(JsonTimeSeriesHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(JsonTimeSeriesHandler.class);
     private String timeSeriesJsonRecordDirectoryPath = System.getProperty("user.home")
             + File.separator
             + "chronixBenchmark"
@@ -51,6 +51,10 @@ public class JsonTimeSeriesHandler {
 
     public String getTimeSeriesJsonRecordDirectoryPath(){
         return timeSeriesJsonRecordDirectoryPath;
+    }
+
+    public String getTimeSeriesMetaDataRecordDirectoryPath() {
+        return timeSeriesMetaDataRecordDirectoryPath;
     }
 
     /**
