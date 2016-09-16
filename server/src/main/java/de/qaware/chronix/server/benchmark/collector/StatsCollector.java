@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.stream.Stream;
 
 /**
  * Created by mcqueen666 on 19.08.16.
@@ -30,6 +31,8 @@ public class StatsCollector {
 
     private static StatsCollector instance;
     private final Logger logger = LoggerFactory.getLogger(StatsCollector.class);
+    private final int MAX_WAIT_TIME = 120_000;
+    private final int WAIT_TIME_SLICE = 250;
     private final String recordDirectory = System.getProperty("user.home") + File.separator
             + "chronixBenchmark" + File.separator
             + "queryRecords" + File.separator;
@@ -44,8 +47,8 @@ public class StatsCollector {
     private StatsCollector(){
         initRecordFile();
         mapper = new ObjectMapper();
-        //Ignore TimeSeries at writing
-        //mapper.addMixIn(QueryRecord.class, IgnoreTimesSeriesForJSON.class);
+        //Ignore TimeSeries and query list at writing
+        mapper.addMixIn(QueryRecord.class, IgnoreTimesSeriesForJSON.class);
         mapper.addMixIn(ImportRecord.class, IgnoreTimesSeriesForJSON.class);
         blockingDequeWriteJobs = new LinkedBlockingDeque<>();
         blockingDequeEditJobs = new LinkedBlockingDeque<>();
@@ -87,7 +90,48 @@ public class StatsCollector {
         }
     }
 
+    /**
+     * Reads the benchmark record file and returns a list of BenchmarkRecords.
+     *
+     * @return list of BenchmarkRecords or empty list if error occurred.
+     */
+    List<BenchmarkRecord> getBenchmarkRecords(){
+        List<BenchmarkRecord> benchmarkRecordList = new LinkedList<>();
+        int elapsedTime = 0;
+        //wait until statsWriters job queue is empty or max wait time has elapsed.
+        while(!blockingDequeWriteJobs.isEmpty() && elapsedTime < MAX_WAIT_TIME){
+           try {
+               Thread.sleep(WAIT_TIME_SLICE);
+               elapsedTime += WAIT_TIME_SLICE;
+           } catch (InterruptedException e) {
+               logger.error("StatsCollector: Error waiting on writers job queue: {}",e.getLocalizedMessage());
+           }
+        }
+        if(elapsedTime < MAX_WAIT_TIME){
 
+                ObjectMapper mapper = new ObjectMapper();
+                File benchmarkRecordFile = new File(recordDirectory + recordFile);
+                if(benchmarkRecordFile.exists() && benchmarkRecordFile.isFile()){
+                    try {
+                        Stream<String> lines = Files.lines(benchmarkRecordFile.toPath());
+                        lines.forEach(line -> {
+                            try {
+                                benchmarkRecordList.add(mapper.readValue(line, BenchmarkRecord.class));
+                            } catch (IOException e) {
+                                logger.error("StatsCollector: Error reading from json: {}",e.getLocalizedMessage());
+                            }
+                        });
+                    } catch (IOException e) {
+                        logger.error("StatsCollector: Error reading from benchmark record file: {}",e.getLocalizedMessage());
+                    }
+                }
+
+        } else {
+            logger.error("StatsCollector: Error waiting on writers job queue: max wait time elapsed.");
+        }
+
+        return benchmarkRecordList;
+    }
 
 
 
