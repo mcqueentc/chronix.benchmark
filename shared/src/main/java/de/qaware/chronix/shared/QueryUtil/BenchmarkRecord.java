@@ -9,7 +9,7 @@ import java.util.List;
  * Created by mcqueen666 on 16.08.16.
  */
 @XmlRootElement
-public abstract class BenchmarkRecord {
+public class BenchmarkRecord {
 
     private String queryID;
     private String ipAddress;
