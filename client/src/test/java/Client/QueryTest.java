@@ -1,17 +1,12 @@
 package Client;
 
+import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.database.BenchmarkQuery;
-import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
-import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -19,11 +14,10 @@ import java.util.List;
  */
 public class QueryTest {
 
-    public static void queryCount(List<TimeSeriesMetaData> metaDataList) {
+    public static void queryCount(List<TimeSeriesMetaData> metaDataList, String server) {
 
         if (metaDataList != null && !metaDataList.isEmpty()){
             Configurator configurator = Configurator.getInstance();
-            String server = "localhost";
 
             System.out.println("\n###### Client.QueryTest ######");
 
@@ -31,48 +25,35 @@ public class QueryTest {
                 System.out.println("Server is up");
             } else {
                 System.out.println("Server not responding");
+                return;
             }
 
             // query test
 
-            ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
-            LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
-            TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
+            BenchmarkRunnerHelper benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
             QueryHandler queryHandler = QueryHandler.getInstance();
 
-            for (ServerConfigRecord r : readRecord) {
-                LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
-                for (String externalImpl : externalImpls) {
-                    BenchmarkDataSource tsdb = interfaceHandler.getTSDBInstance(externalImpl);
-                    String ip = r.getServerAddress();
-                    String port = serverConfigAccessor.getHostPortForTSDB(ip, externalImpl);
-                    String queryID = "query_number_of_imported:count:" + metaDataList.size();
+            String queryID = "query_number_of_imported:count:" + metaDataList.size();
 
-                    List<BenchmarkQuery> querys = new LinkedList<>();
-                    for(TimeSeriesMetaData metaData : metaDataList) {
-                        // make benchmarkquery list with entries
-                        // entry
-                        querys.add(new BenchmarkQuery(metaData, null, BenchmarkDataSource.QueryFunction.COUNT));
+            List<QueryRecord> queryRecordList = benchmarkRunnerHelper.getQueryRecordForTimeSeriesMetaData(metaDataList,
+                    queryID,
+                    server,
+                    BenchmarkDataSource.QueryFunction.COUNT);
+
+            for(QueryRecord queryRecord : queryRecordList){
+                String[] results = queryHandler.doQueryOnServer(queryRecord.getIpAddress(), queryRecord);
+                Long latency = queryHandler.getLatencyForQueryID(queryID);
+                if (latency != null) {
+                    System.out.println("\nTSDB: " + queryRecord.getTsdbName());
+                    System.out.println("QueryID: " + queryID);
+                    System.out.println("Latency: " + latency + " milliseconds");
+                    for (String result : results) {
+                        System.out.println("Result: " + result);
                     }
-
-                    // make queryRecord with the benchmarkquery list
-                    QueryRecord queryRecord = new QueryRecord(queryID, ip, port, externalImpl, querys);
-                    String[] results = queryHandler.doQueryOnServer(ip, queryRecord);
-                    Long latency = queryHandler.getLatencyForQueryID(queryID);
-                    if (latency != null) {
-                        System.out.println("\nTSDB: " + externalImpl);
-                        System.out.println("QueryID: " + queryID);
-                        System.out.println("Latency: " + latency + " milliseconds");
-                        for (String result : results) {
-                            System.out.println("Result: " + result);
-                        }
-                    } else {
-                        System.out.println("Error: " + results[0]);
-                    }
-
+                } else {
+                    System.out.println("Error: " + results[0]);
                 }
             }
-
 
         }
     }

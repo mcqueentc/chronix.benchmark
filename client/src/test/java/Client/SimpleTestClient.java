@@ -3,14 +3,14 @@ package Client;
 import Docker.*;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
+import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
+import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
-import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,6 +21,7 @@ public class SimpleTestClient {
     public static void main(String[] args){
 
         Configurator configurator = Configurator.getInstance();
+        JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
 
         long startMillis;
         long endMillis;
@@ -48,22 +49,35 @@ public class SimpleTestClient {
 
 
         // import test
-        startMillis = System.currentTimeMillis();
+/*
         //ImportTest.importTimeSeriesHeavy();
-        List<TimeSeriesMetaData> importedTimeSeriesMetaData = ImportTest.importNumberOfTimeSeries(10);
-
+        List<File> directories = new ArrayList<>();
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
+        // as if was not imported previously
+        for(File directory : directories){
+            jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
+        }
+        startMillis = System.currentTimeMillis();
+        List<TimeSeriesMetaData> importedTimeSeriesMetaData = ImportTest.importTimeSeriesFromDirectory(directories);
         endMillis = System.currentTimeMillis();
         System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
-
+*/
 
 
         // query test
+        TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
+        List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(1000);
         startMillis = System.currentTimeMillis();
-        QueryTest.queryCount(importedTimeSeriesMetaData);
+        QueryTest.queryCount(randomTimeSeries, server);
         endMillis = System.currentTimeMillis();
         System.out.println("\nQuery test total time: " + (endMillis - startMillis) + "ms");
 
 
+        //get benchmark query record test
+        BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
+        System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
 
     }
 }

@@ -106,12 +106,8 @@ public class ImportTest {
         }
     }
 
-    public static List<TimeSeriesMetaData> importNumberOfTimeSeries(int number){
+    public static List<TimeSeriesMetaData> importTimeSeriesFromDirectory(List<File> directories){
         JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
-        List<File> directories = new ArrayList<>();
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
 
         List<TimeSeriesMetaData> importedTimeSeriesMetaData = new ArrayList<>();
         for(File directory : directories){
@@ -119,10 +115,8 @@ public class ImportTest {
                 File[] files = directory.listFiles();
                 if(files != null) {
                     List<File> fileList = new ArrayList<>();
-                    // as if was not imported previously
-                    jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
 
-                    for (int i = 0; i < number; i++) {
+                    for (int i = 0; i < files.length; i++) {
                         if (i != 0 && i % 100 == 0) {
                             //read timeseries from json
                             List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
@@ -146,7 +140,7 @@ public class ImportTest {
                         System.out.println("Measurement: "+ ts.getMeasurementName() + " -> Metric name to be imported: " + ts.getMetricName());
                     }
                     // import to tsdbs
-                    String queryID = "import:" + directory.getName() + ":" + number;
+                    String queryID = "import:" + directory.getName() + ":" + files.length;
                     ImportTest.importTimeSeries(timeSeries, queryID);
                     // generate meta data
                     importedTimeSeriesMetaData.addAll(jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries));
