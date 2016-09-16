@@ -1,12 +1,13 @@
 package de.qaware.chronix.client.benchmark.benchmarkrunner.util;
 
-import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
+import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
+import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
+import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
+import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
-import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,10 @@ public class BenchmarkRunnerHelper {
      * @param serverAddress the server address on which the import should be done.
      * @return list of ImportRecords.
      */
-    public List<ImportRecord> getImportRecordForTimeSeries(List<TimeSeries> timeSeriesList, String queryID, String serverAddress) {
+    public List<ImportRecord> getImportRecordForTimeSeries(List<TimeSeries> timeSeriesList,
+                                                           String queryID,
+                                                           String serverAddress) {
+
         List<ImportRecord> importRecordList = new LinkedList<>();
         if (!timeSeriesList.isEmpty()) {
             ServerConfigRecord serverConfigRecord = serverConfigAccessor.getServerConfigRecord(serverAddress);
@@ -53,6 +57,35 @@ public class BenchmarkRunnerHelper {
             }
         }
         return importRecordList;
+    }
+
+    public List<QueryRecord> getQueryRecordForTimeSeriesMetaData(List<TimeSeriesMetaData> timeSeriesMetaDataList,
+                                                                 String queryID,
+                                                                 String serverAddress,
+                                                                 QueryFunction function){
+
+        List<QueryRecord> queryRecordList = new LinkedList<>();
+        if(!timeSeriesMetaDataList.isEmpty()){
+            ServerConfigRecord serverConfigRecord = serverConfigAccessor.getServerConfigRecord(serverAddress);
+            if(serverConfigRecord != null){
+                // make benchmarkquery list with entries
+                List<BenchmarkQuery> querys = new LinkedList<>();
+                for(TimeSeriesMetaData metaData : timeSeriesMetaDataList) {
+                    querys.add(new BenchmarkQuery(metaData, null, function));
+                }
+
+                List<String> externalImpls = serverConfigRecord.getExternalTimeSeriesDataBaseImplementations();
+                //generate queryRecord for every tsdb
+                for(String tsdb : externalImpls){
+                    String ip = serverConfigRecord.getServerAddress();
+                    String port = serverConfigAccessor.getHostPortForTSDB(ip, tsdb);
+
+                 queryRecordList.add(new QueryRecord(queryID, serverAddress, port, tsdb, querys));
+
+                }
+            }
+        }
+        return queryRecordList;
     }
 
 
