@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -26,8 +25,8 @@ public class TimeSeriesCounter {
         jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
     }
 
-    public TimeSeriesCounter getInstance(){
-        if(instance != null){
+    public static TimeSeriesCounter getInstance(){
+        if(instance == null){
             instance = new TimeSeriesCounter();
         }
         return instance;
@@ -45,8 +44,8 @@ public class TimeSeriesCounter {
             File[] measurements = directory.listFiles();
             if(measurements != null && measurements.length > 0) {
                 for (File measurement : measurements) {
-                    if (measurement.isDirectory()) {
-                        metaDataList.addAll(jsonTimeSeriesHandler.readTimeSeriesMetaDatafromJson(measurement.getName()));
+                    if (measurement.isFile() && measurement.getName().endsWith(".json")) {
+                        metaDataList.addAll(jsonTimeSeriesHandler.readTimeSeriesMetaDatafromJson(measurement.getName().replaceAll(".json","")));
                     }
                 }
             } else {
