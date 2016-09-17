@@ -1,4 +1,4 @@
-package de.qaware.chronix.client.benchmark.queryhandler.util;
+package de.qaware.chronix.client.benchmark.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.*;

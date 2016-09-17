@@ -1,6 +1,6 @@
 package Client.data;
 
-import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
+import de.qaware.chronix.client.benchmark.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeries;
 
 import java.io.File;

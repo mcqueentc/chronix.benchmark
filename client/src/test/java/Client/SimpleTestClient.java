@@ -6,7 +6,7 @@ import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.client.benchmark.queryhandler.util.JsonTimeSeriesHandler;
+import de.qaware.chronix.client.benchmark.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 
 import java.io.File;
@@ -49,11 +49,11 @@ public class SimpleTestClient {
 
 
         // import test
-/*
+
         //ImportTest.importTimeSeriesHeavy();
         List<File> directories = new ArrayList<>();
         directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
         // as if was not imported previously
         for(File directory : directories){
@@ -63,7 +63,7 @@ public class SimpleTestClient {
         List<TimeSeriesMetaData> importedTimeSeriesMetaData = ImportTest.importTimeSeriesFromDirectory(directories);
         endMillis = System.currentTimeMillis();
         System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
-*/
+
 
 
         // query test

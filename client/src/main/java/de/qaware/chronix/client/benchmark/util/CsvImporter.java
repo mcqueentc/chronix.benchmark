@@ -1,4 +1,4 @@
-package de.qaware.chronix.client.benchmark.queryhandler.util;
+package de.qaware.chronix.client.benchmark.util;
 
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
