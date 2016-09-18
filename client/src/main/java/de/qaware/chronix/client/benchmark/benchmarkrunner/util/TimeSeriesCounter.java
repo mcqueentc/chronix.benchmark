@@ -45,7 +45,7 @@ public class TimeSeriesCounter {
             if(measurements != null && measurements.length > 0) {
                 for (File measurement : measurements) {
                     if (measurement.isFile() && measurement.getName().endsWith(".json")) {
-                        metaDataList.addAll(jsonTimeSeriesHandler.readTimeSeriesMetaDatafromJson(measurement.getName().replaceAll(".json","")));
+                        metaDataList.addAll(jsonTimeSeriesHandler.readTimeSeriesMetaDatafromJson(measurement.getName().replace(".json","")));
                     }
                 }
             } else {
