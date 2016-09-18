@@ -36,7 +36,8 @@ public class StartDockerContainer {
 
         String[] answers = {"no container name given"};
         if(args != null && args.length > 0){
-            for(String tsdbName : args){
+            for(int i = 1; i < args.length; i++) {
+                String tsdbName = args[i];
                 for(DockerRunOptions dockerRunOptions : dockerRunOptionsList){
                     if(dockerRunOptions.getContainerName().equals(tsdbName)){
                         answers = configurator.startDockerContainer(server, dockerRunOptions);
