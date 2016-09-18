@@ -69,7 +69,7 @@ public class SimpleTestClient {
 
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
-        List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(1000);
+        List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
         startMillis = System.currentTimeMillis();
         QueryTest.queryCount(randomTimeSeries, server);
         endMillis = System.currentTimeMillis();
