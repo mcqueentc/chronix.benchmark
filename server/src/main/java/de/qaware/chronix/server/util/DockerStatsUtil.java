@@ -161,11 +161,11 @@ public class DockerStatsUtil {
                 if (Character.getType(secondLast) == Character.LOWERCASE_LETTER || Character.getType(secondLast) == Character.UPPERCASE_LETTER) {
                     result = Double.valueOf(s.substring(0, s.length()-2));
                     switch (secondLast){
-                        case 'k': result *= 1000;
+                        case 'k': result *= 1024;
                             break;
-                        case 'M': result *= 1000 * 1000;
+                        case 'M': result *= 1024 * 1024;
                             break;
-                        case 'G': result *= 1000 * 1000 * 1000;
+                        case 'G': result *= 1024 * 1024 * 1024;
                             break;
                     }
                 } else {
