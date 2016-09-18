@@ -166,7 +166,7 @@ public class JsonTimeSeriesHandler {
 
         List<TimesSeriesReader> timesSeriesReaderList = new ArrayList<>();
         for(File jsonFile : files){
-            if (jsonFile.exists() && jsonFile.isFile()){
+            if (jsonFile.exists() && jsonFile.isFile() && jsonFile.getName().endsWith(".gz")){
                 timesSeriesReaderList.add(new TimesSeriesReader(jsonFile));
             }
         }
@@ -175,7 +175,10 @@ public class JsonTimeSeriesHandler {
             List<Future<TimeSeries>> futureList = executorService.invokeAll(timesSeriesReaderList);
 
             for(Future<TimeSeries> future : futureList){
-                timeSeriesList.add(future.get());
+                TimeSeries ts = future.get();
+                if(ts != null) {
+                    timeSeriesList.add(ts);
+                }
             }
 
             executorService.shutdown();
@@ -264,7 +267,7 @@ public class JsonTimeSeriesHandler {
 
 
             } catch (Exception e){
-                logger.error("TimesSeriesReader Error: " + e.getLocalizedMessage());
+                logger.error("TimesSeriesReader Error: {}, file: {}", e.getLocalizedMessage(), jsonFile.getName());
             }
 
             return timeSeries;
