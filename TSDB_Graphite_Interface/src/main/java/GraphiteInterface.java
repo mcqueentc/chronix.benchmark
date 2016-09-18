@@ -268,6 +268,9 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
         if(metric.charAt(metric.length() -1 ) == '.'){
             metric = metric.substring(0, metric.length() - 1 );
         }
+        if(metric.charAt(0) == '.'){
+            metric = metric.substring(1, metric.length());
+        }
         //String escapedMetric = (prefix + "." + metric).replaceAll("-", ".").replaceAll("\\.+", ".");
         return metric;
     }

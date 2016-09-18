@@ -210,6 +210,9 @@ public class InfluxDB implements BenchmarkDataSource<String> {
         if(result.charAt(result.length() -1 ) == '_'){
             result = result.substring(0, result.length() -1 );
         }
+        if(result.charAt(0) == '_'){
+            result = result.substring(1, result.length());
+        }
         return result;
     }
 
