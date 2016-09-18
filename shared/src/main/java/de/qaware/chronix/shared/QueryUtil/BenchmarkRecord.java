@@ -1,9 +1,6 @@
 package de.qaware.chronix.shared.QueryUtil;
 
-import de.qaware.chronix.database.BenchmarkQuery;
-
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 /**
  * Created by mcqueen666 on 16.08.16.
@@ -24,6 +21,8 @@ public class BenchmarkRecord {
     private String cpuUsageTotal;
     private String diskUsageTotal;
     private String memoryUsageTotal;
+    private String networkDownloadedBytes;
+    private String networkUploadedBytes;
 
     public BenchmarkRecord(){}
 
@@ -114,6 +113,14 @@ public class BenchmarkRecord {
         return memoryUsageTotal;
     }
 
+    public String getNetworkDownloadedBytes() {
+        return networkDownloadedBytes;
+    }
+
+    public String getNetworkUploadedBytes() {
+        return networkUploadedBytes;
+    }
+
     //setter
     public void setQueryID(String queryID) {
         this.queryID = queryID;
@@ -165,5 +172,13 @@ public class BenchmarkRecord {
 
     public void setMemoryUsageTotal(String memoryUsageTotal) {
         this.memoryUsageTotal = memoryUsageTotal;
+    }
+
+    public void setNetworkDownloadedBytes(String networkDownloadedBytes) {
+        this.networkDownloadedBytes = networkDownloadedBytes;
+    }
+
+    public void setNetworkUploadedBytes(String networkUploadedBytes) {
+        this.networkUploadedBytes = networkUploadedBytes;
     }
 }

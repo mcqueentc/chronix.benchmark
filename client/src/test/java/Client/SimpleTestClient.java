@@ -25,7 +25,7 @@ public class SimpleTestClient {
 
         long startMillis;
         long endMillis;
-        String server = "192.168.2.115";
+        String server = "localhost";
 
         try {
             if (configurator.isServerUp(server)) {
@@ -52,7 +52,8 @@ public class SimpleTestClient {
 
         //ImportTest.importTimeSeriesHeavy(server);
         List<File> directories = new ArrayList<>();
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
         // as if was not imported previously

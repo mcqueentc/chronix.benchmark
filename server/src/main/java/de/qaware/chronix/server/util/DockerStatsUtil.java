@@ -120,7 +120,7 @@ public class DockerStatsUtil {
                     + containerID
                     + " --no-stream | grep "
                     + containerID
-                    + " | awk '{print $2 $8 $14$15\"%\" $17$18\"%\"}'"});
+                    + " | awk '{print $2 $8 $14$15\"%\" $17$18\"%\" $9$10\"%\" $12$13\"%\"}'"}); // cpu%mem%readblock%writeblock%netDOWN%netUP
             this.running = running;
         }
 
@@ -136,13 +136,16 @@ public class DockerStatsUtil {
             while(this.running) {
                 List<String> answers = ServerSystemUtil.executeCommand(command);
                 String[] splits = answers.get(0).split("%");
-                if(splits.length == 4) {
+                if(splits.length == 6) {
+                    // cpu%mem%readblock%writeblock%netDOWN%netUP
                     Double cpuUsage = Double.valueOf(splits[0]);
                     Double memoryUsage = Double.valueOf(splits[1]);
                     Long readBytes = getBytesCountFromString(splits[2]);
                     Long writtenBytes = getBytesCountFromString(splits[3]);
+                    Long networkDownloadedBytes = getBytesCountFromString(splits[4]);
+                    Long networkUploadedBytes = getBytesCountFromString(splits[5]);
 
-                    measures.add(new DockerStatsRecord(cpuUsage, memoryUsage, readBytes, writtenBytes));
+                    measures.add(new DockerStatsRecord(cpuUsage, memoryUsage, readBytes, writtenBytes, networkDownloadedBytes, networkUploadedBytes));
                 }
             }
 

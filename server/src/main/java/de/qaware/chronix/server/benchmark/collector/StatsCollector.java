@@ -194,12 +194,17 @@ public class StatsCollector {
                     List<Double> memoryUsage = new LinkedList<>();
                     List<Long> readBytes = new LinkedList<>();
                     List<Long> writtenBytes = new LinkedList<>();
+                    List<Long> networkDownloadedBytes = new LinkedList<>();
+                    List<Long> networkUploadedBytes = new LinkedList<>();
                     BenchmarkRecord benchmarkRecord = queryRecordListPair.getFirst();
+                    // seperate the measurements.
                     for(DockerStatsRecord dockerStatsRecord : queryRecordListPair.getSecond()){
                         cpuUsage.add(dockerStatsRecord.getCpuUsage());
                         memoryUsage.add(dockerStatsRecord.getMemoryUsage());
                         readBytes.add(dockerStatsRecord.getReadBytes());
                         writtenBytes.add(dockerStatsRecord.getWrittenBytes());
+                        networkDownloadedBytes.add(dockerStatsRecord.getNetworkDownloadedBytes());
+                        networkUploadedBytes.add(dockerStatsRecord.getNetworkUploadedBytes());
 
 
                     }
@@ -224,6 +229,16 @@ public class StatsCollector {
                     Long maxWrittenBytes = Collections.max(writtenBytes);
                     Long minWrittenBytes = Collections.min(writtenBytes);
                     benchmarkRecord.setWrittenBytes(String.valueOf((maxWrittenBytes - minWrittenBytes)));
+
+                    // networkDownloadedBytes
+                    Long maxDownloadedBytes = Collections.max(networkDownloadedBytes);
+                    Long minDownloadedBytes = Collections.min(networkDownloadedBytes);
+                    benchmarkRecord.setNetworkDownloadedBytes(String.valueOf(maxDownloadedBytes - minDownloadedBytes));
+
+                    // networkUploadedBytes
+                    Long maxUploadedBytes = Collections.max(networkUploadedBytes);
+                    Long minUploadedBytes = Collections.min(networkUploadedBytes);
+                    benchmarkRecord.setNetworkUploadedBytes(String.valueOf(maxUploadedBytes - minUploadedBytes));
 
                     // add job for writer
                     blockingDequeWriteJobs.put(benchmarkRecord);

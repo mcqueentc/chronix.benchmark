@@ -9,8 +9,10 @@ public class DockerStatsRecord {
     private Double memoryUsage;
     private Long readBytes;
     private Long writtenBytes;
+    private Long networkDownloadedBytes;
+    private Long networkUploadedBytes;
 
-    public DockerStatsRecord(Double cpuUsage, Double memoryUsage, Long readBytes, Long writtenBytes) {
+    public DockerStatsRecord(Double cpuUsage, Double memoryUsage, Long readBytes, Long writtenBytes, Long networkDownloadedBytes, Long networkUploadedBytes) {
         this.cpuUsage = cpuUsage;
         this.memoryUsage = memoryUsage;
         this.readBytes = readBytes;
@@ -34,6 +36,14 @@ public class DockerStatsRecord {
         return writtenBytes;
     }
 
+    public Long getNetworkDownloadedBytes() {
+        return networkDownloadedBytes;
+    }
+
+    public Long getNetworkUploadedBytes() {
+        return networkUploadedBytes;
+    }
+
     //setter
     public void setCpuUsage(Double cpuUsage) {
         this.cpuUsage = cpuUsage;
@@ -49,6 +59,14 @@ public class DockerStatsRecord {
 
     public void setWrittenBytes(Long writtenBytes) {
         this.writtenBytes = writtenBytes;
+    }
+
+    public void setNetworkDownloadedBytes(Long networkDownloadedBytes) {
+        this.networkDownloadedBytes = networkDownloadedBytes;
+    }
+
+    public void setNetworkUploadedBytes(Long networkUploadedBytes) {
+        this.networkUploadedBytes = networkUploadedBytes;
     }
 }
 
