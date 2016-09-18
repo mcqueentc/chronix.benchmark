@@ -11,6 +11,9 @@ public class RunningTestDockerContainer {
 
         Configurator configurator = Configurator.getInstance();
         String server = "localhost";
+        if(args.length > 0){
+            server = args[0];
+        }
 
         System.out.println("\n###### Docker.RunningTestDockerContainer ######");
 

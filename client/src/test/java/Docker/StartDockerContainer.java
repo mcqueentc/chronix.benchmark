@@ -17,6 +17,9 @@ public class StartDockerContainer {
         Configurator configurator = Configurator.getInstance();
         ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
         String server = "localhost";
+        if(args.length > 0){
+            server = args[0];
+        }
 
         System.out.println("\n###### Docker.StartDockerContainer ######");
 

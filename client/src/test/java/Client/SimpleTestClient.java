@@ -25,7 +25,7 @@ public class SimpleTestClient {
 
         long startMillis;
         long endMillis;
-        String server = "localhost";
+        String server = "192.168.2.115";
 
         try {
             if (configurator.isServerUp(server)) {
@@ -37,20 +37,20 @@ public class SimpleTestClient {
         }
 
 
-        GenerateServerConfigRecord.main(null);
-        UploadDockerFiles.main(null);
-        InterfaceAndConfigUploadTest.main(null);
-        //BuildDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        //StartDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        RunningTestDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        GenerateServerConfigRecord.main(new String[]{server});
+        UploadDockerFiles.main(new String[]{server});
+        InterfaceAndConfigUploadTest.main(new String[]{server});
+        //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
-        //StopDockerContainer.main(new String[]{"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
 
 
         // import test
 
-        //ImportTest.importTimeSeriesHeavy();
+        //ImportTest.importTimeSeriesHeavy(server);
         List<File> directories = new ArrayList<>();
         directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
@@ -60,7 +60,7 @@ public class SimpleTestClient {
             jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
         }
         startMillis = System.currentTimeMillis();
-        List<TimeSeriesMetaData> importedTimeSeriesMetaData = ImportTest.importTimeSeriesFromDirectory(directories);
+        List<TimeSeriesMetaData> importedTimeSeriesMetaData = ImportTest.importTimeSeriesFromDirectory(server, directories);
         endMillis = System.currentTimeMillis();
         System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
 

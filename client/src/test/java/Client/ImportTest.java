@@ -17,10 +17,12 @@ import java.util.List;
  */
 public class ImportTest {
 
-    public static void importTimeSeries(List<TimeSeries> checktimeSeriesList, String queryID) {
+    public static void importTimeSeries(String server, List<TimeSeries> checktimeSeriesList, String queryID) {
 
         Configurator configurator = Configurator.getInstance();
-        String server = "localhost";
+        if(server == null || server.isEmpty()) {
+            server = "localhost";
+        }
 
         System.out.println("\n###### Client.ImportTest.importTimesSeries ######");
 
@@ -55,7 +57,7 @@ public class ImportTest {
         }
     }
 
-    public static void importTimeSeriesHeavy(){
+    public static void importTimeSeriesHeavy(String server){
         JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
         List<File> directories = new ArrayList<>();
         directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
@@ -80,7 +82,7 @@ public class ImportTest {
                             System.out.println("Number of TimeSeries left: " + (files.length - i));
                             // import to tsdbs
                             String queryID = directory.getName() + ":" + i;
-                            ImportTest.importTimeSeries(timeSeries, queryID);
+                            ImportTest.importTimeSeries(server, timeSeries, queryID);
                             // generate meta data
                             jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
                         }
@@ -93,7 +95,7 @@ public class ImportTest {
                     System.out.println("Number of TimesSeries to import: " + timeSeries.size());
                     // import to tsdbs
                     String queryID = directory.getName() + ":" + files.length;
-                    ImportTest.importTimeSeries(timeSeries, queryID);
+                    ImportTest.importTimeSeries(server, timeSeries, queryID);
                     // generate meta data
                     jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
                 }
@@ -101,7 +103,7 @@ public class ImportTest {
         }
     }
 
-    public static List<TimeSeriesMetaData> importTimeSeriesFromDirectory(List<File> directories){
+    public static List<TimeSeriesMetaData> importTimeSeriesFromDirectory(String server, List<File> directories){
         JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
 
         List<TimeSeriesMetaData> importedTimeSeriesMetaData = new ArrayList<>();
@@ -120,7 +122,7 @@ public class ImportTest {
                             System.out.println("Number of TimeSeries left: " + (files.length - i));
                             // import to tsdbs
                             String queryID = "import:" + directory.getName() + ":" + i;
-                            ImportTest.importTimeSeries(timeSeries, queryID);
+                            ImportTest.importTimeSeries(server, timeSeries, queryID);
                             // generate meta data
                             importedTimeSeriesMetaData.addAll(jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries));
                         }
@@ -136,7 +138,7 @@ public class ImportTest {
                     }
                     // import to tsdbs
                     String queryID = "import:" + directory.getName() + ":" + files.length;
-                    ImportTest.importTimeSeries(timeSeries, queryID);
+                    ImportTest.importTimeSeries(server, timeSeries, queryID);
                     // generate meta data
                     importedTimeSeriesMetaData.addAll(jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries));
                 }

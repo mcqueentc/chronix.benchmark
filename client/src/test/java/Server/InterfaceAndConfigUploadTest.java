@@ -20,6 +20,9 @@ public class InterfaceAndConfigUploadTest {
 
         Configurator configurator = Configurator.getInstance();
         String server = "localhost";
+        if(args.length > 0){
+            server = args[0];
+        }
 
         System.out.println("\n###### Server.InterfaceAndConfigUploadTest ######");
 

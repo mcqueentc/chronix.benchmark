@@ -16,9 +16,11 @@ public class GenerateServerConfigRecord {
 
 
         //server record test
-
-
         String server = "localhost";
+        if(args.length > 0){
+            server = args[0];
+        }
+
         LinkedList<DockerBuildOptions> buildOptionses = new LinkedList<>();
         LinkedList<DockerRunOptions> runOptionses = new LinkedList<>();
 
