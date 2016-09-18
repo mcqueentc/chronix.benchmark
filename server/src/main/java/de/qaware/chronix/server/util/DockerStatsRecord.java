@@ -17,6 +17,8 @@ public class DockerStatsRecord {
         this.memoryUsage = memoryUsage;
         this.readBytes = readBytes;
         this.writtenBytes = writtenBytes;
+        this.networkDownloadedBytes = networkDownloadedBytes;
+        this.networkUploadedBytes = networkUploadedBytes;
     }
 
     //getter
