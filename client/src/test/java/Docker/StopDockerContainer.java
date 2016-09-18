@@ -28,8 +28,9 @@ public class StopDockerContainer {
         //stop test
 
         String[] answers = {"no container name given"};
-        if(args != null && args.length > 0){
-            for(String containerName : args) {
+        if(args != null && args.length > 1){
+            for(int i = 1; i < args.length; i++) {
+                String containerName = args[i];
                 answers = configurator.stopDockerContainer(server, containerName);
                 for(String s : answers){
                     System.out.println("Server: " + s);

@@ -28,7 +28,8 @@ public class RunningTestDockerContainer {
         //running test
         String[] answers = {"no container name given"};
         if(args != null && args.length > 0){
-            for(String containerName : args){
+            for(int i = 1; i < args.length; i++) {
+                String containerName = args[i];
                 boolean isDockerContainerRunning = configurator.isDockerContainerRunning(server, containerName);
                 if(isDockerContainerRunning){
                     String[] s = {"container " + containerName + " is running"};
