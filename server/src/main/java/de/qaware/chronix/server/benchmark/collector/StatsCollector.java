@@ -85,6 +85,7 @@ public class StatsCollector {
     public void addQueryRecordEditJob(BenchmarkRecord benchmarkRecord, List<DockerStatsRecord> dockerMeasurement){
         try {
             blockingDequeEditJobs.put(Pair.of(benchmarkRecord,dockerMeasurement));
+            //logger.info("StatsCollector: added edit job for: {}, number of measurments: {}", benchmarkRecord.getQueryID(), dockerMeasurement.size());
         } catch (InterruptedException e) {
             logger.error("Error StatsCollector: " + e.getLocalizedMessage());
         }
@@ -153,7 +154,9 @@ public class StatsCollector {
             while (true) {
                 try {
 
+                    //logger.info("StatsWriter started writing:...");
                     BenchmarkRecord benchmarkRecord = blockingDequeWriteJobs.take();
+                    //logger.info("StatsWriter started writing for job: {}",benchmarkRecord.getQueryID());
                     final String queryRecordJSON = mapper.writeValueAsString(benchmarkRecord);
                     if (recordFile.exists()) {
                         Files.write(recordFile.toPath(), Arrays.asList(queryRecordJSON), StandardOpenOption.APPEND);
@@ -189,6 +192,7 @@ public class StatsCollector {
         public void run(){
             while(true){
                 try {
+                    //logger.info("QueryEditor started working...");
                     Pair<BenchmarkRecord, List<DockerStatsRecord>> queryRecordListPair = blockingDequeEditJobs.take();
                     List<Double> cpuUsage = new LinkedList<>();
                     List<Double> memoryUsage = new LinkedList<>();
@@ -205,6 +209,7 @@ public class StatsCollector {
                         writtenBytes.add(dockerStatsRecord.getWrittenBytes());
                         networkDownloadedBytes.add(dockerStatsRecord.getNetworkDownloadedBytes());
                         networkUploadedBytes.add(dockerStatsRecord.getNetworkUploadedBytes());
+                        //logger.info("QueryRecordEditor: cpu: {}, mem: {}, read: {}, written: {}, netDown: {}, netUp: {}",dockerStatsRecord.getCpuUsage(),dockerStatsRecord.getMemoryUsage(),dockerStatsRecord.getReadBytes(),dockerStatsRecord.getWrittenBytes(), dockerStatsRecord.getNetworkDownloadedBytes(), dockerStatsRecord.getNetworkUploadedBytes());
 
 
                     }
@@ -242,6 +247,7 @@ public class StatsCollector {
 
                     // add job for writer
                     blockingDequeWriteJobs.put(benchmarkRecord);
+                    //logger.info("QueryEditor finished working: {}",benchmarkRecord.getQueryID());
 
                 } catch (InterruptedException e) {
                     logger.error("Error StatsCollector: " + e.getLocalizedMessage());

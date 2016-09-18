@@ -145,6 +145,7 @@ public class DockerStatsUtil {
                     Long networkDownloadedBytes = getBytesCountFromString(splits[4]);
                     Long networkUploadedBytes = getBytesCountFromString(splits[5]);
 
+                    //logger.info("MeasureRunner: cpu: {}, mem: {}, readBytes: {}, writtenBytes: {} netDown: {}, netUp: {}",cpuUsage,memoryUsage,readBytes,writtenBytes,networkDownloadedBytes,networkUploadedBytes);
                     measures.add(new DockerStatsRecord(cpuUsage, memoryUsage, readBytes, writtenBytes, networkDownloadedBytes, networkUploadedBytes));
                 }
             }
