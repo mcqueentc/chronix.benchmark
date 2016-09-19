@@ -43,7 +43,7 @@ public class GenerateServerConfigRecord {
 
         //Graphite
         buildOptionses.add(new DockerBuildOptions("graphite", "-t"));
-        runOptionses.add(new DockerRunOptions("graphite", 2003, 2003, "-p 8888:8888"));
+        runOptionses.add(new DockerRunOptions("graphite", 2003, 2003, "-p 80:80"));
 
 
 
