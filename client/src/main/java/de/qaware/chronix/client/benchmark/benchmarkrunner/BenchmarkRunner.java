@@ -167,7 +167,14 @@ public class BenchmarkRunner {
         return resultList;
     }
 
-
+    /**
+     * Performs queries with given meta data and function on all tsdbs on given server.
+     *
+     * @param server the server address or ip
+     * @param metaDataList the meta data on which the queries should be performed.
+     * @param function the query function that should be performed.
+     * @return list of answers from the server.
+     */
     public List<String> queryWithFunction(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function) {
         List<String> resultList = new LinkedList<>();
         if (metaDataList != null && !metaDataList.isEmpty()){
