@@ -203,9 +203,14 @@ public class BenchmarkRunner {
     private void saveBenchmarkRecords(List<BenchmarkRecord> benchmarkRecords){
         ObjectMapper mapper = new ObjectMapper();
         File recordFile = new File(recordFileDirectory + File.separator + recordFileName);
-        recordFile.delete();
+        //recordFile.delete();
         for(BenchmarkRecord benchmarkRecord : benchmarkRecords) {
             Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
+            if(latency == null){
+                // ignore previously downloaded records. for them, no latency entry should exist
+                continue;
+            }
+
             benchmarkRecord.setLatency(latency);
 
             try {
