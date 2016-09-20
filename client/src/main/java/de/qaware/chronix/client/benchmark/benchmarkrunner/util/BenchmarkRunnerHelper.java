@@ -11,6 +11,7 @@ import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by mcqueen666 on 15.09.16.
@@ -37,7 +38,7 @@ public class BenchmarkRunnerHelper {
      *
      * @param timeSeriesList the time series to be imported.
      * @param queryID the query id
-     * @param serverAddress the server address on which the import should be done.
+     * @param serverAddress the server address or ip on which the import should be done.
      * @return list of ImportRecords.
      */
     public List<ImportRecord> getImportRecordForTimeSeries(List<TimeSeries> timeSeriesList,
@@ -59,6 +60,15 @@ public class BenchmarkRunnerHelper {
         return importRecordList;
     }
 
+    /**
+     * Generate a list of QueryRecords containing one QueryRecord per tsdb implementation on given server for given times seres meta data.
+     *
+     * @param timeSeriesMetaDataList the time series meta data which should be queried.
+     * @param queryID the query id
+     * @param serverAddress the server address or ip on which the queries should be done.
+     * @param function the query function which should be performed.
+     * @return list of QueryRecords.
+     */
     public List<QueryRecord> getQueryRecordForTimeSeriesMetaData(List<TimeSeriesMetaData> timeSeriesMetaDataList,
                                                                  String queryID,
                                                                  String serverAddress,
@@ -88,5 +98,16 @@ public class BenchmarkRunnerHelper {
         return queryRecordList;
     }
 
+    /**
+     * Selects a random QueryFunction
+     *
+     * @return a QueryFunction
+     */
+    public QueryFunction getRandomQueryFunction(){
+        Random random = new Random();
+        int functionCount = QueryFunction.values().length - 1; // - 1 to disable QUERY_ONLY at the moment
+
+        return QueryFunction.values()[random.nextInt(functionCount)];
+    }
 
 }
