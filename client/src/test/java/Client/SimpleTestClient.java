@@ -7,6 +7,7 @@ import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.util.JsonTimeSeriesHandler;
+import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 
 import java.io.File;
@@ -70,7 +71,7 @@ public class SimpleTestClient {
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
         List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
         startMillis = System.currentTimeMillis();
-        QueryTest.queryCount(randomTimeSeries, server);
+        QueryTest.queryCount(server, randomTimeSeries, QueryFunction.COUNT);
         endMillis = System.currentTimeMillis();
         System.out.println("\nQuery test total time: " + (endMillis - startMillis) + "ms");
 

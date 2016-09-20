@@ -15,9 +15,7 @@ public class ImportTest {
         BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
         List<String> answers = benchmarkRunner.importTimeSeriesFromDirectory(server, directories, 100);
 
-        for(String answer : answers){
-            System.out.println(answer);
-        }
+        answers.forEach(System.out::println);
 
     }
 
