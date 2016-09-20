@@ -1,6 +1,7 @@
 package de.qaware.chronix.client.benchmark.queryhandler;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
+import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.CleanCommand;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
@@ -22,7 +23,7 @@ public class QueryHandler {
 
     private static QueryHandler instance;
     private Configurator configurator;
-    private Map<String, Long> queryLatency;
+    private Map<Pair<String, String>, Long> queryLatency;
 
     private QueryHandler(){
         configurator = Configurator.getInstance();
@@ -37,13 +38,13 @@ public class QueryHandler {
     }
 
     /**
-     * Returns the latency of a query with given query id.
+     * Returns the latency of a query with given query id, tsdbName Pair.
      *
-     * @param queryID the query id
+     * @param queryID_tsdb_Pair the query id, tsdbName pair
      * @return the latency in milliseconds or null if no record of given query id exists (query failed for some reason)
      */
-    public Long getLatencyForQueryID(String queryID){
-        return queryLatency.get(queryID);
+    public Long getLatencyForQueryID(Pair<String, String> queryID_tsdb_Pair){
+        return queryLatency.get(queryID_tsdb_Pair);
     }
 
 
@@ -71,7 +72,7 @@ public class QueryHandler {
         client.close();
 
         if(statusCode == 200){
-            queryLatency.put(queryRecord.getQueryID(), (endMillis - startMillis));
+            queryLatency.put(Pair.of(queryRecord.getQueryID(), queryRecord.getTsdbName()), (endMillis - startMillis));
             return queryResults;
         }
 
@@ -96,7 +97,7 @@ public class QueryHandler {
         client.close();
 
         if(statusCode == 200){
-            queryLatency.put(importRecord.getQueryID(), (endMillis - startMillis));
+            queryLatency.put(Pair.of(importRecord.getQueryID(), importRecord.getTsdbName()), (endMillis - startMillis));
             return queryResults;
         }
 
