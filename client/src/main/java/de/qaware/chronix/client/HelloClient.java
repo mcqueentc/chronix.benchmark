@@ -8,6 +8,7 @@ import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
+import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
@@ -296,7 +297,7 @@ public class HelloClient {
                 // make queryRecord with the benchmarkquery list
                 QueryRecord queryRecord = new QueryRecord(queryID,ip,port,externalImpl,querys);
                 String[] results = queryHandler.doQueryOnServer(ip, queryRecord);
-                Long latency = queryHandler.getLatencyForQueryID(queryID);
+                Long latency = queryHandler.getLatencyForQueryID(Pair.of(queryID, queryRecord.getTsdbName()));
                 if(latency != null){
                     System.out.println("QueryID: " + queryID);
                     System.out.println("Latency: " + latency + " milliseconds");

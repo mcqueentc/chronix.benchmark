@@ -5,6 +5,7 @@ import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.TimeSeriesMetaData;
+import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public class QueryTest {
 
             for(QueryRecord queryRecord : queryRecordList){
                 String[] results = queryHandler.doQueryOnServer(queryRecord.getIpAddress(), queryRecord);
-                Long latency = queryHandler.getLatencyForQueryID(queryID);
+                Long latency = queryHandler.getLatencyForQueryID(Pair.of(queryID, queryRecord.getTsdbName()));
                 if (latency != null) {
                     System.out.println("\nTSDB: " + queryRecord.getTsdbName());
                     System.out.println("QueryID: " + queryID);
