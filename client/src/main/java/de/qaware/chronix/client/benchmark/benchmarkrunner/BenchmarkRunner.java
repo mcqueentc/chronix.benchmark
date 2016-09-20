@@ -6,11 +6,13 @@ import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHe
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.client.benchmark.util.JsonTimeSeriesHandler;
+import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
+import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -120,8 +123,7 @@ public class BenchmarkRunner {
                             //read timeseries from json
                             List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
                             fileList.clear();
-                            String queryID = "import:" + directory.getName() + ":" + i;
-
+                            String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + i;
 
                             // import to tsdbs
                             answers.addAll(this.importTimeSeries(server, timeSeries, queryID));
@@ -136,7 +138,7 @@ public class BenchmarkRunner {
                     fileList.clear();
 
                     // import to tsdbs
-                    String queryID = "import:" + directory.getName() + ":" + files.length;
+                    String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + files.length;
                     answers.addAll(this.importTimeSeries(server, timeSeries, queryID));
                     // generate meta data
                     jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
@@ -158,12 +160,36 @@ public class BenchmarkRunner {
                 for(String result : results){
                     resultList.add(importRecord.getTsdbName() + ": " + importRecord.getQueryID() + ": " + result);
                 }
+                resultList.add("\n");
             }
 
         }
         return resultList;
     }
 
+
+    public List<String> queryWithFunction(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function) {
+        List<String> resultList = new LinkedList<>();
+        if (metaDataList != null && !metaDataList.isEmpty()){
+
+            String queryID = Instant.now().toString() + "_query_" + function.toString() + "_" + metaDataList.size();
+
+            List<QueryRecord> queryRecordList = benchmarkRunnerHelper.getQueryRecordForTimeSeriesMetaData(metaDataList,
+                    queryID,
+                    server,
+                    function);
+
+            for(QueryRecord queryRecord : queryRecordList){
+                logger.info("Query on: {} ... ", queryRecord.getTsdbName());
+                String[] results = queryHandler.doQueryOnServer(queryRecord.getIpAddress(), queryRecord);
+                for(String result : results){
+                    resultList.add(queryRecord.getTsdbName() + ": " + queryRecord.getQueryID() + ": " + result);
+                }
+                resultList.add("\n");
+            }
+        }
+        return resultList;
+    }
 
 
 
