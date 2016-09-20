@@ -4,6 +4,7 @@ import Docker.*;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
+import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.util.JsonTimeSeriesHandler;
@@ -63,17 +64,21 @@ public class SimpleTestClient {
         startMillis = System.currentTimeMillis();
         ImportTest.importTimeSeriesFromDirectory(server, directories);
         endMillis = System.currentTimeMillis();
-        System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
+        System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
 
 
 
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
         List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
+        BenchmarkRunnerHelper benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
+        QueryFunction function = QueryFunction.COUNT;
+        function = benchmarkRunnerHelper.getRandomQueryFunction();
+
         startMillis = System.currentTimeMillis();
-        QueryTest.queryCount(server, randomTimeSeries, QueryFunction.COUNT);
+        QueryTest.queryCount(server, randomTimeSeries, function);
         endMillis = System.currentTimeMillis();
-        System.out.println("\nQuery test total time: " + (endMillis - startMillis) + "ms");
+        System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
 
         //get benchmark query record test
