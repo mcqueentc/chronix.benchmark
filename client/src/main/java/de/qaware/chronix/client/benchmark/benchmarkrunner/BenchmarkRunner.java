@@ -2,8 +2,15 @@ package de.qaware.chronix.client.benchmark.benchmarkrunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
+import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
+import de.qaware.chronix.client.benchmark.util.JsonTimeSeriesHandler;
+import de.qaware.chronix.database.TimeSeries;
+import de.qaware.chronix.database.TimeSeriesMetaData;
+import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,9 +44,16 @@ public class BenchmarkRunner {
             + File.separator
             + "downloaded_benchmark_records";
     private final String recordFileName = "benchmarkRecords.json";
+    private BenchmarkRunnerHelper benchmarkRunnerHelper;
+    private QueryHandler queryHandler;
+    private JsonTimeSeriesHandler jsonTimeSeriesHandler;
 
     private BenchmarkRunner(){
         configurator = Configurator.getInstance();
+        benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
+        queryHandler = QueryHandler.getInstance();
+        jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
+
         File recordFileDirecotry = new File(recordFileDirectory);
         if(!recordFileDirecotry.exists()){
             recordFileDirecotry.mkdirs();
@@ -82,6 +97,72 @@ public class BenchmarkRunner {
         return false;
     }
 
+    /**
+     * Imports time series to all tsdbs on given server.
+     *
+     * @param server the server address or ip on which to import.
+     * @param directories the directory (aka measurementName) of json time series gzipped files.
+     * @param batchSize the batch size of how many time series should be imported per call on the server.
+     * @return list of answers from the server.
+     */
+    public List<String> importTimeSeriesFromDirectory(String server, List<File> directories, int batchSize){
+        List<String> answers = new LinkedList<>();
+
+        List<String> importedTimeSeriesMetaData = new LinkedList<>();
+        for(File directory : directories){
+            if(directory.exists()){
+                File[] files = directory.listFiles();
+                if(files != null) {
+                    List<File> fileList = new ArrayList<>();
+
+                    for (int i = 0; i < files.length; i++) {
+                        if (i != 0 && i % batchSize == 0) {
+                            //read timeseries from json
+                            List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+                            fileList.clear();
+                            String queryID = "import:" + directory.getName() + ":" + i;
+
+
+                            // import to tsdbs
+                            answers.addAll(this.importTimeSeries(server, timeSeries, queryID));
+                            // generate meta data
+                            jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
+                        }
+
+                        fileList.add(files[i]);
+                    }
+                    //read timeseries from json
+                    List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+                    fileList.clear();
+
+                    // import to tsdbs
+                    String queryID = "import:" + directory.getName() + ":" + files.length;
+                    answers.addAll(this.importTimeSeries(server, timeSeries, queryID));
+                    // generate meta data
+                    jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
+                }
+            }
+        }
+        return answers;
+    }
+
+
+
+    private List<String> importTimeSeries(String serverAddress, List<TimeSeries> timeSeriesList, String queryID){
+        List<String> resultList = new LinkedList<>();
+        if (!timeSeriesList.isEmpty()) {
+            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(timeSeriesList, queryID, serverAddress);
+            for (ImportRecord importRecord : importRecordList) {
+                logger.info("Import on: {} ...", importRecord.getTsdbName());
+                String[] results = queryHandler.doImportOnServer(importRecord.getIpAddress(), importRecord);
+                for(String result : results){
+                    resultList.add(importRecord.getTsdbName() + ": " + importRecord.getQueryID() + ": " + result);
+                }
+            }
+
+        }
+        return resultList;
+    }
 
 
 
@@ -91,6 +172,9 @@ public class BenchmarkRunner {
         File recordFile = new File(recordFileDirectory + File.separator + recordFileName);
         recordFile.delete();
         for(BenchmarkRecord benchmarkRecord : benchmarkRecords) {
+            Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
+            benchmarkRecord.setLatency(latency);
+
             try {
                 final String queryRecordJSON = mapper.writeValueAsString(benchmarkRecord);
                 if (recordFile.exists()) {
