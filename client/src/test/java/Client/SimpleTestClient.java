@@ -50,7 +50,6 @@ public class SimpleTestClient {
 
         // import test
 
-        //ImportTest.importTimeSeriesHeavy(server);
         List<File> directories = new ArrayList<>();
         directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
@@ -61,7 +60,7 @@ public class SimpleTestClient {
             jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
         }
         startMillis = System.currentTimeMillis();
-        List<TimeSeriesMetaData> importedTimeSeriesMetaData = ImportTest.importTimeSeriesFromDirectory(server, directories);
+        ImportTest.importTimeSeriesFromDirectory(server, directories);
         endMillis = System.currentTimeMillis();
         System.out.println("\nImport test total time: " + (endMillis - startMillis) + "ms");
 
