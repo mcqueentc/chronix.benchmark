@@ -23,6 +23,7 @@ public class BenchmarkRecord {
     private String memoryUsageTotal;
     private String networkDownloadedBytes;
     private String networkUploadedBytes;
+    private Long latency;
 
     public BenchmarkRecord(){}
 
@@ -41,6 +42,7 @@ public class BenchmarkRecord {
         this.cpuUsageTotal = null;
         this.diskUsageTotal = null;
         this.memoryUsageTotal = null;
+        this.latency = null;
     }
 
     public BenchmarkRecord(BenchmarkRecord benchmarkRecord){
@@ -57,6 +59,8 @@ public class BenchmarkRecord {
         this.cpuUsageTotal = benchmarkRecord.getCpuUsageTotal();
         this.diskUsageTotal = benchmarkRecord.getDiskUsageTotal();
         this.memoryUsageTotal = benchmarkRecord.getMemoryUsageTotal();
+        this.latency = benchmarkRecord.getLatency();
+
 
     }
 
@@ -121,6 +125,10 @@ public class BenchmarkRecord {
         return networkUploadedBytes;
     }
 
+    public Long getLatency() {
+        return latency;
+    }
+
     //setter
     public void setQueryID(String queryID) {
         this.queryID = queryID;
@@ -180,5 +188,9 @@ public class BenchmarkRecord {
 
     public void setNetworkUploadedBytes(String networkUploadedBytes) {
         this.networkUploadedBytes = networkUploadedBytes;
+    }
+
+    public void setLatency(Long latency) {
+        this.latency = latency;
     }
 }
