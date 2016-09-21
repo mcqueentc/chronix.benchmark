@@ -111,7 +111,7 @@ public class QueryRunnerResource {
             }
 
             if(tsdb.setup(importRecord.getIpAddress(),Integer.valueOf(importRecord.getPortNumber()))) {
-                logger.info("Performing query on {}",tsdb.getClass().getName());
+                logger.info("Performing import on {}",tsdb.getClass().getName());
                 List<TimeSeries> importList = importRecord.getTimeSeriesList();
                 List<String> importResults = new LinkedList<>();
 

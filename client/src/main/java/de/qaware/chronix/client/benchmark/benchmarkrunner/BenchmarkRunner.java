@@ -126,6 +126,7 @@ public class BenchmarkRunner {
                             String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + i;
 
                             // import to tsdbs
+                            logger.info("Import time series from {} to {}, {} left.",(i-batchSize),i,(files.length - i));
                             answers.addAll(this.importTimeSeries(server, timeSeries, queryID));
                             // generate meta data
                             jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
