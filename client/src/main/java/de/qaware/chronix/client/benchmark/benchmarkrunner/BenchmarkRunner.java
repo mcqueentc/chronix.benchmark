@@ -9,6 +9,7 @@ import de.qaware.chronix.client.benchmark.util.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
+import de.qaware.chronix.shared.DataModels.ImportRecordWrapper;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
@@ -27,10 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -154,15 +152,16 @@ public class BenchmarkRunner {
     private List<String> importTimeSeries(String serverAddress, List<TimeSeries> timeSeriesList, String queryID){
         List<String> resultList = new LinkedList<>();
         if (!timeSeriesList.isEmpty()) {
-            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(timeSeriesList, queryID, serverAddress);
-            for (ImportRecord importRecord : importRecordList) {
-                logger.info("Import on: {} ...", importRecord.getTsdbName());
-                String[] results = queryHandler.doImportOnServer(importRecord.getIpAddress(), importRecord);
-                for(String result : results){
-                    resultList.add(importRecord.getTsdbName() + ": " + importRecord.getQueryID() + ": " + result);
-                }
-                resultList.add("\n");
+            //TODO change signature
+            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, serverAddress);
+            ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(timeSeriesList, importRecordList);
+            logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
+            String[] results = queryHandler.doImportOnServer(serverAddress, importRecordWrapper);
+            for(String result : results){
+                resultList.add(result);
             }
+            resultList.add("\n");
+            Collections.addAll(resultList, results);
 
         }
         return resultList;
@@ -206,13 +205,14 @@ public class BenchmarkRunner {
         File recordFile = new File(recordFileDirectory + File.separator + recordFileName);
         //recordFile.delete();
         for(BenchmarkRecord benchmarkRecord : benchmarkRecords) {
-            Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
+            //TODO erase or implement latency measurement again
+            /*Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
             if(latency == null){
                 // ignore previously downloaded records. for them, no latency entry should exist
                 continue;
             }
 
-            benchmarkRecord.setLatency(latency);
+            benchmarkRecord.setLatency(latency);*/
 
             try {
                 final String queryRecordJSON = mapper.writeValueAsString(benchmarkRecord);

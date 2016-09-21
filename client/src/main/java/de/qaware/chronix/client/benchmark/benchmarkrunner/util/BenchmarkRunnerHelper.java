@@ -46,7 +46,7 @@ public class BenchmarkRunnerHelper {
                                                            String serverAddress) {
 
         List<ImportRecord> importRecordList = new LinkedList<>();
-        if (!timeSeriesList.isEmpty()) {
+
             ServerConfigRecord serverConfigRecord = serverConfigAccessor.getServerConfigRecord(serverAddress);
             if(serverConfigRecord != null) {
                 List<String> externalImpls = serverConfigRecord.getExternalTimeSeriesDataBaseImplementations();
@@ -56,7 +56,7 @@ public class BenchmarkRunnerHelper {
                     importRecordList.add(new ImportRecord(queryID, ip, port, tsdb, timeSeriesList));
                 }
             }
-        }
+        
         return importRecordList;
     }
 

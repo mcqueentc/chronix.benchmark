@@ -1,6 +1,7 @@
 package de.qaware.chronix.client.benchmark.queryhandler;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
+import de.qaware.chronix.shared.DataModels.ImportRecordWrapper;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.CleanCommand;
@@ -81,7 +82,7 @@ public class QueryHandler {
 
     }
 
-    public String[] doImportOnServer(String serverAddress, ImportRecord importRecord) {
+    public String[] doImportOnServer(String serverAddress, ImportRecordWrapper importRecordWrapper) {
         final Client client = ClientBuilder.newBuilder().build();
         final WebTarget target = client.target("http://"
                 + serverAddress
@@ -89,7 +90,7 @@ public class QueryHandler {
                 + configurator.getApplicationPort()
                 + "/queryrunner/performImport");
         long startMillis = System.currentTimeMillis();
-        final Response response = target.request().post(Entity.json(importRecord));
+        final Response response = target.request().post(Entity.json(importRecordWrapper));
         long endMillis = System.currentTimeMillis();
 
         int statusCode = response.getStatus();
@@ -97,7 +98,8 @@ public class QueryHandler {
         client.close();
 
         if(statusCode == 200){
-            queryLatency.put(Pair.of(importRecord.getQueryID(), importRecord.getTsdbName()), (endMillis - startMillis));
+            //TODO erase or implement latency measurement again
+            //queryLatency.put(Pair.of(importRecordWrapper.getQueryID(), importRecordWrapper.getTsdbName()), (endMillis - startMillis));
             return queryResults;
         }
 

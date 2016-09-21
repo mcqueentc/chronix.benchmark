@@ -27,7 +27,7 @@ public class SimpleTestClient {
 
         long startMillis;
         long endMillis;
-        String server = "localhost";
+        String server = "46.101.106.184";
 
         try {
             if (configurator.isServerUp(server)) {
@@ -39,12 +39,12 @@ public class SimpleTestClient {
         }
 
 
-        GenerateServerConfigRecord.main(new String[]{server});
-        UploadDockerFiles.main(new String[]{server});
-        InterfaceAndConfigUploadTest.main(new String[]{server});
+        //GenerateServerConfigRecord.main(new String[]{server});
+        //UploadDockerFiles.main(new String[]{server});
+        //InterfaceAndConfigUploadTest.main(new String[]{server});
         //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
         //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
@@ -53,8 +53,8 @@ public class SimpleTestClient {
         // import test
 
         List<File> directories = new ArrayList<>();
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
         // as if was not imported previously
@@ -67,13 +67,13 @@ public class SimpleTestClient {
         System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
 
 
-
+/*
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
         List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
         BenchmarkRunnerHelper benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
         QueryFunction function = QueryFunction.COUNT;
-        function = benchmarkRunnerHelper.getRandomQueryFunction();
+        //function = benchmarkRunnerHelper.getRandomQueryFunction();
 
         startMillis = System.currentTimeMillis();
         QueryTest.queryCount(server, randomTimeSeries, function);
@@ -84,6 +84,6 @@ public class SimpleTestClient {
         //get benchmark query record test
         BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
-
+*/
     }
 }

@@ -8,6 +8,7 @@ import de.qaware.chronix.server.benchmark.collector.StatsCollector;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.DockerStatsRecord;
 import de.qaware.chronix.server.util.DockerStatsUtil;
+import de.qaware.chronix.shared.DataModels.ImportRecordWrapper;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.CleanCommand;
@@ -102,56 +103,64 @@ public class QueryRunnerResource {
     @POST
     @Path("performImport")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response performImport(ImportRecord importRecord){
-        if(importRecord != null) {
-            BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(importRecord.getTsdbName());
-            if (tsdb == null) {
-                logger.error("No TSDB implementation with name " + importRecord.getTsdbName() + " found on.");
-                return Response.serverError().entity(new String[]{"No TSDB implementation with name " + importRecord.getTsdbName() + " found on server!"}).build();
+    public Response performImport(ImportRecordWrapper importRecordWrapper){
+        List<String> importResults = new LinkedList<>();
+        for(ImportRecord importRecord : importRecordWrapper.getImportRecordList()) {
+            if (importRecord != null) {
+                importRecord.setTimeSeriesList(importRecordWrapper.getTimeSeriesList());
+                BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(importRecord.getTsdbName());
+                if (tsdb == null) {
+                    logger.error("No TSDB implementation with name " + importRecord.getTsdbName() + " found on.");
+                    return Response.serverError().entity(new String[]{"No TSDB implementation with name " + importRecord.getTsdbName() + " found on server!"}).build();
+                }
+
+                if (tsdb.setup(importRecord.getIpAddress(), Integer.valueOf(importRecord.getPortNumber()))) {
+                    logger.info("Performing import on {}", tsdb.getClass().getName());
+                    List<TimeSeries> importList = importRecord.getTimeSeriesList();
+
+
+                    //start threaded background measurement
+                    Long startDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
+                    dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(importRecord.getTsdbName()));
+                    long startMilliseconds = System.currentTimeMillis();
+
+                    //preform the import
+                    for (TimeSeries timeSeries : importList) {
+                        String answer = tsdb.importDataPoints(timeSeries);
+                        if(!answer.isEmpty()) {
+                            importResults.add(answer);
+                        } else {
+                            importResults.add(tsdb.getClass().getName() + ": Nothing imported");
+                        }
+                    }
+
+                    // end measurement
+                    long endMilliseconds = System.currentTimeMillis();
+                    tsdb.writeCachesToDisk();
+                    List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
+                    Long endDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
+
+                    // edit and write the queryrecord to json file (threaded)
+                    importRecord.setQueryTimeMilliseconds(endMilliseconds - startMilliseconds);
+                    if (startDiskUsage != -1 && endDiskUsage != -1) {
+                        importRecord.setDiskUsage(String.valueOf((endDiskUsage - startDiskUsage)));
+                        importRecord.setDiskUsageTotal(String.valueOf(endDiskUsage));
+                    } else {
+                        importRecord.setDiskUsage("-1");
+                        importRecord.setDiskUsageTotal("-1");
+                    }
+                    statsCollector.addQueryRecordEditJob(importRecord, dockerMeasurement);
+
+                    tsdb.shutdown();
+                } else {
+                    logger.error("Error performing import!");
+                    return Response.serverError().entity(new String[]{"Error performing import!"}).build();
+                }
+
             }
-
-            if(tsdb.setup(importRecord.getIpAddress(),Integer.valueOf(importRecord.getPortNumber()))) {
-                logger.info("Performing import on {}",tsdb.getClass().getName());
-                List<TimeSeries> importList = importRecord.getTimeSeriesList();
-                List<String> importResults = new LinkedList<>();
-
-                //start threaded background measurement
-                Long startDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
-                dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(importRecord.getTsdbName()));
-                long startMilliseconds = System.currentTimeMillis();
-
-                //preform the import
-                for (TimeSeries timeSeries : importList) {
-                    importResults.add(tsdb.importDataPoints(timeSeries));
-                }
-
-                // end measurement
-                long endMilliseconds = System.currentTimeMillis();
-                tsdb.writeCachesToDisk();
-                List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
-                Long endDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
-
-                // edit and write the queryrecord to json file (threaded)
-                importRecord.setQueryTimeMilliseconds(endMilliseconds - startMilliseconds);
-                if (startDiskUsage != -1 && endDiskUsage != -1) {
-                    importRecord.setDiskUsage(String.valueOf((endDiskUsage - startDiskUsage)));
-                    importRecord.setDiskUsageTotal(String.valueOf(endDiskUsage));
-                } else{
-                    importRecord.setDiskUsage("-1");
-                    importRecord.setDiskUsageTotal("-1");
-                }
-                statsCollector.addQueryRecordEditJob(importRecord, dockerMeasurement);
-
-                tsdb.shutdown();
-                if (!importResults.isEmpty()) {
-                    return Response.ok().entity(importResults.toArray(new String[]{})).build();
-                }
-            }
-
-
         }
-        logger.error("Error performing import!");
-        return Response.serverError().entity(new String[]{"Error performing import!"}).build();
+        return Response.ok().entity(importResults.toArray(new String[]{})).build();
+
     }
 
     @POST
