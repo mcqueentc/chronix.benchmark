@@ -69,7 +69,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     @Override
     public boolean clean() {
         DockerUtil dockerUtil = new DockerUtil();
-        List<String> result = dockerUtil.executeCommandOnDockerContainer("opentsdb", "./opt/cleanseDatabase.sh");
+        List<String> result = dockerUtil.executeCommandOnDockerContainer("opentsdb", "/opt/cleanseDatabase.sh");
         if(!result.isEmpty()){
             logger.info("OpenTsdb: Performing command on docker container: {}", result);
             return true;
