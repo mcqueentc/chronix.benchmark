@@ -60,7 +60,7 @@ public class QueryRunnerResource {
                 }
 
                 //start threaded background measurement
-                Long startDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
+                Long startDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getMappedStorageDirectoryPath());
                 dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(queryRecord.getTsdbName()));
                 long startMilliseconds = System.currentTimeMillis();
 
@@ -77,7 +77,7 @@ public class QueryRunnerResource {
                 long endMilliseconds = System.currentTimeMillis();
                 tsdb.writeCachesToDisk();
                 List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
-                Long endDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
+                Long endDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getMappedStorageDirectoryPath());
 
 
                 // edit and write the queryrecord to json file (threaded)
@@ -120,7 +120,7 @@ public class QueryRunnerResource {
 
 
                     //start threaded background measurement
-                    Long startDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
+                    Long startDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getMappedStorageDirectoryPath());
                     dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(importRecord.getTsdbName()));
                     long startMilliseconds = System.currentTimeMillis();
 
@@ -138,7 +138,7 @@ public class QueryRunnerResource {
                     long endMilliseconds = System.currentTimeMillis();
                     tsdb.writeCachesToDisk();
                     List<DockerStatsRecord> dockerMeasurement = dockerStatsUtil.stopDockerContainerMeasurement();
-                    Long endDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getStorageDirectoryPath());
+                    Long endDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getMappedStorageDirectoryPath());
 
                     // edit and write the queryrecord to json file (threaded)
                     importRecord.setQueryTimeMilliseconds(endMilliseconds - startMilliseconds);

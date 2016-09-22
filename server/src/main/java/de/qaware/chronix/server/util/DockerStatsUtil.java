@@ -83,23 +83,26 @@ public class DockerStatsUtil {
      * Estimates the storage size of the given container.
      *
      * @param containerName the name of the docker container
-     * @param storageDirectoryPath the path to the storage directory in the container of the running tsdb.
-     * @return the size of the storage directory in the container in bytes.
+     * @param mappedStorageDirectoryPath the path to the mapped storage directory on the host.
+     * @return the size of the storage directory mapped from container to host in bytes.
      */
-    public Long estimateStorageSize(String containerName, String storageDirectoryPath){
-        Long resultBytes = new Long(-1);
+    public Long estimateStorageSize(String containerName, String mappedStorageDirectoryPath){
+        Long resultBytes = -1L;
         String containerID = DockerCommandLineUtil.getRunningContainerId(containerName);
         if(!containerID.isEmpty()){
-            String[] command = ServerSystemUtil.getOsSpecificCommand(new String[]{DockerCommandLineUtil.getDockerInstallPath()
-                    + "docker exec -t "
-                    + containerID
-                    + " /usr/bin/du -c -b --max=1 "
-                    + storageDirectoryPath
+            String[] command = ServerSystemUtil.getOsSpecificCommand(new String[]{
+                    "/usr/bin/du -c -b --max=1 "
+                    + mappedStorageDirectoryPath
                     + " | awk '{print $1}'"});
 
             List<String> answers = ServerSystemUtil.executeCommand(command);
             if(!answers.isEmpty()){
-                resultBytes = Long.valueOf(answers.get(answers.size()-1));
+                try {
+                    resultBytes = Long.valueOf(answers.get(answers.size() - 1));
+                } catch (Exception e){
+                    logger.error("Error estimating storage size. Result is not a number: {}",e.getLocalizedMessage());
+                    resultBytes = -1L;
+                }
             }
         }
 
