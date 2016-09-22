@@ -64,6 +64,13 @@ public interface BenchmarkDataSource<T> {
     String getStorageDirectoryPath();
 
     /**
+     *
+     * @return the absolute storage directory path on the host (outside the TSDB docker container)
+     *          which is mapped to the storage directory IN the docker container. (docker -v host/dir:/container/dir)
+     */
+    String getMappedStorageDirectoryPath();
+
+    /**
      * Writes cached data to disk.
      *
      * @apiNote This method will be called just before the disk usage will be estimated

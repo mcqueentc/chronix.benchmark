@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class InfluxDB implements BenchmarkDataSource<String> {
 
     private final String INFLUXDB_STORAGE_DIRECTORY = "/var/lib/influxdb/";
+    private final String INFLUXDB_HOST_MAPPED_STORAGE_DIRECTORY = "/mnt/tsdb-benchmark-data/influxdb";
     private final Logger logger = LoggerFactory.getLogger(InfluxDB.class);
     private final int WAIT_TIME_SLICE = 250;
     private final int MAX_WAIT_TIME = 180_000;
@@ -82,6 +83,11 @@ public class InfluxDB implements BenchmarkDataSource<String> {
     @Override
     public String getStorageDirectoryPath() {
         return INFLUXDB_STORAGE_DIRECTORY;
+    }
+
+    @Override
+    public String getMappedStorageDirectoryPath(){
+        return INFLUXDB_HOST_MAPPED_STORAGE_DIRECTORY;
     }
 
     @Override

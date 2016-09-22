@@ -12,7 +12,8 @@ import java.util.*;
  * Created by mcqueen666 on 06.09.16.
  */
 public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
-    private final String OPENTSDB_STORAGE_DIRECTORY = "/tmp/hadoop-root/dfs/";
+    private final String OPENTSDB_STORAGE_DIRECTORY = "/data/hbase";
+    private final String OPENTSDB_HOST_MAPPED_STORAGE_DIRECTORY = "/mnt/tsdb-benchmark-data/opentsdb";
     private final int OPENTSDB_NUMBER_OF_POINTS_PER_BATCH = 10;
     private final int WAIT_TIME_SLICE = 250;
     private final int MAX_WAIT_TIME = 180_000;
@@ -85,6 +86,11 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     @Override
     public String getStorageDirectoryPath() {
         return OPENTSDB_STORAGE_DIRECTORY;
+    }
+
+    @Override
+    public String getMappedStorageDirectoryPath(){
+        return OPENTSDB_HOST_MAPPED_STORAGE_DIRECTORY;
     }
 
     @Override

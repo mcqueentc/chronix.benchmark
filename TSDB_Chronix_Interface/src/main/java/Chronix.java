@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
     private final String CHRONIX_STORAGE_DIRECTORY = "/opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data";
+    private final String CHRONIX_HOST_MAPPED_STORAGE_DIRECTORY = "/mnt/tsdb-benchmark-data/chronix";
     private final Logger logger = LoggerFactory.getLogger(Chronix.class);
     private final int WAIT_TIME_SLICE = 250;
     private final int MAX_WAIT_TIME = 180_000;
@@ -118,6 +119,11 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
     @Override
     public String getStorageDirectoryPath() {
         return CHRONIX_STORAGE_DIRECTORY;
+    }
+
+    @Override
+    public String getMappedStorageDirectoryPath(){
+        return CHRONIX_HOST_MAPPED_STORAGE_DIRECTORY;
     }
 
     @Override

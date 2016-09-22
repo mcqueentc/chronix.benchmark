@@ -22,6 +22,7 @@ import java.util.Map;
 public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
 
     private final String KAIROSDB_STORAGE_DIRECTORY = "/var/lib/cassandra";
+    private final String KAIROSDB_HOST_MAPPED_STORAGE_DIRECTORY = "/mnt/tsdb-benchmark-data/kairosdb";
     private final Logger logger = LoggerFactory.getLogger(KairosDB.class);
     private String ipAddress;
     private int portNumber;
@@ -84,6 +85,11 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
     @Override
     public String getStorageDirectoryPath() {
         return KAIROSDB_STORAGE_DIRECTORY;
+    }
+
+    @Override
+    public String getMappedStorageDirectoryPath(){
+        return KAIROSDB_HOST_MAPPED_STORAGE_DIRECTORY;
     }
 
     @Override
