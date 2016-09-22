@@ -200,10 +200,17 @@ public class BenchmarkConfiguratorResource {
             if(directory.exists()){
                 if(!DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
 
-                        String command = dockerRunOptions.getValidRunCommand();
+                    // first try restarting docker container
+                    String restartCommand = dockerRunOptions.getValidRunCommand(true);
+                    String[] prepareRestartCommand = {DockerCommandLineUtil.getDockerInstallPath() + restartCommand};
+                    String[] specificRestartCommand = ServerSystemUtil.getOsSpecificCommand(prepareRestartCommand);
+                    List<String> restartResult = ServerSystemUtil.executeCommand(specificRestartCommand);
 
+                    if(!DockerCommandLineUtil.isDockerContainerRunning(containerName)) {
+                        // container was not started before, so run with initial command.
+                        String command = dockerRunOptions.getValidRunCommand(false);
                         //TODO further check command for safety reasons
-                        if (command != null){
+                        if (command != null) {
                             String[] prepareCommand = {DockerCommandLineUtil.getDockerInstallPath() + command};
                             String[] specificCommand = ServerSystemUtil.getOsSpecificCommand(prepareCommand);
                             List<String> startResult = ServerSystemUtil.executeCommand(specificCommand);
@@ -219,6 +226,11 @@ public class BenchmarkConfiguratorResource {
                         String[] response = {"Wrong docker command."};
                         logger.info("Wrong docker command.");
                         return Response.serverError().entity(response).build();
+                    }
+                    // restart successful.
+                    String[] response = {"Docker container " + containerName + " restarted."};
+                    logger.info("Docker container " + containerName + " restarted.");
+                    return Response.ok().entity(response).build();
                 }
                 String[] response = {"docker container " + containerName + " already running."};
                 return Response.ok().entity(response).build();
