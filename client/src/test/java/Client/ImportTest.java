@@ -13,7 +13,7 @@ public class ImportTest {
 
     public static void importTimeSeriesFromDirectory(String server, List<File> directories){
         BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
-        List<String> answers = benchmarkRunner.importTimeSeriesFromDirectory(server, directories, 100);
+        List<String> answers = benchmarkRunner.importTimeSeriesFromDirectory(server, directories, 50);
 
         answers.forEach(System.out::println);
 
