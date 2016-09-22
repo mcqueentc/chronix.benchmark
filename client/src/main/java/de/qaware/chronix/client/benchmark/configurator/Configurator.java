@@ -4,6 +4,8 @@ import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -20,6 +22,7 @@ import java.util.List;
 public class Configurator {
 
     private static Configurator instance;
+    private final Logger logger = LoggerFactory.getLogger(Configurator.class);
     private int applicationPort = 9003;
     private int adminPort = 9004;
     private ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
@@ -119,6 +122,7 @@ public class Configurator {
      * @return the docker build command output
      */
     public String[] buildDockerContainer(String serverAddress, DockerBuildOptions buildOptions){
+        logger.info("Building {} on server {} ... (this may take a while)",buildOptions.getContainerName(),serverAddress);
         final Client client = ClientBuilder.newBuilder().build();
         final WebTarget target = client.target("http://"
                 + serverAddress

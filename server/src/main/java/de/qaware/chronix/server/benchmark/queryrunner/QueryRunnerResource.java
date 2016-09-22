@@ -128,7 +128,7 @@ public class QueryRunnerResource {
                     for (TimeSeries timeSeries : importList) {
                         String answer = tsdb.importDataPoints(timeSeries);
                         if(!answer.isEmpty()) {
-                            importResults.add(answer);
+                            importResults.add(tsdb.getClass().getName() + answer);
                         } else {
                             importResults.add(tsdb.getClass().getName() + ": Nothing imported");
                         }
@@ -159,6 +159,7 @@ public class QueryRunnerResource {
 
             }
         }
+        importResults.add("\n");
         return Response.ok().entity(importResults.toArray(new String[]{})).build();
 
     }

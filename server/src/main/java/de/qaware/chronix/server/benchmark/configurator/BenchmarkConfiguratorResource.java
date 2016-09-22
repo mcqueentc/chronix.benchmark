@@ -249,6 +249,7 @@ public class BenchmarkConfiguratorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("docker/build")
     public Response buildDockerContainer(DockerBuildOptions dockerBuildOptions){
+        logger.info("Building {} ... ", dockerBuildOptions.getContainerName());
         if(DockerCommandLineUtil.isDockerInstalled()){
             String containerName = dockerBuildOptions.getContainerName();
             File directory = new File(ServerSystemUtil.getBenchmarkDockerDirectory() + containerName);
