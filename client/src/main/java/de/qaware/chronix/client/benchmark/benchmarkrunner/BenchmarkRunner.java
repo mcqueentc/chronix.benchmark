@@ -203,7 +203,7 @@ public class BenchmarkRunner {
     private void saveBenchmarkRecords(List<BenchmarkRecord> benchmarkRecords){
         ObjectMapper mapper = new ObjectMapper();
         File recordFile = new File(recordFileDirectory + File.separator + recordFileName);
-        //recordFile.delete();
+        recordFile.delete();
         for(BenchmarkRecord benchmarkRecord : benchmarkRecords) {
             //TODO erase or implement latency measurement again
             /*Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
