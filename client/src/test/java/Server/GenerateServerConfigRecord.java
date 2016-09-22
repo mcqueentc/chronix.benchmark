@@ -25,25 +25,35 @@ public class GenerateServerConfigRecord {
         LinkedList<DockerRunOptions> runOptionses = new LinkedList<>();
 
         // Chronix
+        String tsdbName = "chronix";
+        buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));                        //   host/dir:/container/dir
+        runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "-v /mnt/tsdb-benchmark-data/chronix:/opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data --name " + tsdbName));
+        //runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "-v /mnt/tsdb-benchmark-data/chronix:/opt --name " + tsdbName));
 
-        buildOptionses.add(new DockerBuildOptions("chronix", "-t"));
-        runOptionses.add(new DockerRunOptions("chronix", 8983, 8983, ""));
 
         //InfluxDB
-        buildOptionses.add(new DockerBuildOptions("influxdb", "-t"));
-        runOptionses.add(new DockerRunOptions("influxdb", 8086, 8086, "-p 8083:8083"));
+        tsdbName = "influxdb";
+        buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
+        //runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 -v /mnt/tsdb-benchmark-data/influxdb:/var/lib/influxdb --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 -v /mnt/tsdb-benchmark-data/influxdb:/var --name " + tsdbName));
 
         //KairosDB
-        buildOptionses.add(new DockerBuildOptions("kairosdb", "-t"));
-        runOptionses.add(new DockerRunOptions("kairosdb", 8080, 8080, ""));
+        tsdbName = "kairosdb";
+        buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
+        //runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "-v /mnt/tsdb-benchmark-data/kairosdb:/var/lib/cassandra --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "-v /mnt/tsdb-benchmark-data/kairosdb:/var --name " + tsdbName));
 
         //OpenTSDB
-        buildOptionses.add(new DockerBuildOptions("opentsdb", "-t"));
-        runOptionses.add(new DockerRunOptions("opentsdb", 4242, 4242, "-h localHost"));
+        tsdbName = "opentsdb";
+        buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
+        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /mnt/tsdb-benchmark-data/opentsdb:/data/hbase --name " + tsdbName));
+
 
         //Graphite
-        buildOptionses.add(new DockerBuildOptions("graphite", "-t"));
-        runOptionses.add(new DockerRunOptions("graphite", 2003, 2003, "-p 80:80"));
+        tsdbName = "graphite";
+        buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
+        //runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -v /mnt/tsdb-benchmark-data/graphite:/opt/graphite/storage --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -v /mnt/tsdb-benchmark-data/graphite:/opt --name " + tsdbName));
 
 
 
