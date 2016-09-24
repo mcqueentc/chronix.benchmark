@@ -31,8 +31,6 @@ import java.util.*;
 public class QueryRunnerResource {
 
     private final Logger logger = LoggerFactory.getLogger(QueryRunnerResource.class);
-    private final TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
-    private final DockerStatsUtil dockerStatsUtil = DockerStatsUtil.getInstance();
     private final StatsCollector statsCollector = StatsCollector.getInstance();
 
     @POST
@@ -40,6 +38,7 @@ public class QueryRunnerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response performQuery(QueryRecord queryRecord){
         if(queryRecord != null) {
+            TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
             BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(queryRecord.getTsdbName());
             if (tsdb == null) {
                 logger.error("No TSDB implementation with name " + queryRecord.getTsdbName() + " found on.");
@@ -60,6 +59,7 @@ public class QueryRunnerResource {
                 }
 
                 //start threaded background measurement
+                DockerStatsUtil dockerStatsUtil = DockerStatsUtil.getInstance();
                 Long startDiskUsage = dockerStatsUtil.estimateStorageSize(queryRecord.getTsdbName(), tsdb.getMappedStorageDirectoryPath());
                 dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(queryRecord.getTsdbName()));
                 long startMilliseconds = System.currentTimeMillis();
@@ -107,7 +107,8 @@ public class QueryRunnerResource {
         List<String> importResults = new LinkedList<>();
         for(ImportRecord importRecord : importRecordWrapper.getImportRecordList()) {
             if (importRecord != null) {
-                importRecord.setTimeSeriesList(importRecordWrapper.getTimeSeriesList());
+                TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
+                //importRecord.setTimeSeriesList(importRecordWrapper.getTimeSeriesList());
                 BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(importRecord.getTsdbName());
                 if (tsdb == null) {
                     logger.error("No TSDB implementation with name " + importRecord.getTsdbName() + " found on.");
@@ -116,16 +117,17 @@ public class QueryRunnerResource {
 
                 if (tsdb.setup(importRecord.getIpAddress(), Integer.valueOf(importRecord.getPortNumber()))) {
                     logger.info("Performing import on {}", tsdb.getClass().getName());
-                    List<TimeSeries> importList = importRecord.getTimeSeriesList();
+                    //List<TimeSeries> importList = importRecord.getTimeSeriesList();
 
 
                     //start threaded background measurement
+                    DockerStatsUtil dockerStatsUtil = DockerStatsUtil.getInstance();
                     Long startDiskUsage = dockerStatsUtil.estimateStorageSize(importRecord.getTsdbName(), tsdb.getMappedStorageDirectoryPath());
                     dockerStatsUtil.startDockerContainerMeasurement(DockerCommandLineUtil.getRunningContainerId(importRecord.getTsdbName()));
                     long startMilliseconds = System.currentTimeMillis();
 
                     //preform the import
-                    for (TimeSeries timeSeries : importList) {
+                    for (TimeSeries timeSeries : importRecordWrapper.getTimeSeriesList()) {
                         String answer = tsdb.importDataPoints(timeSeries);
                         if(!answer.isEmpty()) {
                             importResults.add(tsdb.getClass().getName() + answer);
@@ -159,7 +161,7 @@ public class QueryRunnerResource {
 
             }
         }
-        importResults.add("\n");
+
         return Response.ok().entity(importResults.toArray(new String[]{})).build();
 
     }
@@ -170,6 +172,7 @@ public class QueryRunnerResource {
     public Response cleanDatabases(List<CleanCommand> cleanCommandList){
         List<String> results = new ArrayList<>();
         if(cleanCommandList != null && !cleanCommandList.isEmpty()){
+            TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
             for(CleanCommand cleanCommand : cleanCommandList){
                 BenchmarkDataSource<Object> tsdb = tsdbInterfaceHandler.getTSDBInstance(cleanCommand.getTsdbName());
                 if(tsdb != null){
