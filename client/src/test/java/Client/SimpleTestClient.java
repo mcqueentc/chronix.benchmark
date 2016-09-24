@@ -4,6 +4,7 @@ import Docker.BuildDockerContainer;
 import Docker.StartDockerContainer;
 import Docker.StopDockerContainer;
 import Docker.UploadDockerFiles;
+import Server.CleanDatabasesOnServerTest;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
@@ -33,6 +34,13 @@ public class SimpleTestClient {
         long endMillis;
         //String server = "46.101.106.184";
         String server = "localhost";
+        List<String> tsdbImportList = new ArrayList<>();
+        tsdbImportList.add("chronix");
+        //tsdbImportList.add("influxdb");
+        //tsdbImportList.add("kairosdb");
+        //tsdbImportList.add("graphite");
+        //tsdbImportList.add("opentsdb");
+
         try {
             if (configurator.isServerUp(server)) {
                 System.out.println("Server is up");
@@ -47,19 +55,18 @@ public class SimpleTestClient {
         UploadDockerFiles.main(new String[]{server});
         InterfaceAndConfigUploadTest.main(new String[]{server});
         //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-
         //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        CleanDatabasesOnServerTest.main(new String[]{server});
 
 
         //multiple file upload and import test
-        benchmarkRunner.importTimesSeriesWithUploadedFiles(server,
-                new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"), 5, 0);
+        benchmarkRunner.importTimesSeriesWithUploadedFiles(server, new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"), 5, 0, tsdbImportList);
+
 
 
 /*
-
         // import test
 
         List<File> directories = new ArrayList<>();
@@ -73,12 +80,12 @@ public class SimpleTestClient {
         }
         for(File directory : directories) {
             startMillis = System.currentTimeMillis();
-            ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0);
+            ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbImportList);
             endMillis = System.currentTimeMillis();
             System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
         }
-
 */
+/*
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
         List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
@@ -95,6 +102,6 @@ public class SimpleTestClient {
         //get benchmark query record test
         benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
-
+*/
     }
 }

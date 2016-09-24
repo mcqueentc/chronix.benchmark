@@ -39,11 +39,12 @@ public class BenchmarkRunnerHelper {
      * @param timeSeriesList the time series to be imported.
      * @param queryID the query id
      * @param serverAddress the server address or ip on which the import should be done.
+     * @param tsdbImportList a list of tsdb names on which the import should be done. null == all available on server
      * @return list of ImportRecords.
      */
     public List<ImportRecord> getImportRecordForTimeSeries(List<TimeSeries> timeSeriesList,
                                                            String queryID,
-                                                           String serverAddress) {
+                                                           String serverAddress, List<String> tsdbImportList) {
 
         List<ImportRecord> importRecordList = new LinkedList<>();
 
@@ -51,9 +52,18 @@ public class BenchmarkRunnerHelper {
             if(serverConfigRecord != null) {
                 List<String> externalImpls = serverConfigRecord.getExternalTimeSeriesDataBaseImplementations();
                 for (String tsdb : externalImpls) {
-                    String ip = serverConfigRecord.getServerAddress();
-                    String port = serverConfigAccessor.getHostPortForTSDB(ip, tsdb);
-                    importRecordList.add(new ImportRecord(queryID, ip, port, tsdb, timeSeriesList));
+                    if(tsdbImportList != null){
+                        if(tsdbImportList.contains(tsdb)){
+                            String ip = serverConfigRecord.getServerAddress();
+                            String port = serverConfigAccessor.getHostPortForTSDB(ip, tsdb);
+                            importRecordList.add(new ImportRecord(queryID, ip, port, tsdb, timeSeriesList));
+                        }
+                    } else {
+                        //if tsdbImportList is null, take all available tsdbs saved in server record.
+                        String ip = serverConfigRecord.getServerAddress();
+                        String port = serverConfigAccessor.getHostPortForTSDB(ip, tsdb);
+                        importRecordList.add(new ImportRecord(queryID, ip, port, tsdb, timeSeriesList));
+                    }
                 }
             }
         

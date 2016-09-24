@@ -107,7 +107,7 @@ public class BenchmarkRunner {
      * @param batchSize the batch size of how many time series should be imported per call on the server.
      * @return list of answers from the server.
      */
-    public void importTimeSeriesFromDirectory(String server, File directory, int batchSize, int fromFile){
+    public void importTimeSeriesFromDirectory(String server, File directory, int batchSize, int fromFile, List<String> tsdbImportList){
         if(directory != null && directory.exists() && directory.isDirectory()) {
             File[] files = directory.listFiles();
             if (files != null) {
@@ -122,7 +122,7 @@ public class BenchmarkRunner {
 
                         // import to tsdbs
                         logger.info("Import time series from {} to {}, {} left.", (i - batchSize), i, (files.length - i));
-                        List<String> answers = this.importTimeSeries(server, timeSeries, queryID);
+                        List<String> answers = this.importTimeSeries(server, timeSeries, queryID, tsdbImportList);
                         for(String answer : answers) {
                             logger.info("Import: {}", answer);
                         }
@@ -138,7 +138,7 @@ public class BenchmarkRunner {
 
                 // import to tsdbs
                 String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + files.length;
-                List<String> answers = this.importTimeSeries(server, timeSeries, queryID);
+                List<String> answers = this.importTimeSeries(server, timeSeries, queryID, tsdbImportList);
                 logger.info("Imports: \n {} \n", answers);
                 logger.info("Import: {} files imported.",files.length);
                 // generate meta data
@@ -149,11 +149,11 @@ public class BenchmarkRunner {
 
 
 
-    private List<String> importTimeSeries(String serverAddress, List<TimeSeries> timeSeriesList, String queryID){
+    private List<String> importTimeSeries(String serverAddress, List<TimeSeries> timeSeriesList, String queryID, List<String> tsdbImportList){
         List<String> resultList = new LinkedList<>();
         if (!timeSeriesList.isEmpty()) {
             //TODO change signature
-            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, serverAddress);
+            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, serverAddress, tsdbImportList);
             ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(timeSeriesList, importRecordList);
             logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
             String[] results = queryHandler.doImportOnServer(serverAddress, importRecordWrapper);
@@ -251,7 +251,7 @@ public class BenchmarkRunner {
 
 
 
-    public void importTimesSeriesWithUploadedFiles(String server, File directory, int batchSize, int fromFile){
+    public void importTimesSeriesWithUploadedFiles(String server, File directory, int batchSize, int fromFile, List<String> tsdbImportList){
         if(directory != null && directory.exists() && directory.isDirectory()) {
             try {
                 File[] files = directory.listFiles();
@@ -276,7 +276,7 @@ public class BenchmarkRunner {
                             List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
 
                             String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + i;
-                            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server);
+                            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server, tsdbImportList);
                             ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(null, importRecordList);
                             logger.info("Import time series from {} to {}, {} left.", (i - batchSize), i, (files.length - i));
                             logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
@@ -314,7 +314,7 @@ public class BenchmarkRunner {
 
 
                     String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + files.length;
-                    List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server);
+                    List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server, tsdbImportList);
                     ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(null, importRecordList);
                     logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
 
