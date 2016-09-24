@@ -5,6 +5,7 @@ import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
+import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 import de.qaware.chronix.database.TimeSeries;
@@ -206,14 +207,14 @@ public class BenchmarkRunner {
         File recordFile = new File(recordFileDirectory + File.separator + recordFileName);
         recordFile.delete();
         for(BenchmarkRecord benchmarkRecord : benchmarkRecords) {
-            //TODO erase or implement latency measurement again
-            /*Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
-            if(latency == null){
+
+            Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
+            /*if(latency == null){
                 // ignore previously downloaded records. for them, no latency entry should exist
                 continue;
-            }
+            }*/
 
-            benchmarkRecord.setLatency(latency);*/
+            benchmarkRecord.setLatency(latency);
 
             try {
                 final String queryRecordJSON = mapper.writeValueAsString(benchmarkRecord);
