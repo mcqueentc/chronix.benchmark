@@ -96,6 +96,9 @@ public class QueryRunnerResource {
                 if (startDiskUsage != -1 && endDiskUsage != -1) {
                     queryRecord.setDiskUsage(String.valueOf((endDiskUsage - startDiskUsage)));
                     queryRecord.setDiskUsageTotal(String.valueOf(endDiskUsage));
+                } else {
+                    queryRecord.setDiskUsage("-1");
+                    queryRecord.setDiskUsageTotal("-1");
                 }
                 statsCollector.addQueryRecordEditJob(queryRecord, dockerMeasurement);
 
