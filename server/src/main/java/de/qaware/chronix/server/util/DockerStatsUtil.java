@@ -137,19 +137,24 @@ public class DockerStatsUtil {
 
         public void run(){
             while(this.running) {
-                List<String> answers = ServerSystemUtil.executeCommand(command);
-                String[] splits = answers.get(0).split("%");
-                if(splits.length == 6) {
-                    // cpu%mem%readblock%writeblock%netDOWN%netUP
-                    Double cpuUsage = Double.valueOf(splits[0]);
-                    Double memoryUsage = Double.valueOf(splits[1]);
-                    Long readBytes = getBytesCountFromString(splits[2]);
-                    Long writtenBytes = getBytesCountFromString(splits[3]);
-                    Long networkDownloadedBytes = getBytesCountFromString(splits[4]);
-                    Long networkUploadedBytes = getBytesCountFromString(splits[5]);
+                try {
+                    List<String> answers = ServerSystemUtil.executeCommand(command);
+                    String[] splits = answers.get(0).split("%");
+                    if (splits.length == 6) {
+                        // cpu%mem%readblock%writeblock%netDOWN%netUP
+                        Double cpuUsage = Double.valueOf(splits[0]);
+                        Double memoryUsage = Double.valueOf(splits[1]);
+                        Long readBytes = getBytesCountFromString(splits[2]);
+                        Long writtenBytes = getBytesCountFromString(splits[3]);
+                        Long networkDownloadedBytes = getBytesCountFromString(splits[4]);
+                        Long networkUploadedBytes = getBytesCountFromString(splits[5]);
 
-                    //logger.info("MeasureRunner: cpu: {}, mem: {}, readBytes: {}, writtenBytes: {} netDown: {}, netUp: {}",cpuUsage,memoryUsage,readBytes,writtenBytes,networkDownloadedBytes,networkUploadedBytes);
-                    measures.add(new DockerStatsRecord(cpuUsage, memoryUsage, readBytes, writtenBytes, networkDownloadedBytes, networkUploadedBytes));
+                        //logger.info("MeasureRunner: cpu: {}, mem: {}, readBytes: {}, writtenBytes: {} netDown: {}, netUp: {}",cpuUsage,memoryUsage,readBytes,writtenBytes,networkDownloadedBytes,networkUploadedBytes);
+                        measures.add(new DockerStatsRecord(cpuUsage, memoryUsage, readBytes, writtenBytes, networkDownloadedBytes, networkUploadedBytes));
+                    }
+                } catch (Exception e){
+                    logger.error("Error doing docker measurement: {}", e.getLocalizedMessage());
+                    break;
                 }
             }
 
