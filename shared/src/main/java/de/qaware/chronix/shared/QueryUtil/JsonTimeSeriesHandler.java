@@ -1,4 +1,4 @@
-package de.qaware.chronix.client.benchmark.util;
+package de.qaware.chronix.shared.QueryUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;

@@ -3,7 +3,7 @@ package de.qaware.chronix.client;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
-import de.qaware.chronix.client.benchmark.util.CsvImporter;
+import de.qaware.chronix.shared.QueryUtil.CsvImporter;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;

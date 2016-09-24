@@ -1,6 +1,6 @@
 package Client.data;
 
-import de.qaware.chronix.client.benchmark.util.CsvImporter;
+import de.qaware.chronix.shared.QueryUtil.CsvImporter;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesPoint;
 
