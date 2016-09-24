@@ -26,7 +26,6 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class StatsCollectorResource {
 
-    private final StatsCollector statsCollector = StatsCollector.getInstance();
     private final Logger logger = LoggerFactory.getLogger(StatsCollectorResource.class);
 
     // JUST FOR TESTING
@@ -42,6 +41,7 @@ public class StatsCollectorResource {
     @Path("benchmarkrecords")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBenchmarkRecords(){
+        StatsCollector statsCollector = StatsCollector.getInstance();
         List<BenchmarkRecord> benchmarkRecordList = statsCollector.getBenchmarkRecords();
         logger.info("Size of benchmarkRecordList: {}", benchmarkRecordList.size());
         GenericEntity<List<BenchmarkRecord>> genericEntity = new GenericEntity<List<BenchmarkRecord>>(new ArrayList<>(benchmarkRecordList)){};
