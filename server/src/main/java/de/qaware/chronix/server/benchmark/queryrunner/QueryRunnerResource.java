@@ -12,10 +12,7 @@ import de.qaware.chronix.server.util.DockerStatsUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
 import de.qaware.chronix.shared.DataModels.ImportRecordWrapper;
 import de.qaware.chronix.shared.DataModels.Tuple;
-import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
-import de.qaware.chronix.shared.QueryUtil.CleanCommand;
-import de.qaware.chronix.shared.QueryUtil.ImportRecord;
-import de.qaware.chronix.shared.QueryUtil.QueryRecord;
+import de.qaware.chronix.shared.QueryUtil.*;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -169,8 +166,8 @@ public class QueryRunnerResource {
 
                     tsdb.shutdown();
                 } else {
-                    logger.error("Error performing import!");
-                    return Response.serverError().entity(new String[]{"Error performing import!"}).build();
+                    logger.error("Error performing import, tsdb: " + tsdb.getClass().getName());
+                    return Response.serverError().entity(new String[]{"Error performing import! " + tsdb.getClass().getName()}).build();
                 }
 
             }
@@ -184,13 +181,22 @@ public class QueryRunnerResource {
     @Path("performImportWithFiles")
     @Consumes({MediaType.MULTIPART_FORM_DATA})
     public Response performImportWithFiles(@Context HttpServletRequest request) {
-        List<String> resultList = new LinkedList<>();
+        Response response = Response.serverError().entity(new String[]{"Error performing import."}).build();
         if(ServletFileUpload.isMultipartContent(request)){
             final FileItemFactory factory = new DiskFileItemFactory();
             final ServletFileUpload fileUpload = new ServletFileUpload(factory);
+            File[] filesToImport = null;
+            File tempDirectory = new File(ServerSystemUtil.getBenchmarkUtilPath() + "tmp");
+            if (!tempDirectory.exists()){
+                tempDirectory.mkdir();
+            }
+
             try{
                 final List items = fileUpload.parseRequest(request);
                 if(items != null){
+                    ImportRecordWrapper importRecordWrapper = null;
+
+                    // read the files from multipart
                     final Iterator iter = items.iterator();
                     while (iter.hasNext()){
                         final FileItem item = (FileItem) iter.next();
@@ -199,35 +205,71 @@ public class QueryRunnerResource {
                         final String fieldValue = item.getString();
 
 
-                        File workingDir = new File(ServerSystemUtil.getBenchmarkUtilPath() + "filetests");
-                        if (!workingDir.exists()){
-                            workingDir.mkdir();
-                        }
-
                         if(fieldName.equals("ImportRecordWrapper")){
-                            //test
-                            //resultList.add("itemName: " + itemName);
+                            // json string
                             ObjectMapper mapper = new ObjectMapper();
                             String jsonString = new String(fieldValue.getBytes());
-                            ImportRecordWrapper importRecordWrapper = mapper.readValue(jsonString, ImportRecordWrapper.class);
-
+                            importRecordWrapper = mapper.readValue(jsonString, ImportRecordWrapper.class);
                         }
-                        else {
-                            final File savedFile = new File(workingDir.getPath() + File.separator + itemName);
+                        if(!item.isFormField()){
+                            // write file data to file
+                            final File savedFile = new File(tempDirectory.getPath() + File.separator + itemName);
                             item.write(savedFile);
                         }
-
-
                     }
+
+
+                    // only proceed if reading importRecordWrapper was successful.
+                    if(importRecordWrapper != null) {
+                        // read time series from json files
+                        filesToImport = tempDirectory.listFiles();
+
+                        if (filesToImport != null && filesToImport.length > 0) {
+                            //delete non .gz (even if all files were .gz files, there is still a "null" file from the iterator)
+                            List<File> fileList = Arrays.asList(filesToImport);
+                            List<File> importFileList = new LinkedList<>();
+                            for(File file : fileList){
+                                if(file.getName().endsWith(".gz")){
+                                    importFileList.add(file);
+                                }
+                            }
+
+                            JsonTimeSeriesHandler jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
+                            List<TimeSeries> timeSeriesList = jsonTimeSeriesHandler.readTimeSeriesJson(importFileList.toArray(new File[]{}));
+                            importRecordWrapper.setTimeSeriesList(timeSeriesList);
+
+
+                            logger.info("pre import: timeSeriesSize: {} and importRecordSize: {}",
+                                    importRecordWrapper.getTimeSeriesList().size(),
+                                    importRecordWrapper.getImportRecordList().size());
+                            // do the import
+                            response = this.performImport(importRecordWrapper);
+                        }
+                    }
+
+
                 }
 
             } catch (Exception e){
                 logger.error("Error handling files: {}",e.getLocalizedMessage());
-                return Response.serverError().entity(new String[]{"Error performing import!"}).build();
+                response = Response.serverError().entity(new String[]{"Error performing import: " + e.getLocalizedMessage()}).build();
+            }
+
+
+            // clean tmp dir
+            if(filesToImport != null) {
+                for (File file : filesToImport) {
+                    if( ! file.delete()){
+                        logger.error("Could not delete tmp file: {}",file.getName());
+                    }
+                }
+            }
+            if( ! tempDirectory.delete()){
+                logger.error("Could not delete tmp directory: {}", tempDirectory.getAbsolutePath());
             }
         }
 
-        return Response.ok().entity(resultList.toArray(new String[]{})).build();
+        return response;
 
     }
 
