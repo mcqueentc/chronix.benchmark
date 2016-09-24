@@ -20,7 +20,7 @@ public class DockerStatsUtil {
     private final int NUMBER_OF_THREADS = 4;
 
     private static DockerStatsUtil instance;
-    private MeasureRunner[] threads;
+    private volatile MeasureRunner[] threads;
 
 
     private DockerStatsUtil(){
@@ -42,7 +42,7 @@ public class DockerStatsUtil {
      *
      * @param containerID the containerID of the container to be measured.
      */
-    public void startDockerContainerMeasurement(String containerID){
+    public synchronized void startDockerContainerMeasurement(String containerID){
         if(containerID != null && !containerID.isEmpty()) {
             for(int i = 0; i < threads.length; i++) {
                 threads[i] = new MeasureRunner(containerID, true);
@@ -62,7 +62,7 @@ public class DockerStatsUtil {
      *
      * @return A list of Pairs containing as Pair.first the cpu usage in % and as Pair.second the memory usage in %
      */
-    public List<DockerStatsRecord> stopDockerContainerMeasurement(){
+    public synchronized List<DockerStatsRecord> stopDockerContainerMeasurement(){
         List<DockerStatsRecord> completeMeasures = new LinkedList<>();
         for(int i = 0; i < threads.length; i++){
             threads[i].stopRunning();
@@ -70,7 +70,7 @@ public class DockerStatsUtil {
                 threads[i].join(2 * DOCKER_STATS_REACTION_MILLISECONDS);
                 completeMeasures.addAll(threads[i].getMeasures());
 
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                logger.error("Error DockerStatsUtil stopDockerContainerMeasurement: " + e.getLocalizedMessage());
             }
         }
