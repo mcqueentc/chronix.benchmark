@@ -11,11 +11,9 @@ import java.util.List;
 public class ImportTest {
 
 
-    public static void importTimeSeriesFromDirectory(String server, List<File> directories){
+    public static void importTimeSeriesFromDirectory(String server, File directories, int batchSize, int fromFile){
         BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
-        List<String> answers = benchmarkRunner.importTimeSeriesFromDirectory(server, directories, 50);
-
-        answers.forEach(System.out::println);
+        benchmarkRunner.importTimeSeriesFromDirectory(server, directories, batchSize, fromFile);
 
     }
 

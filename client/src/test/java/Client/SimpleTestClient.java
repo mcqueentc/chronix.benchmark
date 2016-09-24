@@ -43,30 +43,31 @@ public class SimpleTestClient {
         //UploadDockerFiles.main(new String[]{server});
         //InterfaceAndConfigUploadTest.main(new String[]{server});
         //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
         //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
 
-/*
+
         // import test
 
         List<File> directories = new ArrayList<>();
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
         // as if was not imported previously
         for(File directory : directories){
             jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
         }
-        startMillis = System.currentTimeMillis();
-        ImportTest.importTimeSeriesFromDirectory(server, directories);
-        endMillis = System.currentTimeMillis();
-        System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
-
-*/
+        for(File directory : directories) {
+            startMillis = System.currentTimeMillis();
+            ImportTest.importTimeSeriesFromDirectory(server, directory, 25 , 5200);
+            endMillis = System.currentTimeMillis();
+            System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
+        }
+/*
 
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
@@ -80,7 +81,7 @@ public class SimpleTestClient {
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
-
+*/
         //get benchmark query record test
         BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
