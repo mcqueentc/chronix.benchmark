@@ -22,11 +22,20 @@ import java.util.stream.Stream;
  */
 public class ServerSystemUtil {
 
-    static final String benchmarkUtilPath = "chronixBenchmark" + File.separator + "docker";
+    private static final String benchmarkUtilPath = System.getProperty("user.home") + File.separator +"chronixBenchmark" + File.separator;
     private static final Logger logger = LoggerFactory.getLogger(ServerSystemUtil.class);
 
     private ServerSystemUtil(){
         //Avoid instances
+    }
+
+    /**
+     * Returns the chronix benchmark directory
+     *
+     * @return The directory with appending File separator. (Unix: "/", Windows: "\")
+     */
+    public static String getBenchmarkUtilPath(){
+        return benchmarkUtilPath;
     }
 
     /**
@@ -35,12 +44,8 @@ public class ServerSystemUtil {
      * @return The directory with appending File separator. (Unix: "/", Windows: "\")
      */
     public static String getBenchmarkDockerDirectory() {
-        String path = null;
-        OSInfo.OSType os = sun.awt.OSInfo.getOSType();
-        if (os != OSInfo.OSType.UNKNOWN) {
-            path = System.getProperty("user.home") + File.separator + benchmarkUtilPath + File.separator;
-        }
-        return path;
+
+        return benchmarkUtilPath + "docker" + File.separator;
     }
 
     /**

@@ -14,11 +14,15 @@ import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -113,7 +117,7 @@ public class BenchmarkRunner {
                 List<File> fileList = new ArrayList<>();
 
                 for (int i = fromFile; i < files.length; i++) {
-                    if (i != 0 && i % batchSize == 0) {
+                    if (i != fromFile && i % batchSize == 0) {
                         //read timeseries from json
                         List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
                         fileList.clear();
@@ -139,6 +143,7 @@ public class BenchmarkRunner {
                 String queryID = Instant.now().toString() + "_import_" + files[files.length - 1].getParent() + "_" + files.length;
                 List<String> answers = this.importTimeSeries(server, timeSeries, queryID);
                 logger.info("Imports: \n {} \n", answers);
+                logger.info("Import: {} files imported.",files.length);
                 // generate meta data
                 jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
             }
@@ -246,5 +251,69 @@ public class BenchmarkRunner {
         }
         return benchmarkRecordList;
     }
+
+
+
+    public void importTimesSeriesWithUploadedFiles(String server, File directory, int batchSize, int fromFile){
+        if(directory != null && directory.exists() && directory.isDirectory()) {
+            try {
+                File[] files = directory.listFiles();
+                if (files != null) {
+                    List<File> fileList = new ArrayList<>();
+
+                    for (int i = fromFile; i < files.length; i++) {
+                        if (i != fromFile && i % batchSize == 0) {
+                            String queryID = Instant.now().toString() + "_import_" + files[i].getParent() + "_" + i;
+                            List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server);
+                            ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(null, importRecordList);
+                            logger.info("Import time series from {} to {}, {} left.", (i - batchSize), i, (files.length - i));
+                            logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
+
+                            // make multipart
+                            FormDataMultiPart multiPart = new FormDataMultiPart();
+                            ObjectMapper mapper = new ObjectMapper();
+                            final String ImportRecordWrapperJSON = mapper.writeValueAsString(importRecordWrapper);
+                            multiPart.field("ImportRecordWrapper", ImportRecordWrapperJSON, MediaType.APPLICATION_JSON_TYPE);
+
+                            for (File file : fileList) {
+                                final FileDataBodyPart filePart = new FileDataBodyPart("file", file);
+                                multiPart.field("file", file, MediaType.MULTIPART_FORM_DATA_TYPE).bodyPart(filePart);
+                            }
+
+                            String[] results = queryHandler.doImportOnServerWithUploadedFiles(server, multiPart);
+                            logger.info("Imports:\n {}", Arrays.asList(results));
+
+                            fileList.clear();
+                        }
+
+                        fileList.add(files[i]);
+                    }
+
+                    String queryID = Instant.now().toString() + "_import_" + files[files.length - 1].getParent() + "_" + files.length;
+                    List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server);
+                    ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(null, importRecordList);
+                    logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
+
+                    // make multipart
+                    FormDataMultiPart multiPart = new FormDataMultiPart();
+                    ObjectMapper mapper = new ObjectMapper();
+                    final String ImportRecordWrapperJSON = mapper.writeValueAsString(importRecordWrapper);
+                    multiPart.field("ImportRecordWrapper", ImportRecordWrapperJSON, MediaType.APPLICATION_JSON_TYPE);
+
+                    for (File file : fileList) {
+                        final FileDataBodyPart filePart = new FileDataBodyPart("file", file);
+                        multiPart.field("file", file, MediaType.MULTIPART_FORM_DATA_TYPE).bodyPart(filePart);
+                    }
+
+                    String[] results = queryHandler.doImportOnServerWithUploadedFiles(server, multiPart);
+                    logger.info("Imports:\n {}", Arrays.asList(results));
+                    logger.info("Import: {} files imported.", files.length);
+                }
+            } catch (Exception e){
+                logger.error("Error importing: {}", e.getLocalizedMessage());
+            }
+        }
+    }
+
 
 }

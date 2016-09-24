@@ -1,6 +1,7 @@
 package de.qaware.chronix.server.benchmark.queryrunner;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
@@ -8,6 +9,7 @@ import de.qaware.chronix.server.benchmark.collector.StatsCollector;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.DockerStatsRecord;
 import de.qaware.chronix.server.util.DockerStatsUtil;
+import de.qaware.chronix.server.util.ServerSystemUtil;
 import de.qaware.chronix.shared.DataModels.ImportRecordWrapper;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
@@ -15,12 +17,24 @@ import de.qaware.chronix.shared.QueryUtil.CleanCommand;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -165,6 +179,59 @@ public class QueryRunnerResource {
         return Response.ok().entity(importResults.toArray(new String[]{})).build();
 
     }
+
+    @POST
+    @Path("performImportWithFiles")
+    @Consumes({MediaType.MULTIPART_FORM_DATA})
+    public Response performImportWithFiles(@Context HttpServletRequest request) {
+        List<String> resultList = new LinkedList<>();
+        if(ServletFileUpload.isMultipartContent(request)){
+            final FileItemFactory factory = new DiskFileItemFactory();
+            final ServletFileUpload fileUpload = new ServletFileUpload(factory);
+            try{
+                final List items = fileUpload.parseRequest(request);
+                if(items != null){
+                    final Iterator iter = items.iterator();
+                    while (iter.hasNext()){
+                        final FileItem item = (FileItem) iter.next();
+                        final String itemName = item.getName();
+                        final String fieldName = item.getFieldName();
+                        final String fieldValue = item.getString();
+
+
+                        File workingDir = new File(ServerSystemUtil.getBenchmarkUtilPath() + "filetests");
+                        if (!workingDir.exists()){
+                            workingDir.mkdir();
+                        }
+
+                        if(fieldName.equals("ImportRecordWrapper")){
+                            //test
+                            //resultList.add("itemName: " + itemName);
+                            ObjectMapper mapper = new ObjectMapper();
+                            String jsonString = new String(fieldValue.getBytes());
+                            ImportRecordWrapper importRecordWrapper = mapper.readValue(jsonString, ImportRecordWrapper.class);
+
+                        }
+                        else {
+                            final File savedFile = new File(workingDir.getPath() + File.separator + itemName);
+                            item.write(savedFile);
+                        }
+
+
+                    }
+                }
+
+            } catch (Exception e){
+                logger.error("Error handling files: {}",e.getLocalizedMessage());
+                return Response.serverError().entity(new String[]{"Error performing import!"}).build();
+            }
+        }
+
+        return Response.ok().entity(resultList.toArray(new String[]{})).build();
+
+    }
+
+
 
     @POST
     @Path("cleanDatabases")

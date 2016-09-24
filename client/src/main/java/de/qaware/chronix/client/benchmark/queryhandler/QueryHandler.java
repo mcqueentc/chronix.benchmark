@@ -7,6 +7,8 @@ import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.CleanCommand;
 import de.qaware.chronix.shared.QueryUtil.ImportRecord;
 import de.qaware.chronix.shared.QueryUtil.QueryRecord;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -104,6 +106,22 @@ public class QueryHandler {
         }
 
         return new String[]{"Server status code: " + statusCode};
+    }
+
+    public String[] doImportOnServerWithUploadedFiles(String serverAddress, FormDataMultiPart multiPart){
+        final Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
+        final WebTarget target = client.target("http://"
+                + serverAddress
+                + ":"
+                + configurator.getApplicationPort()
+                + "/queryrunner/performImportWithFiles");
+
+
+        Response response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
+        String[] answer = response.readEntity(String[].class);
+        client.close();
+
+        return answer;
     }
 
     public String[] cleanDatabasesOnServer(String serverAddress, List<CleanCommand> cleanCommandList){

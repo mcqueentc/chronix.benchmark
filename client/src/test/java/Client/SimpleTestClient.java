@@ -27,8 +27,8 @@ public class SimpleTestClient {
 
         long startMillis;
         long endMillis;
-        String server = "46.101.106.184";
-        //String server = "localhost";
+        //String server = "46.101.106.184";
+        String server = "localhost";
         try {
             if (configurator.isServerUp(server)) {
                 System.out.println("Server is up");
@@ -49,7 +49,14 @@ public class SimpleTestClient {
         //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
 
 
+        //multiple file upload and import test
 
+        BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
+        benchmarkRunner.importTimesSeriesWithUploadedFiles(server ,new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"), 5,0);
+
+
+
+/*
         // import test
 
         List<File> directories = new ArrayList<>();
@@ -67,7 +74,7 @@ public class SimpleTestClient {
             endMillis = System.currentTimeMillis();
             System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
         }
-/*
+
 
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
@@ -81,10 +88,10 @@ public class SimpleTestClient {
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
-*/
+
         //get benchmark query record test
         BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
-
+*/
     }
 }
