@@ -118,7 +118,7 @@ public class BenchmarkRunner {
                         //read timeseries from json
                         List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
                         fileList.clear();
-                        String queryID = Instant.now().toString() + "_import_" + files[i].getParent() + "_" + i;
+                        String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + i;
 
                         // import to tsdbs
                         logger.info("Import time series from {} to {}, {} left.", (i - batchSize), i, (files.length - i));
@@ -137,7 +137,7 @@ public class BenchmarkRunner {
                 fileList.clear();
 
                 // import to tsdbs
-                String queryID = Instant.now().toString() + "_import_" + files[files.length - 1].getParent() + "_" + files.length;
+                String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + files.length;
                 List<String> answers = this.importTimeSeries(server, timeSeries, queryID);
                 logger.info("Imports: \n {} \n", answers);
                 logger.info("Import: {} files imported.",files.length);
@@ -255,12 +255,27 @@ public class BenchmarkRunner {
         if(directory != null && directory.exists() && directory.isDirectory()) {
             try {
                 File[] files = directory.listFiles();
+                // delete non times series files
+                if(files != null) {
+                    List<File> fileList = Arrays.asList(files);
+                    List<File> jsonFileList = new LinkedList<>();
+                    for(File file : fileList){
+                        if(file.getName().endsWith(".gz")){
+                            jsonFileList.add(file);
+                        }
+                    }
+                    files = jsonFileList.toArray(new File[]{});
+                }
+
                 if (files != null) {
                     List<File> fileList = new ArrayList<>();
 
                     for (int i = fromFile; i < files.length; i++) {
                         if (i != fromFile && i % batchSize == 0) {
-                            String queryID = Instant.now().toString() + "_import_" + files[i].getParent() + "_" + i;
+                            //read timeseries from json
+                            List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+
+                            String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + i;
                             List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server);
                             ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(null, importRecordList);
                             logger.info("Import time series from {} to {}, {} left.", (i - batchSize), i, (files.length - i));
@@ -277,16 +292,28 @@ public class BenchmarkRunner {
                                 multiPart.field("file", file, MediaType.MULTIPART_FORM_DATA_TYPE).bodyPart(filePart);
                             }
 
+                            // do the import
                             String[] results = queryHandler.doImportOnServerWithUploadedFiles(server, multiPart);
-                            logger.info("Imports:\n {}", Arrays.asList(results));
+                            for(String result : results){
+                                logger.info("Imports: {}",result);
+                            }
+
+                            // generate meta data
+                            jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
 
                             fileList.clear();
                         }
 
+
                         fileList.add(files[i]);
+
                     }
 
-                    String queryID = Instant.now().toString() + "_import_" + files[files.length - 1].getParent() + "_" + files.length;
+                    //read timeseries from json
+                    List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+
+
+                    String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + files.length;
                     List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, server);
                     ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(null, importRecordList);
                     logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
@@ -294,16 +321,26 @@ public class BenchmarkRunner {
                     // make multipart
                     FormDataMultiPart multiPart = new FormDataMultiPart();
                     ObjectMapper mapper = new ObjectMapper();
+                    //add importrecordwrapper json
                     final String ImportRecordWrapperJSON = mapper.writeValueAsString(importRecordWrapper);
                     multiPart.field("ImportRecordWrapper", ImportRecordWrapperJSON, MediaType.APPLICATION_JSON_TYPE);
 
+                    //add the time series files
                     for (File file : fileList) {
                         final FileDataBodyPart filePart = new FileDataBodyPart("file", file);
                         multiPart.field("file", file, MediaType.MULTIPART_FORM_DATA_TYPE).bodyPart(filePart);
                     }
 
+                    // do the import
                     String[] results = queryHandler.doImportOnServerWithUploadedFiles(server, multiPart);
-                    logger.info("Imports:\n {}", Arrays.asList(results));
+
+                    // generate meta data
+                    jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
+
+
+                    for(String result : results){
+                        logger.info("Imports: {}",result);
+                    }
                     logger.info("Import: {} files imported.", files.length);
                 }
             } catch (Exception e){
