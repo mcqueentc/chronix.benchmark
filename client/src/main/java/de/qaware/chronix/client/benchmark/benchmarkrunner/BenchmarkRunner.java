@@ -102,49 +102,47 @@ public class BenchmarkRunner {
      * Imports time series to all tsdbs on given server.
      *
      * @param server the server address or ip on which to import.
-     * @param directories the directory (aka measurementName) of json time series gzipped files.
+     * @param directory the directory containing gzipped times series files.
      * @param batchSize the batch size of how many time series should be imported per call on the server.
      * @return list of answers from the server.
      */
-    public List<String> importTimeSeriesFromDirectory(String server, List<File> directories, int batchSize){
-        List<String> answers = new LinkedList<>();
+    public void importTimeSeriesFromDirectory(String server, File directory, int batchSize, int fromFile){
+        if(directory != null && directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                List<File> fileList = new ArrayList<>();
 
-        List<String> importedTimeSeriesMetaData = new LinkedList<>();
-        for(File directory : directories){
-            if(directory.exists()){
-                File[] files = directory.listFiles();
-                if(files != null) {
-                    List<File> fileList = new ArrayList<>();
+                for (int i = fromFile; i < files.length; i++) {
+                    if (i != 0 && i % batchSize == 0) {
+                        //read timeseries from json
+                        List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+                        fileList.clear();
+                        String queryID = Instant.now().toString() + "_import_" + files[i].getParent() + "_" + i;
 
-                    for (int i = 0; i < files.length; i++) {
-                        if (i != 0 && i % batchSize == 0) {
-                            //read timeseries from json
-                            List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
-                            fileList.clear();
-                            String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + i;
-
-                            // import to tsdbs
-                            logger.info("Import time series from {} to {}, {} left.",(i-batchSize),i,(files.length - i));
-                            answers.addAll(this.importTimeSeries(server, timeSeries, queryID));
-                            // generate meta data
-                            jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
+                        // import to tsdbs
+                        logger.info("Import time series from {} to {}, {} left.", (i - batchSize), i, (files.length - i));
+                        List<String> answers = this.importTimeSeries(server, timeSeries, queryID);
+                        for(String answer : answers) {
+                            logger.info("Import: {}", answer);
                         }
-
-                        fileList.add(files[i]);
+                        // generate meta data
+                        jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
                     }
-                    //read timeseries from json
-                    List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
-                    fileList.clear();
 
-                    // import to tsdbs
-                    String queryID = Instant.now().toString() + "_import_" + directory.getName() + "_" + files.length;
-                    answers.addAll(this.importTimeSeries(server, timeSeries, queryID));
-                    // generate meta data
-                    jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
+                    fileList.add(files[i]);
                 }
+                //read timeseries from json
+                List<TimeSeries> timeSeries = jsonTimeSeriesHandler.readTimeSeriesJson(fileList.toArray(new File[]{}));
+                fileList.clear();
+
+                // import to tsdbs
+                String queryID = Instant.now().toString() + "_import_" + files[files.length - 1].getParent() + "_" + files.length;
+                List<String> answers = this.importTimeSeries(server, timeSeries, queryID);
+                logger.info("Imports: \n {} \n", answers);
+                // generate meta data
+                jsonTimeSeriesHandler.writeTimeSeriesMetaDataJson(timeSeries);
             }
         }
-        return answers;
     }
 
 
