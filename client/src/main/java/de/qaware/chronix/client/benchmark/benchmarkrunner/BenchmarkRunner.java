@@ -175,7 +175,7 @@ public class BenchmarkRunner {
      * @param function the query function that should be performed.
      * @return list of answers from the server.
      */
-    public List<String> queryWithFunction(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function) {
+    public List<String> queryWithFunction(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function, List<String> tsdbImportList) {
         List<String> resultList = new LinkedList<>();
         if (metaDataList != null && !metaDataList.isEmpty()){
 
@@ -184,7 +184,8 @@ public class BenchmarkRunner {
             List<QueryRecord> queryRecordList = benchmarkRunnerHelper.getQueryRecordForTimeSeriesMetaData(metaDataList,
                     queryID,
                     server,
-                    function);
+                    function,
+                    tsdbImportList);
 
             for(QueryRecord queryRecord : queryRecordList){
                 logger.info("Query on: {} ... ", queryRecord.getTsdbName());

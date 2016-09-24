@@ -141,7 +141,7 @@ public class QueryRunnerResource {
                     for (TimeSeries timeSeries : importRecordWrapper.getTimeSeriesList()) {
                         String answer = tsdb.importDataPoints(timeSeries);
                         if(!answer.isEmpty()) {
-                            importResults.add(tsdb.getClass().getName() + answer);
+                            importResults.add(tsdb.getClass().getName() + ": " + answer);
                         } else {
                             importResults.add(tsdb.getClass().getName() + ": Nothing imported");
                         }

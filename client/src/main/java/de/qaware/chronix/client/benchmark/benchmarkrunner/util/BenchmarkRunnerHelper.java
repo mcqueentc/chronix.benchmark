@@ -44,7 +44,8 @@ public class BenchmarkRunnerHelper {
      */
     public List<ImportRecord> getImportRecordForTimeSeries(List<TimeSeries> timeSeriesList,
                                                            String queryID,
-                                                           String serverAddress, List<String> tsdbImportList) {
+                                                           String serverAddress,
+                                                           List<String> tsdbImportList) {
 
         List<ImportRecord> importRecordList = new LinkedList<>();
 
@@ -82,7 +83,8 @@ public class BenchmarkRunnerHelper {
     public List<QueryRecord> getQueryRecordForTimeSeriesMetaData(List<TimeSeriesMetaData> timeSeriesMetaDataList,
                                                                  String queryID,
                                                                  String serverAddress,
-                                                                 QueryFunction function){
+                                                                 QueryFunction function,
+                                                                 List<String> tsdbImportList){
 
         List<QueryRecord> queryRecordList = new LinkedList<>();
         if(!timeSeriesMetaDataList.isEmpty()){
@@ -97,11 +99,18 @@ public class BenchmarkRunnerHelper {
                 List<String> externalImpls = serverConfigRecord.getExternalTimeSeriesDataBaseImplementations();
                 //generate queryRecord for every tsdb
                 for(String tsdb : externalImpls){
-                    String ip = serverConfigRecord.getServerAddress();
-                    String port = serverConfigAccessor.getHostPortForTSDB(ip, tsdb);
-
-                 queryRecordList.add(new QueryRecord(queryID, serverAddress, port, tsdb, querys));
-
+                    if(tsdbImportList != null){
+                        if(tsdbImportList.contains(tsdb)){
+                            String ip = serverConfigRecord.getServerAddress();
+                            String port = serverConfigAccessor.getHostPortForTSDB(ip, tsdb);
+                            queryRecordList.add(new QueryRecord(queryID, serverAddress, port, tsdb, querys));
+                        }
+                    } else {
+                        //if tsdbImportList is null, take all available tsdbs saved in server record.
+                        String ip = serverConfigRecord.getServerAddress();
+                        String port = serverConfigAccessor.getHostPortForTSDB(ip, tsdb);
+                        queryRecordList.add(new QueryRecord(queryID, serverAddress, port, tsdb, querys));
+                    }
                 }
             }
         }

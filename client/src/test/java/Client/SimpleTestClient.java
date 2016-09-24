@@ -36,7 +36,7 @@ public class SimpleTestClient {
         String server = "localhost";
         List<String> tsdbImportList = new ArrayList<>();
         tsdbImportList.add("chronix");
-        //tsdbImportList.add("influxdb");
+        tsdbImportList.add("influxdb");
         //tsdbImportList.add("kairosdb");
         //tsdbImportList.add("graphite");
         //tsdbImportList.add("opentsdb");
@@ -85,7 +85,7 @@ public class SimpleTestClient {
             System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
         }
 */
-/*
+
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
         List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
@@ -94,7 +94,7 @@ public class SimpleTestClient {
         //function = benchmarkRunnerHelper.getRandomQueryFunction();
 
         startMillis = System.currentTimeMillis();
-        QueryTest.queryCount(server, randomTimeSeries, function);
+        QueryTest.queryCount(server, randomTimeSeries, function, tsdbImportList);
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
@@ -102,6 +102,6 @@ public class SimpleTestClient {
         //get benchmark query record test
         benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
-*/
+
     }
 }
