@@ -53,11 +53,16 @@ public class GenerateServerConfigRecord {
         //Graphite
         tsdbName = "graphite";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
+        runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -v /opt/graphite/storage --name " + tsdbName));
         //runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 --name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -v /mnt/tsdb-benchmark-data/graphite:/opt/graphite/storage"
-                                                                            + " -v /mnt/tsdb-benchmark-data/graphite_nginx:/etc/nginx"
-                                                                            + " -v /mnt/tsdb-benchmark-data/graphite_log:/var/log"
-                                                                            + " --name " + tsdbName));
+        /*runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -p 2004:2004 -p 2023:2023 -p 2024:2024 -p 8125:8125 -p 8126:8126"
+                                                                            + " -v /mnt/tsdb-benchmark-data/graphite/storage:/opt/graphite/storage"
+                                                                            + " -v /mnt/tsdb-benchmark-data/graphite/nginx:/etc/nginx"
+                                                                            + " -v /mnt/tsdb-benchmark-data/graphite/log:/var/log"
+                                                                            + " -v /mnt/tsdb-benchmark-data/graphite/conf:/opt/graphite/conf"
+                                                                            + " -v /mnt/tsdb-benchmark-data/graphite/statsd:/opt/statsd"
+                                                                            + " -v /mnt/tsdb-benchmark-data/graphite/logrotate:/etc/logrotate.d"
+                                                                            + " --name " + tsdbName));*/
 
 
 

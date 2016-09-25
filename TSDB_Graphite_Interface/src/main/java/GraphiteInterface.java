@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     private final String GRAPHITE_STORAGE_DIRECTORY = "/opt/graphite/storage";
-    private final String GRAPHITE_HOST_MAPPED_STORAGE_DIRECTORY = "/mnt/tsdb-benchmark-data/graphite";
+    private final String GRAPHITE_HOST_MAPPED_STORAGE_DIRECTORY = "/mnt/tsdb-benchmark-data/graphite/storage";
     private final Logger logger = LoggerFactory.getLogger(GraphiteInterface.class);
     private final int WAIT_TIME_SLICE = 250;
     private final int MAX_WAIT_TIME = 180_000;

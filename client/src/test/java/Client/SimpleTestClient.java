@@ -55,7 +55,7 @@ public class SimpleTestClient {
         //UploadDockerFiles.main(new String[]{server});
         //InterfaceAndConfigUploadTest.main(new String[]{server});
         //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //CleanDatabasesOnServerTest.main(new String[]{server});
@@ -64,7 +64,7 @@ public class SimpleTestClient {
 
 
 
-/*
+
         // import test
 
         List<File> directories = new ArrayList<>();
@@ -79,15 +79,15 @@ public class SimpleTestClient {
         for(File directory : directories) {
             startMillis = System.currentTimeMillis();
             //multiple file upload and import test
-            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 0, tsdbImportList);
+            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 900, tsdbImportList);
 
             //ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbImportList);
             endMillis = System.currentTimeMillis();
             System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
 
        }
-*/
-/*
+
+
 
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
@@ -101,7 +101,7 @@ public class SimpleTestClient {
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
-*/
+
         //get benchmark query record test
         benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
