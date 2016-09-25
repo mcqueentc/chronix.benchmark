@@ -117,6 +117,11 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
     }
 
     @Override
+    public boolean ableToMeasureExternalDirectory(){
+        return true;
+    }
+
+    @Override
     public String getStorageDirectoryPath() {
         return CHRONIX_STORAGE_DIRECTORY;
     }

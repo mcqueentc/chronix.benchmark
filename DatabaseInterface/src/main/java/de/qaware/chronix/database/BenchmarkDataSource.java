@@ -56,6 +56,15 @@ public interface BenchmarkDataSource<T> {
      */
     void shutdown();
 
+    /**
+     * Decide if the storage measurement should be done IN the docker container or on external mapped folder on the host.
+     * @apiNote the OS of the docker container must have the coreutils du command, otherwise setup external mapped folder
+     *          and return true. (host does also need coreutils du command)
+     *
+     * @return true if the host could measure size of getMappedStorageDirectoryPath() by it self,
+     *      or false if host has to measure the getStorageDirectoryPath() IN the docker container.
+     */
+    boolean ableToMeasureExternalDirectory();
 
     /**
      *

@@ -102,6 +102,11 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
     }
 
     @Override
+    public boolean ableToMeasureExternalDirectory(){
+        return false;
+    }
+
+    @Override
     public String getStorageDirectoryPath() {
         return GRAPHITE_STORAGE_DIRECTORY;
     }

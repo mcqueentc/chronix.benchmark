@@ -84,6 +84,11 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     }
 
     @Override
+    public boolean ableToMeasureExternalDirectory(){
+        return true;
+    }
+
+    @Override
     public String getStorageDirectoryPath() {
         return OPENTSDB_STORAGE_DIRECTORY;
     }

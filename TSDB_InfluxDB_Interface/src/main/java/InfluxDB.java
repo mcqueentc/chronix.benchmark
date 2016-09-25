@@ -81,6 +81,11 @@ public class InfluxDB implements BenchmarkDataSource<String> {
     }
 
     @Override
+    public boolean ableToMeasureExternalDirectory(){
+        return false;
+    }
+
+    @Override
     public String getStorageDirectoryPath() {
         return INFLUXDB_STORAGE_DIRECTORY;
     }

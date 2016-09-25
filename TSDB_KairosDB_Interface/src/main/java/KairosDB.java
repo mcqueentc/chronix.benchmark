@@ -83,6 +83,11 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
     }
 
     @Override
+    public boolean ableToMeasureExternalDirectory(){
+        return true;
+    }
+
+    @Override
     public String getStorageDirectoryPath() {
         return KAIROSDB_STORAGE_DIRECTORY;
     }

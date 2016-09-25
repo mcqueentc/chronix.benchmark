@@ -83,17 +83,26 @@ public class DockerStatsUtil {
      * Estimates the storage size of the given container.
      *
      * @param containerName the name of the docker container
-     * @param mappedStorageDirectoryPath the path to the mapped storage directory on the host.
+     * @param storageDirectoryPath the path to the storage directory.
      * @return the size of the storage directory mapped from container to host in bytes.
      */
-    public Long estimateStorageSize(String containerName, String mappedStorageDirectoryPath){
+    public Long estimateStorageSize(String containerName, String storageDirectoryPath, boolean external){
         Long resultBytes = -1L;
         String containerID = DockerCommandLineUtil.getRunningContainerId(containerName);
         if(!containerID.isEmpty()){
-            String[] command = ServerSystemUtil.getOsSpecificCommand(new String[]{
-                    "/usr/bin/du -c -b --max=1 "
-                    + mappedStorageDirectoryPath
-                    + " | awk '{print $1}'"});
+            String[] command;
+            if(external) {
+                command = ServerSystemUtil.getOsSpecificCommand(new String[]{"/usr/bin/du -c -b --max=1 "
+                                + storageDirectoryPath
+                                + " | awk '{print $1}'"});
+            } else {
+                command = ServerSystemUtil.getOsSpecificCommand(new String[]{DockerCommandLineUtil.getDockerInstallPath()
+                        + "docker exec -t "
+                        + containerID
+                        + " /usr/bin/du -c -b --max=1 "
+                        + storageDirectoryPath
+                        + " | awk '{print $1}'"});
+            }
 
             List<String> answers = ServerSystemUtil.executeCommand(command);
             if(!answers.isEmpty()){
