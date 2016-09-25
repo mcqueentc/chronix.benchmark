@@ -32,14 +32,14 @@ public class SimpleTestClient {
 
         long startMillis;
         long endMillis;
-        //String server = "46.101.106.184";
-        String server = "localhost";
+        String server = "46.101.106.184";
+        //String server = "localhost";
         List<String> tsdbImportList = new ArrayList<>();
         tsdbImportList.add("chronix");
         tsdbImportList.add("influxdb");
-        //tsdbImportList.add("kairosdb");
-        //tsdbImportList.add("graphite");
-        //tsdbImportList.add("opentsdb");
+        tsdbImportList.add("kairosdb");
+        tsdbImportList.add("graphite");
+        tsdbImportList.add("opentsdb");
 
         try {
             if (configurator.isServerUp(server)) {
@@ -51,18 +51,16 @@ public class SimpleTestClient {
         }
 
 
-        GenerateServerConfigRecord.main(new String[]{server});
-        UploadDockerFiles.main(new String[]{server});
-        InterfaceAndConfigUploadTest.main(new String[]{server});
+        //GenerateServerConfigRecord.main(new String[]{server});
+        //UploadDockerFiles.main(new String[]{server});
+        //InterfaceAndConfigUploadTest.main(new String[]{server});
         //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        //StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        CleanDatabasesOnServerTest.main(new String[]{server});
+        //CleanDatabasesOnServerTest.main(new String[]{server});
 
 
-        //multiple file upload and import test
-        benchmarkRunner.importTimesSeriesWithUploadedFiles(server, new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"), 5, 0, tsdbImportList);
 
 
 
@@ -70,8 +68,8 @@ public class SimpleTestClient {
         // import test
 
         List<File> directories = new ArrayList<>();
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
         // as if was not imported previously
@@ -80,11 +78,16 @@ public class SimpleTestClient {
         }
         for(File directory : directories) {
             startMillis = System.currentTimeMillis();
-            ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbImportList);
+            //multiple file upload and import test
+            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 0, tsdbImportList);
+
+            //ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbImportList);
             endMillis = System.currentTimeMillis();
             System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
-        }
+
+       }
 */
+/*
 
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
@@ -98,7 +101,7 @@ public class SimpleTestClient {
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
-
+*/
         //get benchmark query record test
         benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
