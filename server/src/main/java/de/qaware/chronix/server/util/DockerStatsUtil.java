@@ -109,7 +109,7 @@ public class DockerStatsUtil {
                 try {
                     resultBytes = Long.valueOf(answers.get(answers.size() - 1));
                 } catch (Exception e){
-                    logger.error("Error estimating storage size. Result is not a number: {}",e.getLocalizedMessage());
+                    logger.error("Error estimating storage size. Result \"{}\" is not a number: {}",answers.get(answers.size() - 1),e.getLocalizedMessage());
                     resultBytes = -1L;
                 }
             }
