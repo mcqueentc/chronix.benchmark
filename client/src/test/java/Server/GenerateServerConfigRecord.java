@@ -5,6 +5,7 @@ import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
+import java.io.File;
 import java.util.LinkedList;
 
 /**
@@ -47,7 +48,7 @@ public class GenerateServerConfigRecord {
         tsdbName = "opentsdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /data/hbase --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v " + System.getProperty("user.home") + File.separator + "opentsdb:/data/hbase --name " + tsdbName));
 
 
         //Graphite
