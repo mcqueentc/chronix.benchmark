@@ -84,7 +84,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
 
     @Override
     public boolean ableToMeasureExternalDirectory(){
-        return true;
+        return false;
     }
 
     @Override

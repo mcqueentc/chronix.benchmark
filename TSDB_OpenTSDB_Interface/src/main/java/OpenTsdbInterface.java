@@ -85,7 +85,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
 
     @Override
     public boolean ableToMeasureExternalDirectory(){
-        return true;
+        return false;
     }
 
     @Override
