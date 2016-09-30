@@ -134,6 +134,11 @@ public class BenchmarkConfiguratorResource {
                                       @FormDataParam("file")FormDataContentDisposition fileMetaData){
         TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
         if(interfaceHandler.copyTSDBInterface(fileInputStream, tsdbName)){
+            BenchmarkDataSource<Object> tsdb = interfaceHandler.getTSDBInstance(tsdbName);
+            if(tsdb != null){
+                //create external measurement directory if impl needs one. (done by impl)
+                tsdb.ableToMeasureExternalDirectory();
+            }
             return Response.ok().entity("copy successful").build();
         }
         logger.info(tsdbName + ": copy error");
