@@ -61,6 +61,8 @@ public interface BenchmarkDataSource<T> {
      * @apiNote the OS of the docker container must have the coreutils du command, otherwise setup external mapped folder
      *          and return true. (host does also need coreutils du command)
      *
+     * @implNote also create the mapped folder here!
+     *
      * @return true if the host could measure size of getMappedStorageDirectoryPath() by it self,
      *      or false if host has to measure the getStorageDirectoryPath() IN the docker container.
      */
