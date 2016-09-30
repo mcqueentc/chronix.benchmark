@@ -25,13 +25,13 @@ public class TSDBInterfaceHandler {
     private static TSDBInterfaceHandler instance;
     private final Logger logger = LoggerFactory.getLogger(TSDBInterfaceHandler.class);
     private String interfaceDirectoryName = "interfaces";
-    private String interfaceDirectory;
-    private ServerConfigAccessor serverConfigAccessor;
+    private String interfaceDirectory = System.getProperty("user.home") + File.separator +"chronixBenchmark" + File.separator + interfaceDirectoryName + File.separator;
+    //private ServerConfigAccessor serverConfigAccessor;
     private Map<String, File> interfaces;
 
     private TSDBInterfaceHandler(){
-        serverConfigAccessor = ServerConfigAccessor.getInstance();
-        interfaceDirectory = serverConfigAccessor.getConfigDirectory() + interfaceDirectoryName + File.separator;
+        //serverConfigAccessor = ServerConfigAccessor.getInstance();
+        //interfaceDirectory = serverConfigAccessor.getConfigDirectory() + interfaceDirectoryName + File.separator;
         makeInterfaceDirectory();
         interfaces = new HashMap<>();
         readInterfaceDirectory();
