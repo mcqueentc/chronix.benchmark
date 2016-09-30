@@ -28,26 +28,26 @@ public class GenerateServerConfigRecord {
         String tsdbName = "chronix";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));                        //   host/dir:/container/dir
         //runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "-v /mnt/tsdb-benchmark-data/chronix:/opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "-v /opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data --name " + tsdbName));
 
 
         //InfluxDB
         tsdbName = "influxdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 --name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 -v /mnt/tsdb-benchmark-data/influxdb:/var/lib/influxdb --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 -v /var/lib/influxdb --name " + tsdbName));
 
         //KairosDB
         tsdbName = "kairosdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "-v /mnt/tsdb-benchmark-data/kairosdb:/var/lib/cassandra --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "-v /var/lib/cassandra --name " + tsdbName));
 
         //OpenTSDB
         tsdbName = "opentsdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /mnt/tsdb-benchmark-data/opentsdb:/data/hbase --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /data/hbase --name " + tsdbName));
 
 
         //Graphite
