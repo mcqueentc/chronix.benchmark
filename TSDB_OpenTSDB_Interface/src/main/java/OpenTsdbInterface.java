@@ -136,6 +136,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
 
             Set<OpenTsdbMetric> openTsdbMetricSet = new HashSet<>();
 
+            long totalCounter = 0L;
             int counter = 0;
             for(TimeSeriesPoint point : timeSeries.getPoints()){
                 if(counter == OPENTSDB_NUMBER_OF_POINTS_PER_BATCH){
@@ -161,13 +162,14 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
 
                 openTsdbMetricSet.add(openTsdbMetric);
                 counter++;
+                totalCounter++;
 
             }
 
             try {
                 //send uses given batch point size
                 if(!openTsdbMetricSet.isEmpty() && openTsdb.send(openTsdbMetricSet)){
-                    reply = "Import of " + openTsdbMetricSet.size() + " points successful. Metric name: " + metricName;
+                    reply = "Import of " + totalCounter + " points successful. Metric name: " + metricName;
                 }
             } catch (Exception e){
                 logger.error("Error importing data points to openTsdb: " + e.getLocalizedMessage());
