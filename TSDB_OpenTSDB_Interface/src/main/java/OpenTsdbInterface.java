@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     private final String OPENTSDB_STORAGE_DIRECTORY = "/data/hbase";
-    private final String OPENTSDB_HOST_MAPPED_STORAGE_DIRECTORY = System.getProperty("user.home") + File.separator + "opentsdb";
+    private final String OPENTSDB_HOST_MAPPED_STORAGE_DIRECTORY = System.getProperty("user.home") + File.separator + "opentsdb_storage";
     private final int OPENTSDB_NUMBER_OF_POINTS_PER_BATCH = 10;
     private final int WAIT_TIME_SLICE = 250;
     private final int MAX_WAIT_TIME = 180_000;
