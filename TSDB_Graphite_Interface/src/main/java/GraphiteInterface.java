@@ -208,7 +208,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                     break;
                 case MAX:   query = summerizeMetric +  ", \"max\", \"true\")";
                     break;
-                case STDDEV: query = "stddevSeries(" + metric + ")";
+                case STDDEV: query = summerizeMetric + ", \"stddev\", \"true\")"; //"stddevSeries(" + metric + ")";
                     break;
                 case PERCENTILE:
                     Float p = benchmarkQuery.getPercentile();
