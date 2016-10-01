@@ -78,12 +78,14 @@ public class BenchmarkRunnerHelper {
      * @param queryID the query id
      * @param serverAddress the server address or ip on which the queries should be done.
      * @param function the query function which should be performed.
+     * @param p the percentile value (if needed, null if not).
      * @return list of QueryRecords.
      */
     public List<QueryRecord> getQueryRecordForTimeSeriesMetaData(List<TimeSeriesMetaData> timeSeriesMetaDataList,
                                                                  String queryID,
                                                                  String serverAddress,
                                                                  QueryFunction function,
+                                                                 Float p,
                                                                  List<String> tsdbImportList){
 
         List<QueryRecord> queryRecordList = new LinkedList<>();
@@ -93,7 +95,7 @@ public class BenchmarkRunnerHelper {
                 // make benchmarkquery list with entries
                 List<BenchmarkQuery> querys = new LinkedList<>();
                 for(TimeSeriesMetaData metaData : timeSeriesMetaDataList) {
-                    querys.add(new BenchmarkQuery(metaData, null, function));
+                    querys.add(new BenchmarkQuery(metaData, p, function));
                 }
 
                 List<String> externalImpls = serverConfigRecord.getExternalTimeSeriesDataBaseImplementations();

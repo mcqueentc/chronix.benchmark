@@ -174,9 +174,10 @@ public class BenchmarkRunner {
      * @param server the server address or ip
      * @param metaDataList the meta data on which the queries should be performed.
      * @param function the query function that should be performed.
+     * @param p the percentile value (if needed, null if not).
      * @return list of answers from the server.
      */
-    public List<String> queryWithFunction(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function, List<String> tsdbImportList) {
+    public List<String> queryWithFunction(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function, Float p, List<String> tsdbImportList) {
         List<String> resultList = new LinkedList<>();
         if (metaDataList != null && !metaDataList.isEmpty()){
 
@@ -186,6 +187,7 @@ public class BenchmarkRunner {
                     queryID,
                     server,
                     function,
+                    p,
                     tsdbImportList);
 
             for(QueryRecord queryRecord : queryRecordList){

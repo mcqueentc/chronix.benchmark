@@ -1,10 +1,6 @@
 package Client;
 
-import Docker.BuildDockerContainer;
-import Docker.StartDockerContainer;
-import Docker.StopDockerContainer;
 import Docker.UploadDockerFiles;
-import Server.CleanDatabasesOnServerTest;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
@@ -15,7 +11,6 @@ import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +27,8 @@ public class SimpleTestClient {
 
         long startMillis;
         long endMillis;
-        String server = "46.101.106.184";
+
+        String server = "192.168.2.123";
         //String server = "localhost";
         List<String> tsdbImportList = new ArrayList<>();
         tsdbImportList.add("chronix");
@@ -51,9 +47,9 @@ public class SimpleTestClient {
         }
 
 
-        //GenerateServerConfigRecord.main(new String[]{server});
-        //UploadDockerFiles.main(new String[]{server});
-        //InterfaceAndConfigUploadTest.main(new String[]{server});
+        GenerateServerConfigRecord.main(new String[]{server});
+        UploadDockerFiles.main(new String[]{server});
+        InterfaceAndConfigUploadTest.main(new String[]{server});
         //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
@@ -63,13 +59,13 @@ public class SimpleTestClient {
 
 
 
-
+/*
 
         // import test
 
         List<File> directories = new ArrayList<>();
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
         // as if was not imported previously
@@ -79,7 +75,7 @@ public class SimpleTestClient {
         for(File directory : directories) {
             startMillis = System.currentTimeMillis();
             //multiple file upload and import test
-            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 900, tsdbImportList);
+            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 0, tsdbImportList);
 
             //ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbImportList);
             endMillis = System.currentTimeMillis();
@@ -87,17 +83,18 @@ public class SimpleTestClient {
 
        }
 
-
+*/
 
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
         List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
         BenchmarkRunnerHelper benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
-        BenchmarkDataSource.QueryFunction function = BenchmarkDataSource.QueryFunction.COUNT;
+        BenchmarkDataSource.QueryFunction function = BenchmarkDataSource.QueryFunction.STDDEV;
+        Float p = 0.5f;
         //function = benchmarkRunnerHelper.getRandomQueryFunction();
 
         startMillis = System.currentTimeMillis();
-        QueryTest.queryCount(server, randomTimeSeries, function, tsdbImportList);
+        QueryTest.queryTest(server, randomTimeSeries, function, p, tsdbImportList);
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
