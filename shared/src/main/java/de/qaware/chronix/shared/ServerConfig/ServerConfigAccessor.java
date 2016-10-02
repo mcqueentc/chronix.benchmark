@@ -136,7 +136,8 @@ public class ServerConfigAccessor {
         ObjectMapper mapper = new ObjectMapper();
         File file = new File(configDirectory + serverConfigFileName);
         try {
-            mapper.writeValue(file, serverConfigRecords);
+            //mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json)
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, serverConfigRecords);
         } catch (IOException e) {
             logger.error("Error ServerConfigAccessor: " + e.getLocalizedMessage());
         }
