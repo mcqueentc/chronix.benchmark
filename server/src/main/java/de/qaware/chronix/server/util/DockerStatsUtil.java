@@ -5,6 +5,7 @@ import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.DataModels.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.awt.OSInfo;
 
 import java.lang.management.ManagementFactory;
 import java.util.LinkedList;
@@ -92,9 +93,21 @@ public class DockerStatsUtil {
         if(!containerID.isEmpty()){
             String[] command;
             if(external) {
-                command = ServerSystemUtil.getOsSpecificCommand(new String[]{"/usr/bin/du -c -b --max=1 "
-                                + storageDirectoryPath
-                                + " | awk '{print $1}'"});
+                String programm = "";
+                OSInfo.OSType os = OSInfo.getOSType();
+                if(os == OSInfo.OSType.LINUX){
+                    programm = "/usr/bin/du -c -b --max=1 "
+                            + storageDirectoryPath
+                            + " | awk '{print $1}'";
+                }
+                if(os == OSInfo.OSType.MACOSX){
+                    programm = "find "
+                            + storageDirectoryPath
+                            + " ! -type d -print0 | xargs -0 stat -f '%z' | awk '{sum += $1} END {print sum}'";
+                }
+
+                command = ServerSystemUtil.getOsSpecificCommand(new String[]{programm});
+
             } else {
                 command = ServerSystemUtil.getOsSpecificCommand(new String[]{DockerCommandLineUtil.getDockerInstallPath()
                         + "docker exec -t "
