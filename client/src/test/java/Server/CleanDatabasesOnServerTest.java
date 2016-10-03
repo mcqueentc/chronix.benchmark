@@ -34,19 +34,18 @@ public class CleanDatabasesOnServerTest {
 
 
         ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
-        LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
-        TSDBInterfaceHandler interfaceHandler = TSDBInterfaceHandler.getInstance();
         QueryHandler queryHandler = QueryHandler.getInstance();
+
+        ServerConfigRecord serverConfigRecord = serverConfigAccessor.getServerConfigRecord(server);
+        String ip = serverConfigRecord.getServerAddress();
 
         // generate clean commands
         List<CleanCommand> cleanCommandList = new ArrayList<>();
-        for (ServerConfigRecord r : readRecord) {
-            LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
-            for (String externalImpl : externalImpls) {
-                String ip = r.getServerAddress();
-                Integer port = Integer.valueOf(serverConfigAccessor.getHostPortForTSDB(ip, externalImpl));
-                cleanCommandList.add(new CleanCommand(externalImpl, ip, port));
-
+        LinkedList<String> externalImpls = serverConfigRecord.getExternalTimeSeriesDataBaseImplementations();
+        for (int i = 1; i < args.length; i++) {
+            if(externalImpls.contains(args[i])) {
+                Integer port = Integer.valueOf(serverConfigAccessor.getHostPortForTSDB(ip, args[i]));
+                cleanCommandList.add(new CleanCommand(args[i], ip, port));
             }
         }
 

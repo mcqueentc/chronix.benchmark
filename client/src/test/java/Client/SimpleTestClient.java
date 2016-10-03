@@ -1,6 +1,9 @@
 package Client;
 
+import Docker.BuildDockerContainer;
+import Docker.StartDockerContainer;
 import Docker.UploadDockerFiles;
+import Server.CleanDatabasesOnServerTest;
 import Server.GenerateServerConfigRecord;
 import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
@@ -11,6 +14,7 @@ import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +32,13 @@ public class SimpleTestClient {
         long startMillis;
         long endMillis;
 
-        String server = "192.168.2.123";
+        String server = "192.168.2.107";
         //String server = "localhost";
         List<String> tsdbImportList = new ArrayList<>();
-        tsdbImportList.add("chronix");
-        tsdbImportList.add("influxdb");
-        tsdbImportList.add("kairosdb");
-        tsdbImportList.add("graphite");
+        //tsdbImportList.add("chronix");
+        //tsdbImportList.add("influxdb");
+        //tsdbImportList.add("kairosdb");
+        //tsdbImportList.add("graphite");
         tsdbImportList.add("opentsdb");
 
         try {
@@ -47,27 +51,28 @@ public class SimpleTestClient {
         }
 
 
-        GenerateServerConfigRecord.main(new String[]{server});
-        UploadDockerFiles.main(new String[]{server});
-        InterfaceAndConfigUploadTest.main(new String[]{server});
+        //GenerateServerConfigRecord.main(new String[]{server});
+        //UploadDockerFiles.main(new String[]{server});
+        //InterfaceAndConfigUploadTest.main(new String[]{server});
         //BuildDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        //StartDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
+        //StartDockerContainer.main(new String[]{server,/*"chronix","influxdb","kairosdb", */"opentsdb"/*, "graphite"*/});
         //RunningTestDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
         //StopDockerContainer.main(new String[]{server,"chronix","influxdb","kairosdb", "opentsdb", "graphite"});
-        //CleanDatabasesOnServerTest.main(new String[]{server});
+        //CleanDatabasesOnServerTest.main(new String[]{server, "opentsdb"});
 
 
 
 
-/*
+
 
         // import test
 
         List<File> directories = new ArrayList<>();
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/swl"));
         // as if was not imported previously
         for(File directory : directories){
             jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
@@ -75,7 +80,7 @@ public class SimpleTestClient {
         for(File directory : directories) {
             startMillis = System.currentTimeMillis();
             //multiple file upload and import test
-            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 0, tsdbImportList);
+            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 1150, tsdbImportList);
 
             //ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbImportList);
             endMillis = System.currentTimeMillis();
@@ -83,8 +88,8 @@ public class SimpleTestClient {
 
        }
 
-*/
 
+/*
         // query test
         TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
         List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
@@ -98,7 +103,7 @@ public class SimpleTestClient {
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
-
+*/
         //get benchmark query record test
         benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
