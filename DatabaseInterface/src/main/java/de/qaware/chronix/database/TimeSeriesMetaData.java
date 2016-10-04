@@ -42,6 +42,15 @@ public class TimeSeriesMetaData {
         this.end = timeSeries.getEnd();
     }
 
+    public TimeSeriesMetaData(TimeSeriesMetaData timeSeriesMetaData){
+        this.measurementName = timeSeriesMetaData.getMeasurementName();
+        this.metricName = timeSeriesMetaData.getMetricName();
+        this.tagKey_tagValue = new HashMap<>(timeSeriesMetaData.getTagKey_tagValue());
+        this.start = timeSeriesMetaData.getStart();
+        this.end = timeSeriesMetaData.getEnd();
+
+    }
+
     public String getMeasurementName() {
         return measurementName;
     }
