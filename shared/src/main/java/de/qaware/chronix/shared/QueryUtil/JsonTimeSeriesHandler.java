@@ -229,7 +229,14 @@ public class JsonTimeSeriesHandler {
                 Stream<String> lines = Files.lines(file.toPath());
                 lines.forEach(line -> {
                     try {
-                        timeSeriesMetaDataList.add(mapper.readValue(line, TimeSeriesMetaData.class));
+                        TimeSeriesMetaData timeSeriesMetaData = mapper.readValue(line, TimeSeriesMetaData.class);
+                        /*//DEBUG
+                        logger.info("read from meta data json: Measurement: {}, metricName: {}, start: {}, end: {}",
+                                timeSeriesMetaData.getMeasurementName(),
+                                timeSeriesMetaData.getMetricName(),
+                                timeSeriesMetaData.getStart(),
+                                timeSeriesMetaData.getEnd());*/
+                        timeSeriesMetaDataList.add(timeSeriesMetaData);
                     } catch (IOException e) {
                         logger.error("Could not generate object from json: " + e.getLocalizedMessage());
                     }
@@ -351,10 +358,23 @@ public class JsonTimeSeriesHandler {
             try {
                 InputStream inputStream = new GZIPInputStream(new FileInputStream(jsonFile));
                 timeSeries = mapper.readValue(inputStream, TimeSeries.class);
+                /*//DEBUG
+                logger.info("Read from gzip json file: Measurement: {}, metricName: {}, start: {}, end: {}",
+                        timeSeries.getMeasurementName(),
+                        timeSeries.getMetricName(),
+                        timeSeries.getStart(),
+                        timeSeries.getEnd());*/
 
                 List<TimeSeriesPoint> pointList = timeSeries.getPoints();
                 Collections.sort(pointList);
                 timeSeries.setPoints(pointList);
+
+                /*//DEBUG
+                logger.info("Sorted list, returned from reader thread: Measurement: {}, metricName: {}, start: {}, end: {}",
+                        timeSeries.getMeasurementName(),
+                        timeSeries.getMetricName(),
+                        timeSeries.getStart(),
+                        timeSeries.getEnd());*/
 
 
             } catch (Exception e){
@@ -380,6 +400,13 @@ public class JsonTimeSeriesHandler {
 
        @Override
        public String call(){
+
+           /*//DEBUG
+           logger.info("writer thread start: Measurement: {}, metricName: {}, start: {}, end: {}",
+                   timeSeries.getMeasurementName(),
+                   timeSeries.getMetricName(),
+                   timeSeries.getStart(),
+                   timeSeries.getEnd());*/
 
            //host_process_metricGroup;
            String fileName = timeSeries.getMeasurementName() + "_"
