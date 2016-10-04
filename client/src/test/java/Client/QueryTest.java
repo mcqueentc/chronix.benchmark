@@ -11,10 +11,10 @@ import java.util.List;
  */
 public class QueryTest {
 
-    public static void queryTest(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function, Float p, List<String> tsdbImportList) {
+    public static void queryTest(String server, String queryID, List<TimeSeriesMetaData> metaDataList, QueryFunction function, Float p, List<String> tsdbImportList) {
 
         BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
-        List<String> answers = benchmarkRunner.queryWithFunction(server, metaDataList, function, p, tsdbImportList);
+        List<String> answers = benchmarkRunner.queryWithFunction(server, queryID, metaDataList, function, p, tsdbImportList);
 
         answers.forEach(System.out::println);
     }
