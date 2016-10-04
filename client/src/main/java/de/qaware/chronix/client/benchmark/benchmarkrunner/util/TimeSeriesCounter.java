@@ -112,10 +112,16 @@ public class TimeSeriesCounter {
         if(!timeSeriesMetaDataList.isEmpty()){
             Random random = new Random();
             for(int i = 0; i < size; i++){
-                TimeSeriesMetaData randomMetaData = timeSeriesMetaDataList.get(random.nextInt(timeSeriesMetaDataList.size()));
+                TimeSeriesMetaData randomMetaData = new TimeSeriesMetaData(timeSeriesMetaDataList.get(random.nextInt(timeSeriesMetaDataList.size())));
+                /*logger.info("random ts: Measurement: {}, MetricName: {}, Start: {}, End: {}",
+                        randomMetaData.getMeasurementName(),
+                        randomMetaData.getMetricName(),
+                        randomMetaData.getStart(),
+                        randomMetaData.getEnd());*/
 
-                if(randomMetaData.getStart() > randomMetaData.getEnd()) {
-                    logger.info("Start: {}, End: {}", randomMetaData.getStart(), randomMetaData.getEnd());
+
+                if(randomMetaData.getStart() < randomMetaData.getEnd()) {
+                    //logger.info("Start: {}, End: {}", randomMetaData.getStart(), randomMetaData.getEnd());
                     long randomStart = random.longs(randomMetaData.getStart(), randomMetaData.getEnd()).iterator().next();
                     long randomEnd = random.longs(randomStart, randomMetaData.getEnd() + 1L).iterator().next();
                     randomMetaData.setStart(randomStart);
@@ -125,6 +131,11 @@ public class TimeSeriesCounter {
                 }
                 else {
                     metaDataList.add(randomMetaData);
+                    logger.info("start >= end: Measurement: {}, MetricName: {}, Start: {}, End: {}",
+                            randomMetaData.getMeasurementName(),
+                            randomMetaData.getMetricName(),
+                            randomMetaData.getStart(),
+                            randomMetaData.getEnd());
                 }
             }
         }
