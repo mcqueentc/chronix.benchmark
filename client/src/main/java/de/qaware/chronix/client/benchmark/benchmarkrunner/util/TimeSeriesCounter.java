@@ -113,13 +113,19 @@ public class TimeSeriesCounter {
             Random random = new Random();
             for(int i = 0; i < size; i++){
                 TimeSeriesMetaData randomMetaData = timeSeriesMetaDataList.get(random.nextInt(timeSeriesMetaDataList.size()));
-                // get at least a time span of 2000ms
-                long randomStart = random.longs(randomMetaData.getStart(), randomMetaData.getEnd() - 2000L).iterator().next();
-                long randomEnd = random.longs(randomStart, randomMetaData.getEnd() + 1L).iterator().next();
-                randomMetaData.setStart(randomStart);
-                randomMetaData.setEnd(randomEnd);
 
-                metaDataList.add(randomMetaData);
+                if(randomMetaData.getStart() > randomMetaData.getEnd()) {
+                    logger.info("Start: {}, End: {}", randomMetaData.getStart(), randomMetaData.getEnd());
+                    long randomStart = random.longs(randomMetaData.getStart(), randomMetaData.getEnd()).iterator().next();
+                    long randomEnd = random.longs(randomStart, randomMetaData.getEnd() + 1L).iterator().next();
+                    randomMetaData.setStart(randomStart);
+                    randomMetaData.setEnd(randomEnd);
+
+                    metaDataList.add(randomMetaData);
+                }
+                else {
+                    metaDataList.add(randomMetaData);
+                }
             }
         }
         return metaDataList;
