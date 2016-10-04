@@ -3,6 +3,7 @@ package de.qaware.chronix.client.benchmark.benchmarkrunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
+import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
 import de.qaware.chronix.shared.DataModels.Pair;
@@ -47,6 +48,8 @@ public class BenchmarkRunner {
             + File.separator
             + "downloaded_benchmark_records";
     private final String recordFileName = "benchmarkRecords.json";
+    private final int BENCHMARK_TIMESERIES_METADATA_SIZE = 500;
+    private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1000;
     private BenchmarkRunnerHelper benchmarkRunnerHelper;
     private QueryHandler queryHandler;
     private JsonTimeSeriesHandler jsonTimeSeriesHandler;
@@ -153,7 +156,6 @@ public class BenchmarkRunner {
     private List<String> importTimeSeries(String serverAddress, List<TimeSeries> timeSeriesList, String queryID, List<String> tsdbImportList){
         List<String> resultList = new LinkedList<>();
         if (!timeSeriesList.isEmpty()) {
-            //TODO change signature
             List<ImportRecord> importRecordList = benchmarkRunnerHelper.getImportRecordForTimeSeries(null, queryID, serverAddress, tsdbImportList);
             ImportRecordWrapper importRecordWrapper = new ImportRecordWrapper(timeSeriesList, importRecordList);
             logger.info("Import on: {} ...", importRecordWrapper.getAllTsdbNames());
@@ -169,6 +171,44 @@ public class BenchmarkRunner {
     }
 
     /**
+     * This method is used to actually benchmark the given TSDBs on a given server.
+     * If there is no benchmark generated meta data in the BenchmarkTimeSeriesMetaDataDirectoryPath
+     * this method will generate random time series meta data from previously imported time series
+     * which will then be stored in BenchmarkTimeSeriesMetaDataDirectoryPath.
+     * So for future calls all TSDBs are measured with the same set of meta data.
+     * The QueryFunction and percentile value will be selected randomly for every set of meta data
+     * but will be the same per set for all TSDBs per measurement, of course.
+     *
+     * @param server the address or ip on which the query should be performed.
+     * @param tsdbQueryList the TSDBs on which the query should be performed.
+     */
+    public void doBenchmarkQuery(String server, List<String> tsdbQueryList){
+        if(server != null && tsdbQueryList != null && ! tsdbQueryList.isEmpty()){
+            // should there be no benchmark meta data, generate it.
+            if(! jsonTimeSeriesHandler.benchmarkMetaDataExists()){
+                generateBenchmarkTimeSeriesMetaDataLists(NUMBER_OF_BENCHMARK_METADATA_LISTS, BENCHMARK_TIMESERIES_METADATA_SIZE);
+            }
+
+            Map<Integer, List<TimeSeriesMetaData>> metaDatasToQuery = jsonTimeSeriesHandler.readBenchmarkTimeSeriesMetaDataJson();
+            if( ! metaDatasToQuery.isEmpty()){
+                for(Map.Entry<Integer, List<TimeSeriesMetaData>> entry : metaDatasToQuery.entrySet()){
+                    Float randomPercentile = benchmarkRunnerHelper.getRandomPercentile();
+                    QueryFunction randomQueryFunction = benchmarkRunnerHelper.getRandomQueryFunction();
+                    String querID = "benchmark_randomTimeSeries:&function=" + randomQueryFunction + "&number=" + entry.getKey();
+                    //do the query
+                    logger.info("\nPerforming query on random time series number: {} with function: {}\n", entry.getKey(), randomQueryFunction);
+                    List<String> results = queryWithFunction(server, querID, entry.getValue(), randomQueryFunction, randomPercentile, tsdbQueryList);
+
+                    for(String result : results){
+                        logger.info(result);
+                    }
+                }
+            }
+        }
+
+    }
+
+    /**
      * Performs queries with given meta data and function on all tsdbs on given server.
      *
      * @param server the server address or ip
@@ -177,18 +217,16 @@ public class BenchmarkRunner {
      * @param p the percentile value (if needed, null if not).
      * @return list of answers from the server.
      */
-    public List<String> queryWithFunction(String server, List<TimeSeriesMetaData> metaDataList, QueryFunction function, Float p, List<String> tsdbImportList) {
+    public List<String> queryWithFunction(String server, String queryID, List<TimeSeriesMetaData> metaDataList, QueryFunction function, Float p, List<String> tsdbQueryList) {
         List<String> resultList = new LinkedList<>();
         if (metaDataList != null && !metaDataList.isEmpty()){
-
-            String queryID = Instant.now().toString() + "_query_" + function.toString() + "_" + metaDataList.size();
 
             List<QueryRecord> queryRecordList = benchmarkRunnerHelper.getQueryRecordForTimeSeriesMetaData(metaDataList,
                     queryID,
                     server,
                     function,
                     p,
-                    tsdbImportList);
+                    tsdbQueryList);
 
             for(QueryRecord queryRecord : queryRecordList){
                 logger.info("Query on: {} ... ", queryRecord.getTsdbName());
@@ -202,6 +240,15 @@ public class BenchmarkRunner {
         return resultList;
     }
 
+    private void generateBenchmarkTimeSeriesMetaDataLists(int numberOfLists, int listSize){
+        if(numberOfLists > 0 && listSize > 0){
+            TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
+            for(int i = 0; i < numberOfLists; i++){
+                List<TimeSeriesMetaData> metaDataList = timeSeriesCounter.getRandomTimeSeriesMetaData(listSize);
+                jsonTimeSeriesHandler.writeBenchmarkTimeSeriesMetaDataJson(metaDataList, i);
+            }
+        }
+    }
 
 
     private void saveBenchmarkRecords(List<BenchmarkRecord> benchmarkRecords){
