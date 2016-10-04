@@ -34,12 +34,12 @@ public class SimpleTestClient {
 
         String server = "192.168.2.107";
         //String server = "localhost";
-        List<String> tsdbImportList = new ArrayList<>();
-        //tsdbImportList.add("chronix");
-        //tsdbImportList.add("influxdb");
-        //tsdbImportList.add("kairosdb");
-        //tsdbImportList.add("graphite");
-        tsdbImportList.add("opentsdb");
+        List<String> tsdbList = new ArrayList<>();
+        //tsdbList.add("chronix");
+        //tsdbList.add("influxdb");
+        //tsdbList.add("kairosdb");
+        //tsdbList.add("graphite");
+        tsdbList.add("opentsdb");
 
         try {
             if (configurator.isServerUp(server)) {
@@ -63,7 +63,7 @@ public class SimpleTestClient {
 
 
 
-
+/*
 
         // import test
 
@@ -71,8 +71,8 @@ public class SimpleTestClient {
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest_small"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/air-lasttest"));
         //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/shd"));
-        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
-        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/swl"));
+        //directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/promt"));
+        directories.add(new File("/Users/mcqueen666/chronixBenchmark/timeseries_records/swl"));
         // as if was not imported previously
         for(File directory : directories){
             jsonTimeSeriesHandler.deleteTimeSeriesMetaDataJsonFile(directory.getName());
@@ -80,30 +80,31 @@ public class SimpleTestClient {
         for(File directory : directories) {
             startMillis = System.currentTimeMillis();
             //multiple file upload and import test
-            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 1150, tsdbImportList);
+            benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, 25, 0, tsdbList);
 
-            //ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbImportList);
+            //ImportTest.importTimeSeriesFromDirectory(server, directory, 5 , 0, tsdbList);
             endMillis = System.currentTimeMillis();
             System.out.println("Import test total time: " + (endMillis - startMillis) + "ms\n");
 
        }
+*/
 
 
-/*
         // query test
-        TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
-        List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
-        BenchmarkRunnerHelper benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
-        BenchmarkDataSource.QueryFunction function = BenchmarkDataSource.QueryFunction.STDDEV;
-        Float p = 0.5f;
+        //TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
+        //List<TimeSeriesMetaData> randomTimeSeries = timeSeriesCounter.getRandomTimeSeriesMetaData(10);
+        //BenchmarkRunnerHelper benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
+        //BenchmarkDataSource.QueryFunction function = BenchmarkDataSource.QueryFunction.COUNT;
+        //Float p = 0.5f;
         //function = benchmarkRunnerHelper.getRandomQueryFunction();
 
         startMillis = System.currentTimeMillis();
-        QueryTest.queryTest(server, randomTimeSeries, function, p, tsdbImportList);
+        //QueryTest.queryTest(server, randomTimeSeries, function, p, tsdbList);
+        benchmarkRunner.doBenchmarkQuery(server, tsdbList);
         endMillis = System.currentTimeMillis();
         System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
 
-*/
+
         //get benchmark query record test
         benchmarkRunner = BenchmarkRunner.getInstance();
         System.out.println("Downloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
