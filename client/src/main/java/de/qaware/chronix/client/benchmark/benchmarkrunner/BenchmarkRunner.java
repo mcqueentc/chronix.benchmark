@@ -186,6 +186,7 @@ public class BenchmarkRunner {
         if(server != null && tsdbQueryList != null && ! tsdbQueryList.isEmpty()){
             // should there be no benchmark meta data, generate it.
             if(! jsonTimeSeriesHandler.benchmarkMetaDataExists()){
+                logger.info("Benchmark data does not exist -> generating ... ");
                 generateBenchmarkTimeSeriesMetaDataLists(NUMBER_OF_BENCHMARK_METADATA_LISTS, BENCHMARK_TIMESERIES_METADATA_SIZE);
             }
 
@@ -196,12 +197,11 @@ public class BenchmarkRunner {
                     QueryFunction randomQueryFunction = benchmarkRunnerHelper.getRandomQueryFunction();
                     String querID = "benchmark_randomTimeSeries:&function=" + randomQueryFunction + "&number=" + entry.getKey();
                     //do the query
-                    logger.info("\nPerforming query on random time series number: {} with function: {}\n", entry.getKey(), randomQueryFunction);
+                    logger.info("Performing query on random time series number: {} with function: {}\n", entry.getKey(), randomQueryFunction);
                     List<String> results = queryWithFunction(server, querID, entry.getValue(), randomQueryFunction, randomPercentile, tsdbQueryList);
 
-                    for(String result : results){
-                        logger.info(result);
-                    }
+                    //TODO log results into log file
+
                 }
             }
         }
