@@ -75,6 +75,17 @@ public class JsonTimeSeriesHandler {
         return measurementDirectory.exists();
     }
 
+    public boolean benchmarkMetaDataExists(){
+        File benchmarkMetaDataDirectory = new File(BenchmarkTimeSeriesMetaDataDirectoryPath);
+        if(benchmarkMetaDataDirectory.exists()){
+            File[] files = benchmarkMetaDataDirectory.listFiles();
+            if(files != null && files.length > 0){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Deletes the previously saved meta data for a given measurement name.
      *
@@ -100,7 +111,7 @@ public class JsonTimeSeriesHandler {
      * @param metaDataList the time series meta data list to be saved to json.
      * @param sequenceNumber the sequence number for this list.
      */
-    public void writeBenchamrkTimeSeriesMetaDataJson(List<TimeSeriesMetaData> metaDataList, int sequenceNumber){
+    public void writeBenchmarkTimeSeriesMetaDataJson(List<TimeSeriesMetaData> metaDataList, int sequenceNumber){
         if(metaDataList != null && ! metaDataList.isEmpty()){
             ObjectMapper mapper = new ObjectMapper();
             File recordFile = new File(BenchmarkTimeSeriesMetaDataDirectoryPath + File.separator + "benchmark_metadata_" + sequenceNumber + ".json");
@@ -139,16 +150,18 @@ public class JsonTimeSeriesHandler {
 
         if(directory.exists()){
             File[] files = directory.listFiles();
-            for(File file : files){
-                if(file.getName().endsWith(".json")){
-                    String sequenceNumberString = file.getName().split("_")[2].replaceFirst(".json" ,"");
-                    List<TimeSeriesMetaData> metaDataList = readTimeSeriesMetaDataFromFile(file);
-                    if(!metaDataList.isEmpty()){
-                        try {
-                            Integer sequenceNumber = Integer.valueOf(sequenceNumberString);
-                            sequenceMetaDataList.put(sequenceNumber, metaDataList);
-                        } catch (Exception e){
-                            logger.error("Could not create sequence number from {}", sequenceNumberString);
+            if(files != null) {
+                for (File file : files) {
+                    if (file.getName().endsWith(".json")) {
+                        String sequenceNumberString = file.getName().split("_")[2].replaceFirst(".json", "");
+                        List<TimeSeriesMetaData> metaDataList = readTimeSeriesMetaDataFromFile(file);
+                        if (!metaDataList.isEmpty()) {
+                            try {
+                                Integer sequenceNumber = Integer.valueOf(sequenceNumberString);
+                                sequenceMetaDataList.put(sequenceNumber, metaDataList);
+                            } catch (Exception e) {
+                                logger.error("Could not create sequence number from {}", sequenceNumberString);
+                            }
                         }
                     }
                 }
