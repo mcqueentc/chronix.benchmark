@@ -48,7 +48,7 @@ public class GenerateServerConfigRecord {
         tsdbName = "opentsdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /Users/mcqueen/opentsdb_storage:/data/hbase --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /home/mcqueen/opentsdb_storage:/data/hbase --name " + tsdbName));
 
 
         //Graphite
