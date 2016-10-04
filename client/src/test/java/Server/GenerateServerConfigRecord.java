@@ -29,32 +29,32 @@ public class GenerateServerConfigRecord {
         String tsdbName = "chronix";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));                        //   host/dir:/container/dir
         //runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "-v /opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8983, 8983, "-v /opt/chronix-0.3/chronix-solr-6.1.0/server/solr/chronix/data --log-opt max-size=50m --name " + tsdbName));
 
 
         //InfluxDB
         tsdbName = "influxdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 --name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 -v /var/lib/influxdb --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8086, 8086, "-p 8083:8083 -v /var/lib/influxdb --log-opt max-size=50m --name " + tsdbName));
 
         //KairosDB
         tsdbName = "kairosdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "-v /var/lib/cassandra --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 8080, 8080, "-v /var/lib/cassandra --log-opt max-size=50m --name " + tsdbName));
 
         //OpenTSDB
         tsdbName = "opentsdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "--name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /home/mcqueen/opentsdb_storage:/data/hbase --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /home/mcqueen/opentsdb_storage:/data/hbase --log-opt max-size=50m --name " + tsdbName));
 
 
         //Graphite
         tsdbName = "graphite";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
-        runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -v /opt/graphite/storage --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -v /opt/graphite/storage --log-opt max-size=50m --name " + tsdbName));
         //runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 --name " + tsdbName));
         /*runOptionses.add(new DockerRunOptions(tsdbName, 2003, 2003, "-p 80:80 -p 2004:2004 -p 2023:2023 -p 2024:2024 -p 8125:8125 -p 8126:8126"
                                                                             + " -v /mnt/tsdb-benchmark-data/graphite/storage:/opt/graphite/storage"
