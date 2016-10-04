@@ -131,4 +131,14 @@ public class BenchmarkRunnerHelper {
         return QueryFunction.values()[random.nextInt(functionCount)];
     }
 
+    /**
+     * @return random percentile float value between 0.0 (inclusive) and 1.0 (exclusive)
+     */
+    public Float getRandomPercentile(){
+        Random random = new Random();
+         return random.nextFloat();
+    }
+
+
+
 }
