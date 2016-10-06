@@ -48,8 +48,8 @@ public class GenerateServerConfigRecord {
         tsdbName = "opentsdb";
         buildOptionses.add(new DockerBuildOptions(tsdbName, "-t"));
         //runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "--name " + tsdbName));
-        //runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /home/mcqueen/opentsdb_storage:/data/hbase --log-opt max-size=50m --name " + tsdbName));
-        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /Users/mcqueen666/opentsdb_storage:/data/hbase --log-opt max-size=50m --name " + tsdbName));
+        runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /home/mcqueen/opentsdb_storage:/data/hbase --log-opt max-size=50m --name " + tsdbName));
+        //runOptionses.add(new DockerRunOptions(tsdbName, 4242, 4242, "-v /Users/mcqueen666/opentsdb_storage:/data/hbase --log-opt max-size=50m --name " + tsdbName));
 
 
         //Graphite
