@@ -1,6 +1,7 @@
 package de.qaware.chronix.client.benchmark.configurator;
 
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
@@ -25,7 +26,6 @@ public class Configurator {
     private final Logger logger = LoggerFactory.getLogger(Configurator.class);
     private int applicationPort = 9003;
     private int adminPort = 9004;
-    private ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
 
     private Configurator(){
     }
@@ -53,11 +53,17 @@ public class Configurator {
                 + ":"
                 + applicationPort
                 + "/configurator/upload/config");
-        final Response response = target.request().post(Entity.json(serverConfigAccessor.getServerConfigRecords()));
-        client.close();
+        LinkedList<ServerConfigRecord> serverConfigRecords = new LinkedList<>();
+        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
+        ServerConfigRecord serverConfigRecord = serverConfigAccessor.getServerConfigRecord(serverAddress);
+        if(serverConfigRecord != null) {
+            serverConfigRecords.add(serverConfigRecord);
+            final Response response = target.request().post(Entity.json(serverConfigRecords));
+            client.close();
 
-        if(response.getStatus() == 200){
-            return true;
+            if (response.getStatus() == 200) {
+                return true;
+            }
         }
 
         return false;
