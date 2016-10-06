@@ -73,6 +73,10 @@ public class ServerConfigAccessor {
         }
     }
 
+    public synchronized void updateServerConfigRecord(){
+        writeRecordFile();
+    }
+
 
     /**
      * Returns ServerConfigRecord for given server address.
