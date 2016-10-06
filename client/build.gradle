@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-mainClassName = 'de.qaware.chronix.client.HelloClient'
+mainClassName = 'de.qaware.chronix.client.ClientMenu'
 
 group 'de.qaware.chronix'
 version '1.0-SNAPSHOT'
