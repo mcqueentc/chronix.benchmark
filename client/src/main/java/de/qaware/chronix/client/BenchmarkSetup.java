@@ -207,7 +207,7 @@ public class BenchmarkSetup {
 
 
     private static void printUsage(){
-        System.out.println("Usage: java BenchmarkSetup.class [command] [server] [option1] [option2] ... ");
+        System.out.println("Usage: setup [command] [server] [option1] [option2] ... ");
         System.out.println("Call command without option to get more help for each command.\n");
     }
 
@@ -220,8 +220,8 @@ public class BenchmarkSetup {
     }
 
     private static void printAddHelp(){
-        System.out.println("Add Usage: java BenchmarkSetup.class add [server] [tsdbName] [hostPort:containerPort] [\"additionalDockerOptionsString\"] [<TSDB>.jar] [dockerFilesFolder]");
-        System.out.println("\" --name [tsdbName]\" will be added to additionalOptions automatically");
+        System.out.println("Add Usage: add [server] [tsdbName] [hostPort:containerPort] [\"additionalDockerOptionsString\"] [<TSDB>.jar] [dockerFilesFolder]");
+        System.out.println("NOTICE: \" --name [tsdbName]\" will be added to additionalOptions automatically");
     }
 
     private static void printHintUpload(){
@@ -230,10 +230,10 @@ public class BenchmarkSetup {
     }
 
     private static void printUploadHelp(){
-        System.out.println("Upload usage: java BenchmarkSetup.class upload [server]");
+        System.out.println("Upload usage: upload [server]");
     }
 
     private static void printRemoveHelp(){
-        System.out.println("Remove usage: java BenchmarkSetup.class remove [server]");
+        System.out.println("Remove usage: remove [server]");
     }
 }
