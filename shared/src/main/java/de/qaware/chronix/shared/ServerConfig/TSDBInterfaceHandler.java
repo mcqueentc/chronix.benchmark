@@ -45,6 +45,10 @@ public class TSDBInterfaceHandler {
         return instance;
     }
 
+    public Map<String, File> getInterfaces() {
+        return interfaces;
+    }
+
     public String getInterfaceDirectory() {
         return interfaceDirectory;
     }
@@ -61,7 +65,9 @@ public class TSDBInterfaceHandler {
         if(directory.exists()){
             File[] fileList = directory.listFiles();
             for(File file : fileList){
-                interfaces.put(file.getName().replaceAll(".jar", ""), file);
+                if(file.getName().endsWith(".jar")) {
+                    interfaces.put(file.getName().replaceFirst(".jar", ""), file);
+                }
             }
         }
     }
