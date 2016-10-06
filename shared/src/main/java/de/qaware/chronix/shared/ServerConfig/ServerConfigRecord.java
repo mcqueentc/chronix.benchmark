@@ -29,6 +29,14 @@ public class ServerConfigRecord {
         this.externalTimeSeriesDataBaseImplementations = new LinkedList<>();
     }
 
+    public ServerConfigRecord(ServerConfigRecord otherRecord){
+        this.serverAddress = otherRecord.getServerAddress();
+        this.tsdbRunRecords = new LinkedList<>(otherRecord.getTsdbRunRecords());
+        this.tsdbBuildRecords = new LinkedList<>(otherRecord.getTsdbBuildRecords());
+        this.timeSeriesDataFolders = new LinkedList<>(otherRecord.getTimeSeriesDataFolders());
+        this.externalTimeSeriesDataBaseImplementations = new LinkedList<>(otherRecord.getExternalTimeSeriesDataBaseImplementations());
+    }
+
     //setter
     public void setServerAddress(String serverAddress) {
         this.serverAddress = serverAddress;
