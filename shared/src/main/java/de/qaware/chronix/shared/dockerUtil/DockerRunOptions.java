@@ -110,4 +110,22 @@ public class DockerRunOptions {
             return true;
         }
     }
+
+    @JsonIgnore
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof DockerRunOptions
+                && ((DockerRunOptions) o).getContainerName().equals(containerName)){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    @JsonIgnore
+    @Override
+    public int hashCode(){
+        return containerName.hashCode();
+    }
 }
