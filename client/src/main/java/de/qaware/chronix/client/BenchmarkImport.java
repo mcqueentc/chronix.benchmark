@@ -2,6 +2,8 @@ package de.qaware.chronix.client;
 
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 
 import java.io.File;
@@ -52,12 +54,19 @@ public class BenchmarkImport {
         tsdbImportList.forEach(s -> System.out.println("TSDB:       " + s));
         importDirectories.forEach(dir -> System.out.println("Directory: " + dir.getAbsolutePath()));
 
-        // check if tsdb interface is imported. (at least on client side)
-        TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
+        //check if server is configured
+        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
+        ServerConfigRecord serverConfig = serverConfigAccessor.getServerConfigRecord(server);
+        if(serverConfig == null){
+            System.err.println("Server: " + server + " was not configured.");
+            return;
+        }
+
+        // check if tsdb interface is imported.
+        LinkedList<String> configuredTsdbImpls = serverConfig.getExternalTimeSeriesDataBaseImplementations();
         List<String> removeTsdbList = new LinkedList<>();
         for(String tsdb : tsdbImportList) {
-            BenchmarkDataSource<Object> tsdbInterface = tsdbInterfaceHandler.getTSDBInstance(tsdb);
-            if(tsdbInterface == null){
+            if(!configuredTsdbImpls.contains(tsdb)){
                 removeTsdbList.add(tsdb);
                 System.err.println("No interface found for: " + tsdb + " -> rejected!");
             }
