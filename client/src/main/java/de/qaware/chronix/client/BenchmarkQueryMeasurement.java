@@ -1,38 +1,29 @@
 package de.qaware.chronix.client;
 
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
-import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
-
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mcqueen666 on 07.10.16.
  */
 public class BenchmarkQueryMeasurement {
     public static void main(String[] args){
-        if(args.length < 1) {
+        if(args.length < 2) {
             printUsage();
             return;
         }
 
         String server = args[0];
-        List<String> tsdbList = new LinkedList<>();
+        List<String> tsdbList;
 
-        TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
-        // print info for user
-        System.out.println("Server: " + server);
-        for(int i = 1; i < args.length; i++){
-            BenchmarkDataSource<Object> tsdbInterface = tsdbInterfaceHandler.getTSDBInstance(args[i]);
-            if(tsdbInterface != null){
-                System.out.println("TSDB:   " + args[i]);
-                tsdbList.add(args[i]);
-            } else {
-                System.err.println("No interface found for: " + args[i] + " -> rejected!");
-            }
+        Map<String, List<String>> serverTsdbMap = ClientMenu.getConfiguredServerAndTSDBs(args);
+        if(serverTsdbMap.isEmpty()){
+            System.err.println("Server: " + server + " was not configured!");
+            return;
         }
 
+        tsdbList = serverTsdbMap.get(server);
         if(tsdbList.isEmpty()){
             System.err.println("No implemented tsdb interfaces found for your entries -> aborting");
             return;
