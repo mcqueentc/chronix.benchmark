@@ -83,5 +83,6 @@ public class BenchmarkImport {
     private static void printImportUsage(){
         System.out.println("Import usage:   import [server] [batchSize] [fromFile] -t [tsdbName1] -t [tsdbName2] ... -d [directoryToImport1] -d [directoryToImport2] ...");
         System.out.println("Example:        import localhost 25 0 -t someTsdb -d /home/someUser/chronixBenchmark/timeseries_records/someFolder");
+        System.out.println("NOTICE: paths have to be absolute paths!");
     }
 }

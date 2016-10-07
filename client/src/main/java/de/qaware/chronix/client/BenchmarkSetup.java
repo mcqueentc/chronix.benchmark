@@ -222,6 +222,7 @@ public class BenchmarkSetup {
     private static void printAddHelp(){
         System.out.println("Add Usage: add [server] [tsdbName] [hostPort:containerPort] [\"additionalDockerOptionsString\"] [<TSDB>.jar] [dockerFilesFolder]");
         System.out.println("NOTICE: \" --name [tsdbName]\" will be added to additionalOptions automatically");
+        System.out.println("NOTICE: paths have to be absolute paths!");
     }
 
     private static void printHintUpload(){
