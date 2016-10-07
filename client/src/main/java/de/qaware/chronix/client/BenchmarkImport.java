@@ -76,7 +76,7 @@ public class BenchmarkImport {
         for(File directory : importDirectories) {
             BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
             System.out.println("\nImporting directory: " + directory);
-            //benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
+            benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
         }
     }
 
