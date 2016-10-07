@@ -1,5 +1,6 @@
 package de.qaware.chronix.client;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,11 +22,15 @@ public class ClientMenu {
         args = arguments.toArray(new String[]{});
 
         switch (function){
-            case "setup":
+            case "setup": {
                 BenchmarkSetup.main(args);
                 break;
+            }
 
-            case "import":
+            case "import":{
+                BenchmarkImport.main(args);
+                break;
+            }
             case "convert":
             case "benchmark":
             case "build":
@@ -53,4 +58,6 @@ public class ClientMenu {
         System.out.println("stop:       stops docker containers on the server");
         System.out.println("clean:      purge all data from TSDBs on the server");
     }
+
+
 }
