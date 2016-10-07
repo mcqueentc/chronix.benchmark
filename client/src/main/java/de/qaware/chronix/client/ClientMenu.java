@@ -3,6 +3,7 @@ package de.qaware.chronix.client;
 
 import de.qaware.chronix.client.benchmark.util.CsvConverter;
 import de.qaware.chronix.client.benchmark.util.DockerBuild;
+import de.qaware.chronix.client.benchmark.util.DockerStart;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 
@@ -46,7 +47,10 @@ public class ClientMenu {
                 DockerBuild.main(args);
                 break;
             }
-            case "start":
+            case "start": {
+                DockerStart.main(args);
+                break;
+            }
             case "stop":
             case "clean":
             default:
