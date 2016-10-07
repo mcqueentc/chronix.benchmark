@@ -37,7 +37,10 @@ public class ClientMenu {
                 CsvConverter.main(args);
                 break;
             }
-            case "benchmark":
+            case "benchmark": {
+                BenchmarkQueryMeasurement.main(args);
+                break;
+            }
             case "build":
             case "start":
             case "stop":
