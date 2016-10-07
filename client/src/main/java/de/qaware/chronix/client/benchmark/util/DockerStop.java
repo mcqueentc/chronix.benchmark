@@ -41,10 +41,10 @@ public class DockerStop {
         for(String tsdb : tsdbList){
             if(configuredTsdbImpls.contains(tsdb)){
                 System.out.println("Stopping " + tsdb + " on server: " + server);
-                /*answers = configurator.stopDockerContainer(server, tsdb);
+                answers = configurator.stopDockerContainer(server, tsdb);
                 for(String s : answers){
                     System.out.println("Server: " + s);
-                }*/
+                }
             }
         }
     }
