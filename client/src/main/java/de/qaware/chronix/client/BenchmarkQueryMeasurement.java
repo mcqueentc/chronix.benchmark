@@ -42,7 +42,10 @@ public class BenchmarkQueryMeasurement {
         long startMillis = System.currentTimeMillis();
         benchmarkRunner.doBenchmarkQuery(server, tsdbList);
         long endMillis = System.currentTimeMillis();
-        System.out.println("Query test total time: " + (endMillis - startMillis) + "ms\n");
+        System.out.println("Query test total time: " + (endMillis - startMillis) + "ms");
+
+        System.out.println("\nDownloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
+
 
 
     }
