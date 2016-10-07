@@ -57,6 +57,10 @@ public class ClientMenu {
                 CleanDatabase.main(args);
                 break;
             }
+            case "ping": {
+                PingServer.main(args);
+                break;
+            }
             default:
                 printUsage();
                 printFunctions();
@@ -80,6 +84,7 @@ public class ClientMenu {
         System.out.println("start:      starts docker containers on the server");
         System.out.println("stop:       stops docker containers on the server");
         System.out.println("clean:      purge all data from TSDBs on the server");
+        System.out.println("ping:       check if server is responding");
     }
 
     public static Map<String, List<String>> getConfiguredServerAndTSDBs(String[] args){
