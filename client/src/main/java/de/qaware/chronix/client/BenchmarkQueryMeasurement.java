@@ -41,7 +41,7 @@ public class BenchmarkQueryMeasurement {
 
     }
 
-    public static void printUsage(){
+    private static void printUsage(){
         System.out.println("Benchmark usage: benchmark [server] [tsdbName1] [tsdbName2] ...");
     }
 }

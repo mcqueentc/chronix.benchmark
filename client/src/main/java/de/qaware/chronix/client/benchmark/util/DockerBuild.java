@@ -50,7 +50,7 @@ public class DockerBuild {
         }
     }
 
-    public static void printUsage(){
+    private static void printUsage(){
         System.out.println("Build usage: build [server] [tsdbName1] [tsdbName2] ...");
     }
 }
