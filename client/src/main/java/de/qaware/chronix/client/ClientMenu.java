@@ -1,6 +1,8 @@
 package de.qaware.chronix.client;
 
 
+import de.qaware.chronix.client.benchmark.util.CsvConverter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +29,14 @@ public class ClientMenu {
                 break;
             }
 
-            case "import":{
+            case "import": {
                 BenchmarkImport.main(args);
                 break;
             }
-            case "convert":
+            case "convert": {
+                CsvConverter.main(args);
+                break;
+            }
             case "benchmark":
             case "build":
             case "start":
