@@ -49,7 +49,7 @@ public class BenchmarkRunner {
             + "downloaded_benchmark_records";
     private final String recordFileName = "benchmarkRecords.json";
     private final int BENCHMARK_TIMESERIES_METADATA_SIZE = 500;
-    private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1000;
+    private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1400;
     private BenchmarkRunnerHelper benchmarkRunnerHelper;
     private QueryHandler queryHandler;
     private JsonTimeSeriesHandler jsonTimeSeriesHandler;
@@ -190,16 +190,28 @@ public class BenchmarkRunner {
                 generateBenchmarkTimeSeriesMetaDataLists(NUMBER_OF_BENCHMARK_METADATA_LISTS, BENCHMARK_TIMESERIES_METADATA_SIZE);
             }
 
+            int listFunctionRatio = (NUMBER_OF_BENCHMARK_METADATA_LISTS / QueryFunction.values().length);
+            int queryFunctionNumber = 0;
+            int listCounter = 0;
             Map<Integer, List<TimeSeriesMetaData>> metaDatasToQuery = jsonTimeSeriesHandler.readBenchmarkTimeSeriesMetaDataJson();
             if( ! metaDatasToQuery.isEmpty()){
                 for(Map.Entry<Integer, List<TimeSeriesMetaData>> entry : metaDatasToQuery.entrySet()){
-                    Float randomPercentile = benchmarkRunnerHelper.getRandomPercentile();
-                    QueryFunction randomQueryFunction = benchmarkRunnerHelper.getRandomQueryFunction();
-                    String querID = "benchmark_randomTimeSeries:&function=" + randomQueryFunction + "&number=" + entry.getKey();
-                    //do the query
-                    logger.info("Performing query on random time series number: {} with function: {}\n", entry.getKey(), randomQueryFunction);
-                    List<String> results = queryWithFunction(server, querID, entry.getValue(), randomQueryFunction, randomPercentile, tsdbQueryList);
+                    if( listCounter != 0 && listCounter % listFunctionRatio == 0){
+                        queryFunctionNumber++;
+                        if(queryFunctionNumber > QueryFunction.values().length -1){
+                            queryFunctionNumber = 0;
+                        }
+                    }
 
+                    Float randomPercentile = benchmarkRunnerHelper.getRandomPercentile();
+                    QueryFunction queryFunction = QueryFunction.values()[queryFunctionNumber];
+                    String querID = "benchmark_randomTimeSeries:&function=" + queryFunction + "&number=" + entry.getKey();
+                    //do the query
+                    System.out.println();
+                    logger.info("Performing query on random time series number: {} with function: {}", entry.getKey(), queryFunction);
+                    List<String> results = queryWithFunction(server, querID, entry.getValue(), queryFunction, randomPercentile, tsdbQueryList);
+
+                    listCounter++;
                     //TODO log results into log file
 
                 }
