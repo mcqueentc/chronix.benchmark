@@ -126,7 +126,7 @@ public class BenchmarkRunnerHelper {
      */
     public QueryFunction getRandomQueryFunction(){
         Random random = new Random();
-        int functionCount = QueryFunction.values().length - 1; // - 1 to disable QUERY_ONLY at the moment
+        int functionCount = QueryFunction.values().length;
 
         return QueryFunction.values()[random.nextInt(functionCount)];
     }
