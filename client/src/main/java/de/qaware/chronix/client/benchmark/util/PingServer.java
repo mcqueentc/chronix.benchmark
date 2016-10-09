@@ -14,17 +14,22 @@ public class PingServer {
             return;
         }
         String server = args[0];
-        ServerConfigRecord serverConfigRecord = ServerConfigAccessor.getInstance().getServerConfigRecord(server);
+        /*ServerConfigRecord serverConfigRecord = ServerConfigAccessor.getInstance().getServerConfigRecord(server);
         if(serverConfigRecord == null){
             System.err.println("Server: " + server + " was not configured!");
             return;
+        }*/
+
+        try {
+            if(Configurator.getInstance().isServerUp(server)){
+                System.out.println("Server is up");
+            } else {
+                System.out.println("Server not responding");
+            }
+        } catch (Exception e){
+            System.err.println("Server not reachable. Reason: " + e.getLocalizedMessage());
         }
 
-        if(Configurator.getInstance().isServerUp(server)){
-            System.out.println("Server is up");
-        } else {
-            System.out.println("Server not responding");
-        }
     }
 
     private static void printPingUsage(){
