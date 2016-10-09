@@ -87,6 +87,9 @@ public class BenchmarkConfiguratorResource {
     @Path("upload/config")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response uploadServerConfig(LinkedList<ServerConfigRecord> serverConfigRecords) {
+        for(ServerConfigRecord serverConfigRecord : serverConfigRecords){
+            serverConfigRecord.getTsdbDockerFilesDirectoryMap().clear();
+        }
         serverConfigAccessor.setServerConfigRecords(serverConfigRecords);
 
         return Response.ok().build();
