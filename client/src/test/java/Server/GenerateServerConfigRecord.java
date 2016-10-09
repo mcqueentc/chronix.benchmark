@@ -74,7 +74,7 @@ public class GenerateServerConfigRecord {
         LinkedList<String> tsdata = new LinkedList<>();
         tsdata.add("p1");
         //tsdata.add("p2");
-        serverConfigRecord.setTimeSeriesDataFolders(tsdata);
+        //serverConfigRecord.setTimeSeriesDataFolders(tsdata);
 
 /*
             ServerConfigRecord serverConfigRecord2 = new ServerConfigRecord("www.fau.cs.de");
