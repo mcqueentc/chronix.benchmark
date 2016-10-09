@@ -11,6 +11,7 @@ import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -89,20 +90,24 @@ public class BenchmarkSetup {
                     LinkedList<DockerBuildOptions> buildOptions = new LinkedList<>();
                     LinkedList<DockerRunOptions> runOptions = new LinkedList<>();
                     LinkedList<String> tsdbImpls = new LinkedList<>();
+                    Map<String, String> tsdbDockerFilesDirectories = new HashMap<>();
 
                     buildOptions.add(buildOption);
                     runOptions.add(runOption);
                     tsdbImpls.add(tsdbName);
+                    tsdbDockerFilesDirectories.put(tsdbName, dockerFilesDirectory);
 
                     serverConfigRecord = new ServerConfigRecord(server);
                     serverConfigRecord.setTsdbBuildRecords(buildOptions);
                     serverConfigRecord.setTsdbRunRecords(runOptions);
                     serverConfigRecord.setExternalTimeSeriesDataBaseImplementations(tsdbImpls);
+                    serverConfigRecord.setTsdbDockerFilesDirectoryMap(tsdbDockerFilesDirectories);
 
                     //save new record
                     serverConfigAccessor.addServerConfigRecord(serverConfigRecord);
                     System.out.println("New record saved to config.");
                     printHintUpload();
+                    break;
 
                 } else {
                     // update existing record
@@ -119,6 +124,14 @@ public class BenchmarkSetup {
                     }
                     if (!serverConfigRecord.getExternalTimeSeriesDataBaseImplementations().contains(tsdbName)) {
                         serverConfigRecord.getExternalTimeSeriesDataBaseImplementations().add(tsdbName);
+                    }
+                    if(!serverConfigRecord.getTsdbDockerFilesDirectoryMap().containsKey(tsdbName)){
+                        serverConfigRecord.getTsdbDockerFilesDirectoryMap().put(tsdbName, dockerFilesDirectory);
+                    } else {
+                        // remove and re-add
+                        serverConfigRecord.getTsdbDockerFilesDirectoryMap().remove(tsdbName);
+                        serverConfigRecord.getTsdbDockerFilesDirectoryMap().put(tsdbName, dockerFilesDirectory);
+
                     }
 
                     serverConfigAccessor.updateServerConfigRecord();
@@ -143,7 +156,6 @@ public class BenchmarkSetup {
                 if(serverConfigRecord != null){
                     serverConfigAccessor.removeServerConfigRecord(serverConfigRecord);
                     System.out.println("Server removed from config.");
-                    printHintUpload();
                 } else {
                     System.out.println("No record with given server found -> nothing was removed");
                 }
@@ -154,6 +166,11 @@ public class BenchmarkSetup {
                 ObjectMapper mapper = new ObjectMapper();
                 ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
                 LinkedList<ServerConfigRecord> serverConfigRecords = serverConfigAccessor.getServerConfigRecords();
+                if(serverConfigRecords.isEmpty()){
+                    System.out.println("No config found.");
+                    printAddHelp();
+                    break;
+                }
                 for(ServerConfigRecord record : serverConfigRecords){
                     try {
                         System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(record));
@@ -180,6 +197,7 @@ public class BenchmarkSetup {
                         ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
                         ServerConfigRecord serverConfigRecord = serverConfigAccessor.getServerConfigRecord(server);
                         TSDBInterfaceHandler tsdbInterfaceHandler = TSDBInterfaceHandler.getInstance();
+                        // jar files
                         Map<String, File> interfaces = tsdbInterfaceHandler.getInterfaces();
                         for (Map.Entry<String, File> entry : interfaces.entrySet()) {
                             if (serverConfigRecord.getExternalTimeSeriesDataBaseImplementations().contains(entry.getKey())) {
@@ -191,6 +209,15 @@ public class BenchmarkSetup {
                                 for(String answer : answers){
                                     System.out.println("Server: " + answer);
                                 }
+                            }
+                        }
+
+                        // docker files
+                        Map<String, String> tsdbDockerfilesDirectories = serverConfigRecord.getTsdbDockerFilesDirectoryMap();
+                        for(Map.Entry<String, String> entry : tsdbDockerfilesDirectories.entrySet()){
+                            String[] answers = configurator.uploadFiles(server, entry.getValue());
+                            for(String answer : answers){
+                                System.out.println("Server: " + answer);
                             }
                         }
                     } else {
