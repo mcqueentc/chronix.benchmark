@@ -22,8 +22,7 @@ public interface BenchmarkDataSource<T> {
         MIN,
         MAX,
         STDDEV,
-        PERCENTILE,
-        QUERY_ONLY
+        PERCENTILE
     }
 
     /**

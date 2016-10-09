@@ -257,7 +257,6 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
                     }
                 }
                 break;
-            case QUERY_ONLY: defaultAggregatedMetric = "sum:" + aggregatedTimeSpan;
         }
 
         defaultAggregatedMetric = defaultAggregatedMetric + ":" + escapedMetricName + "{tags}";
@@ -274,15 +273,15 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
                 String result = openTsdb.query(queryObject.getStartDate(), queryObject.getEndDate(), queryObject.getAggregatedMetric(), queryObject.getTagString());
                 queryResults.add(result);
 
-                // TODO erase, only for debug
+                /*// TODO erase, only for debug
                 queryResults.add("OpenTsdb aggregatedMetric: " + queryObject.getAggregatedMetric());
                 queryResults.add("OpenTsdb tagString: " + queryObject.getTagString());
                 queryResults.add("OpenTsdb time range: " + queryObject.getStartDate() + " -> " + queryObject.getEndDate());
-                queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result) + "\n");
+                queryResults.add("OpenTsdb number of data points: " + getDataPointCount(result) + "\n");*/
             } catch (Exception e) {
                 logger.error("OpenTSDB error performing query: " + e.getLocalizedMessage());
                 // TODO erase, only for debug
-                queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());
+                //queryResults.add("OpenTSDB error performing query: " + e.getLocalizedMessage());
             }
 
         }

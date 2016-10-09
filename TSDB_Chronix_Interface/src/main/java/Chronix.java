@@ -247,8 +247,6 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                                 query.addFilterQuery("function=p:" + p);
                             }
                             break;
-                        case QUERY_ONLY:
-                            break;
                     }
                 }
             }
@@ -273,7 +271,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                             if (!resultList.isEmpty()) {
                                 resultList.forEach(ts -> queryResults.add(ts.toString()));
                                 // debug //TODO erase
-                                queryResults.add("Chronix time range millis: " + timeSeriesMetaData.getStart() + " -> " + timeSeriesMetaData.getEnd() + "\n");
+                                //queryResults.add("Chronix time range millis: " + timeSeriesMetaData.getStart() + " -> " + timeSeriesMetaData.getEnd() + "\n");
                                 //queryResults.add("Query: " + queryObject);
                                 //SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                                 //queryResults.add("Chronix Solr Server date: " + formatter.format(new Date(Instant.now().toEpochMilli())));

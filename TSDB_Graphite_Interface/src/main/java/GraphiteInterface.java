@@ -216,7 +216,6 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                             query = "nPercentile(" + metric + ", " + (int)(p * 100) + ")";
                     }
                     break;
-                case QUERY_ONLY:
             }
             graphiteQuery = new GraphiteQuery(query, startDate, endDate);
 
@@ -239,10 +238,10 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
 
                 queryResults.add(result);
 
-                //TODO EREASE: DEBUG ONLY
+                /*//TODO EREASE: DEBUG ONLY
                 queryResults.add("Graphite query string: " + queryObject.getQuery());
                 queryResults.add("Graphite query time range: " + queryObject.getStartDate() + " -> " + queryObject.getEndDate() + "\n");
-
+*/
 
             } catch (Exception e){
                 logger.error("Error performing graphite query: " + e.getLocalizedMessage());

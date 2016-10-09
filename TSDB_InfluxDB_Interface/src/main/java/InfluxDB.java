@@ -172,7 +172,6 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                     queryString = "SELECT PERCENTILE(" + escapedMetricName + "," + p + ")";
                 }
                 break;
-            case QUERY_ONLY: queryString = "SELECT " + escapedMetricName;
         }
 
         queryString += " FROM " + escapeInfluxDBMetricName(metaData.getMeasurementName())
@@ -203,7 +202,7 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                 }
 
                 //TODO ERASE! JUST FOR DEBUG
-                queryResults.add(queryObject + "\n");
+                //queryResults.add(queryObject + "\n");
 
             } catch (Exception e){
                 logger.error("Error performing InfluxDB query: " + e.getLocalizedMessage());
