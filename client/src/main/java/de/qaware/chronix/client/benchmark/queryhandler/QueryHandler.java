@@ -25,11 +25,9 @@ import java.util.Map;
 public class QueryHandler {
 
     private static QueryHandler instance;
-    private Configurator configurator;
     private Map<Pair<String, String>, Long> queryLatency;
 
     private QueryHandler(){
-        configurator = Configurator.getInstance();
         queryLatency = new HashMap<>();
     }
 
@@ -64,7 +62,7 @@ public class QueryHandler {
         final WebTarget target = client.target("http://"
                 + serverAddress
                 + ":"
-                + configurator.getApplicationPort()
+                + Configurator.getInstance().getApplicationPort()
                 + "/queryrunner/performQuery");
         long startMillis = System.currentTimeMillis();
         final Response response = target.request().post(Entity.json(queryRecord));
@@ -89,7 +87,7 @@ public class QueryHandler {
         final WebTarget target = client.target("http://"
                 + serverAddress
                 + ":"
-                + configurator.getApplicationPort()
+                + Configurator.getInstance().getApplicationPort()
                 + "/queryrunner/performImport");
         long startMillis = System.currentTimeMillis();
         final Response response = target.request().post(Entity.json(importRecordWrapper));
@@ -113,7 +111,7 @@ public class QueryHandler {
         final WebTarget target = client.target("http://"
                 + serverAddress
                 + ":"
-                + configurator.getApplicationPort()
+                + Configurator.getInstance().getApplicationPort()
                 + "/queryrunner/performImportWithFiles");
 
 
@@ -129,7 +127,7 @@ public class QueryHandler {
         final WebTarget target = client.target("http://"
                 + serverAddress
                 + ":"
-                + configurator.getApplicationPort()
+                + Configurator.getInstance().getApplicationPort()
                 + "/queryrunner/cleanDatabases");
 
         final Response response = target.request().post(Entity.json(cleanCommandList));
