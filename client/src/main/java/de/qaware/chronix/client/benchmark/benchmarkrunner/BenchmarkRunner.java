@@ -40,7 +40,6 @@ import java.util.stream.Stream;
 public class BenchmarkRunner {
     private static BenchmarkRunner instance;
 
-    private Configurator configurator;
     private final Logger logger = LoggerFactory.getLogger(BenchmarkRunner.class);
     private final String recordFileDirectory = System.getProperty("user.home")
             + File.separator
@@ -48,14 +47,13 @@ public class BenchmarkRunner {
             + File.separator
             + "downloaded_benchmark_records";
     private final String recordFileName = "benchmarkRecords.json";
-    private final int BENCHMARK_TIMESERIES_METADATA_SIZE = 500;
+    private final int BENCHMARK_TIMESERIES_METADATA_SIZE = 400;
     private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1400;
     private BenchmarkRunnerHelper benchmarkRunnerHelper;
     private QueryHandler queryHandler;
     private JsonTimeSeriesHandler jsonTimeSeriesHandler;
 
     private BenchmarkRunner(){
-        configurator = Configurator.getInstance();
         benchmarkRunnerHelper = BenchmarkRunnerHelper.getInstance();
         queryHandler = QueryHandler.getInstance();
         jsonTimeSeriesHandler = JsonTimeSeriesHandler.getInstance();
@@ -86,7 +84,7 @@ public class BenchmarkRunner {
             final WebTarget target = client.target("http://"
                     + serverAddress
                     + ":"
-                    + configurator.getApplicationPort()
+                    + Configurator.getInstance().getApplicationPort()
                     + "/collector/benchmarkrecords");
 
             final Response response = target.request(MediaType.APPLICATION_JSON_TYPE).get();
