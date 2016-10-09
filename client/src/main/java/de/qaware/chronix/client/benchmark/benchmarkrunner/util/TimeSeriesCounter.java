@@ -112,12 +112,18 @@ public class TimeSeriesCounter {
         if(!timeSeriesMetaDataList.isEmpty()){
             Random random = new Random();
             for(int i = 0; i < size; i++){
-                TimeSeriesMetaData randomMetaData = new TimeSeriesMetaData(timeSeriesMetaDataList.get(random.nextInt(timeSeriesMetaDataList.size())));
+                TimeSeriesMetaData ts = timeSeriesMetaDataList.get(random.nextInt(timeSeriesMetaDataList.size()));
+                TimeSeriesMetaData randomMetaData = new TimeSeriesMetaData(ts);
                 /*logger.info("random ts: Measurement: {}, MetricName: {}, Start: {}, End: {}",
                         randomMetaData.getMeasurementName(),
                         randomMetaData.getMetricName(),
                         randomMetaData.getStart(),
-                        randomMetaData.getEnd());*/
+                        randomMetaData.getEnd());
+                logger.info("random ts: Measurement: {}, MetricName: {}, Start: {}, End: {}",
+                        ts.getMeasurementName(),
+                        ts.getMetricName(),
+                        ts.getStart(),
+                        ts.getEnd());*/
 
 
                 if(randomMetaData.getStart() < randomMetaData.getEnd()) {
@@ -127,17 +133,29 @@ public class TimeSeriesCounter {
                     randomMetaData.setStart(randomStart);
                     randomMetaData.setEnd(randomEnd);
 
-                    metaDataList.add(randomMetaData);
-                }
-                else {
-                    // time series only contains one point, no random start end needed
-                    metaDataList.add(randomMetaData);
-                    /*logger.info("start >= end: Measurement: {}, MetricName: {}, Start: {}, End: {}",
+                    /*logger.info("randomized ts: Measurement: {}, MetricName: {}, Start: {}, End: {}",
                             randomMetaData.getMeasurementName(),
                             randomMetaData.getMetricName(),
                             randomMetaData.getStart(),
-                            randomMetaData.getEnd());*/
+                            randomMetaData.getEnd());
+                    logger.info("randomized ts: Measurement: {}, MetricName: {}, Start: {}, End: {}",
+                            ts.getMeasurementName(),
+                            ts.getMetricName(),
+                            ts.getStart(),
+                            ts.getEnd());*/
+
+                    metaDataList.add(randomMetaData);
                 }
+                /*else {
+                    // time series only contains one point, adjust end for kairosdb to not get error during query
+                    //randomMetaData.setEnd(randomMetaData.getEnd() + 1L);
+                    //metaDataList.add(randomMetaData);
+                    *//*logger.info("start >= end: Measurement: {}, MetricName: {}, Start: {}, End: {}",
+                            randomMetaData.getMeasurementName(),
+                            randomMetaData.getMetricName(),
+                            randomMetaData.getStart(),
+                            randomMetaData.getEnd());*//*
+                }*/
             }
         }
         return metaDataList;
