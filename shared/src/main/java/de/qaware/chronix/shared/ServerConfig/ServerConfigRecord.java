@@ -1,11 +1,14 @@
 package de.qaware.chronix.shared.ServerConfig;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
 import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Created by mcqueen666 on 04.08.16.
@@ -16,8 +19,8 @@ public class ServerConfigRecord {
     private String serverAddress;
     private LinkedList<DockerRunOptions> tsdbRunRecords;
     private LinkedList<DockerBuildOptions> tsdbBuildRecords;
-    private LinkedList<String> timeSeriesDataFolders;
     private LinkedList<String> externalTimeSeriesDataBaseImplementations;
+    private Map<String, String> tsdbDockerFilesDirectoryMap;
 
     public ServerConfigRecord(){}
 
@@ -25,16 +28,16 @@ public class ServerConfigRecord {
         this.serverAddress = serverAddress;
         this.tsdbRunRecords = new LinkedList<>();
         this.tsdbBuildRecords = new LinkedList<>();
-        this.timeSeriesDataFolders = new LinkedList<>();
         this.externalTimeSeriesDataBaseImplementations = new LinkedList<>();
+        this.tsdbDockerFilesDirectoryMap = new HashMap<>();
     }
 
     public ServerConfigRecord(ServerConfigRecord otherRecord){
         this.serverAddress = otherRecord.getServerAddress();
         this.tsdbRunRecords = new LinkedList<>(otherRecord.getTsdbRunRecords());
         this.tsdbBuildRecords = new LinkedList<>(otherRecord.getTsdbBuildRecords());
-        this.timeSeriesDataFolders = new LinkedList<>(otherRecord.getTimeSeriesDataFolders());
         this.externalTimeSeriesDataBaseImplementations = new LinkedList<>(otherRecord.getExternalTimeSeriesDataBaseImplementations());
+        this.tsdbDockerFilesDirectoryMap = new HashMap<>(otherRecord.getTsdbDockerFilesDirectoryMap());
     }
 
     //setter
@@ -54,10 +57,9 @@ public class ServerConfigRecord {
         this.externalTimeSeriesDataBaseImplementations = externalTimeSeriesDataBaseImplementations;
     }
 
-    public void setTimeSeriesDataFolders(LinkedList<String> timeSeriesDataFolders) {
-        this.timeSeriesDataFolders = timeSeriesDataFolders;
+    public void setTsdbDockerFilesDirectoryMap(Map<String, String> tsdbDockerFilesDirectoryMap) {
+        this.tsdbDockerFilesDirectoryMap = tsdbDockerFilesDirectoryMap;
     }
-
     //getter
 
     public String getServerAddress() {
@@ -72,11 +74,29 @@ public class ServerConfigRecord {
         return tsdbBuildRecords;
     }
 
-    public LinkedList<String> getTimeSeriesDataFolders() {
-        return timeSeriesDataFolders;
-    }
-
     public LinkedList<String> getExternalTimeSeriesDataBaseImplementations() {
         return externalTimeSeriesDataBaseImplementations;
+    }
+
+    public Map<String, String> getTsdbDockerFilesDirectoryMap() {
+        return tsdbDockerFilesDirectoryMap;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof ServerConfigRecord
+                && ((ServerConfigRecord) o).getServerAddress().equals(serverAddress)){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    @JsonIgnore
+    @Override
+    public int hashCode(){
+        return serverAddress.hashCode();
     }
 }
