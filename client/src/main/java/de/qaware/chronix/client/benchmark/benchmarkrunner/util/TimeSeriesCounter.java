@@ -130,12 +130,13 @@ public class TimeSeriesCounter {
                     metaDataList.add(randomMetaData);
                 }
                 else {
+                    // time series only contains one point, no random start end needed
                     metaDataList.add(randomMetaData);
-                    logger.info("start >= end: Measurement: {}, MetricName: {}, Start: {}, End: {}",
+                    /*logger.info("start >= end: Measurement: {}, MetricName: {}, Start: {}, End: {}",
                             randomMetaData.getMeasurementName(),
                             randomMetaData.getMetricName(),
                             randomMetaData.getStart(),
-                            randomMetaData.getEnd());
+                            randomMetaData.getEnd());*/
                 }
             }
         }
