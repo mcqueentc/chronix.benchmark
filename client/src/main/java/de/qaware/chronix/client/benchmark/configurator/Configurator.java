@@ -186,11 +186,11 @@ public class Configurator {
     }
 
     /**
-     * Uploads files to the server
+     * Uploads docker files to the server
      *
      * @param serverAddress the server address or ip WITHOUT http://
      * @param directoryPath the directory to be uploaded recursively to the server.
-     *                      Will be placed into servers user.home + benchmarkDirectory
+     *                      Will be placed into servers user.home + benchmarkDirectory + docker
      * @return the server response output
      */
     public String[] uploadFiles(String serverAddress, String directoryPath){
