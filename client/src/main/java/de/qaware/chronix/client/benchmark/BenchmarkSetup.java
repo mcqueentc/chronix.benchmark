@@ -1,4 +1,4 @@
-package de.qaware.chronix.client;
+package de.qaware.chronix.client.benchmark;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

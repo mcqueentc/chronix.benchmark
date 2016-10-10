@@ -1,4 +1,4 @@
-package de.qaware.chronix.client;
+package de.qaware.chronix.client.benchmark;
 
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.database.BenchmarkDataSource;

@@ -1,5 +1,6 @@
-package de.qaware.chronix.client;
+package de.qaware.chronix.client.benchmark;
 
+import de.qaware.chronix.client.ClientMenu;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import java.util.List;
 import java.util.Map;
