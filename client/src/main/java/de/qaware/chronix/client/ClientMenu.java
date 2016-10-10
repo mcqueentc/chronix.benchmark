@@ -1,6 +1,10 @@
 package de.qaware.chronix.client;
 
 
+import de.qaware.chronix.client.benchmark.BenchmarkImport;
+import de.qaware.chronix.client.benchmark.BenchmarkQueryMeasurement;
+import de.qaware.chronix.client.benchmark.BenchmarkSetup;
+import de.qaware.chronix.client.benchmark.BenchmarkStatistics;
 import de.qaware.chronix.client.benchmark.util.*;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
@@ -61,6 +65,10 @@ public class ClientMenu {
                 PingServer.main(args);
                 break;
             }
+            case "stats":{
+                BenchmarkStatistics.main(args);
+                break;
+            }
             default:
                 printUsage();
                 printFunctions();
@@ -80,6 +88,7 @@ public class ClientMenu {
         System.out.println("import:     import json time series.");
         System.out.println("convert:    convert .csv to json time series.");
         System.out.println("benchmark:  run the benchmark (after you have imported something)");
+        System.out.println("stats:      analyze time series, import or benchmark records");
         System.out.println("build:      builds docker containers on the server");
         System.out.println("start:      starts docker containers on the server");
         System.out.println("stop:       stops docker containers on the server");
