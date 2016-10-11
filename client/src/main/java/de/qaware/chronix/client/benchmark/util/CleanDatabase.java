@@ -47,9 +47,13 @@ public class CleanDatabase {
             }
         }
 
-        String[] results = QueryHandler.getInstance().cleanDatabasesOnServer(server, cleanCommandList);
-        for(String s : results){
-            System.out.println(s);
+        try {
+            String[] results = QueryHandler.getInstance().cleanDatabasesOnServer(server, cleanCommandList);
+            for (String s : results) {
+                System.out.println(s);
+            }
+        } catch (Exception e){
+            System.err.println("Error cleaning database on " + server + ": " + e.getLocalizedMessage());
         }
     }
 

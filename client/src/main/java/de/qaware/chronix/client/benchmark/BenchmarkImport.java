@@ -82,13 +82,18 @@ public class BenchmarkImport {
             return;
         }
 
-        BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
-        for(File directory : importDirectories) {
-            System.out.println("\nImporting directory: " + directory);
-            benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
-        }
+        try {
+            BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
+            for (File directory : importDirectories) {
+                System.out.println("\nImporting directory: " + directory);
+                benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
+            }
 
-        System.out.println("\nDownloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
+            System.out.println("\nDownloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
+
+        } catch (Exception e){
+            System.err.println("Error importing on " + server + ": " + e.getLocalizedMessage());
+        }
 
     }
 

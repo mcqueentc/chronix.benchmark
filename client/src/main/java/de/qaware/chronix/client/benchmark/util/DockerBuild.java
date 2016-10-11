@@ -41,9 +41,13 @@ public class DockerBuild {
             for(DockerBuildOptions buildOption : dockerBuildOptionsList){
                 if(buildOption.getContainerName().equals(tsdb)){
                     System.out.println("Building " + tsdb + " on server: " + server);
-                    answers = configurator.buildDockerContainer(server, buildOption);
-                    for(String s : answers){
-                        System.out.println("Server: " + s);
+                    try {
+                        answers = configurator.buildDockerContainer(server, buildOption);
+                        for (String s : answers) {
+                            System.out.println("Server: " + s);
+                        }
+                    } catch (Exception e){
+                        System.err.println("Error building " + tsdb + " on " + server + ": " + e.getLocalizedMessage());
                     }
                 }
             }

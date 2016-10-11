@@ -42,9 +42,13 @@ public class DockerStart {
             for(DockerRunOptions runOptions : dockerRunOptionsList){
                 if(runOptions.getContainerName().equals(tsdb)){
                     System.out.println("Starting " + tsdb + " on server: " + server);
-                    answers = configurator.startDockerContainer(server, runOptions);
-                    for(String s : answers){
-                        System.out.println("Server: " + s);
+                    try {
+                        answers = configurator.startDockerContainer(server, runOptions);
+                        for (String s : answers) {
+                            System.out.println("Server: " + s);
+                        }
+                    } catch (Exception e){
+                        System.err.println("Error starting " + tsdb + " on " + server + ": " + e.getLocalizedMessage());
                     }
                 }
             }

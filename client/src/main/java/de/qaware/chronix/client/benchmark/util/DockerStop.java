@@ -41,9 +41,13 @@ public class DockerStop {
         for(String tsdb : tsdbList){
             if(configuredTsdbImpls.contains(tsdb)){
                 System.out.println("Stopping " + tsdb + " on server: " + server);
-                answers = configurator.stopDockerContainer(server, tsdb);
-                for(String s : answers){
-                    System.out.println("Server: " + s);
+                try {
+                    answers = configurator.stopDockerContainer(server, tsdb);
+                    for (String s : answers) {
+                        System.out.println("Server: " + s);
+                    }
+                } catch (Exception e){
+                    System.err.println("Error stopping " + tsdb + " on " + server + ": " + e.getLocalizedMessage());
                 }
             }
         }
