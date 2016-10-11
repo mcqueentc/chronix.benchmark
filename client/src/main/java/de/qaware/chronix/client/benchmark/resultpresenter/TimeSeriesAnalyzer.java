@@ -27,7 +27,7 @@ public class TimeSeriesAnalyzer {
 
     public TimeSeriesAnalyzer(){
         statisticsDirectory = ResultPresenter.getInstance().getStatisticsDirectory();
-        statsFilePath = statisticsDirectory + File.separator + "timeseries_analytics";
+        statsFilePath = statisticsDirectory + File.separator + "timeseries_analytics.json";
     }
 
     /**
