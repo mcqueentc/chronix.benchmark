@@ -257,6 +257,9 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
                     }
                 }
                 break;
+            case QUERY_ONLY:
+                defaultAggregatedMetric = "sum";
+                break;
         }
 
         defaultAggregatedMetric = defaultAggregatedMetric + ":" + escapedMetricName + "{tags}";

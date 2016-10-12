@@ -172,6 +172,9 @@ public class InfluxDB implements BenchmarkDataSource<String> {
                     queryString = "SELECT PERCENTILE(" + escapedMetricName + "," + p + ")";
                 }
                 break;
+            case QUERY_ONLY:
+                queryString = "SELECT " + escapedMetricName;
+                break;
         }
 
         queryString += " FROM " + escapeInfluxDBMetricName(metaData.getMeasurementName())

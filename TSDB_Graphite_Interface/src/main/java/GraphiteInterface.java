@@ -216,6 +216,10 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
                             query = "nPercentile(" + metric + ", " + (int)(p * 100) + ")";
                     }
                     break;
+                case QUERY_ONLY:
+                    query = metric;
+                    break;
+
             }
             graphiteQuery = new GraphiteQuery(query, startDate, endDate);
 

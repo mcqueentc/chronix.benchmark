@@ -195,6 +195,9 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
                         aggregator = AggregatorFactory.createPercentileAggregator(p.doubleValue(), 10, TimeUnit.YEARS);
                     }
                     break;
+                case QUERY_ONLY:
+                    // nothing to do here for kairosdb
+
             }
 
 

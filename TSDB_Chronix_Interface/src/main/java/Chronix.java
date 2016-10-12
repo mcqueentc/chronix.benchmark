@@ -247,6 +247,8 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                                 query.addFilterQuery("function=p:" + p);
                             }
                             break;
+                        case QUERY_ONLY:
+                            // nothing to do here for chronix
                     }
                 }
             }
