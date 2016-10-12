@@ -3,6 +3,7 @@ package de.qaware.chronix.client.benchmark.resultpresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
+import de.qaware.chronix.database.TimeSeriesPoint;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,25 +55,37 @@ public class TimeSeriesAnalyzer {
             }
         }
 
+        List<Double> pointsPerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> minimumValuePerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> maximumValuePerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> meanValuePerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(allFiles.size());
+
         // start the threads
         Future<Long> futureFileSize = executorService.submit(new FileSizeCalculator(allFiles));
 
-        List<Future<List<Integer>>> futurePointCounts = new LinkedList<>();
+        List<Future<Map<String, List<Double>>>> futureAnalyticsListOfMaps = new LinkedList<>();
+        int threadId = 1;
         int batchsize = allFiles.size() / oSMXBean.getAvailableProcessors() - 1;
         int from = 0;
         for(int i = batchsize; i < allFiles.size(); i = i + batchsize){
-            futurePointCounts.add(executorService.submit(new AnalyzerThread(allFiles.subList(from, i))));
+            futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId++, allFiles.subList(from, i))));
 
             from = i;
         }
-        futurePointCounts.add(executorService.submit(new AnalyzerThread(allFiles.subList(from, allFiles.size()))));
+        futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId, allFiles.subList(from, allFiles.size()))));
 
         // collect results
         try {
             Long totalFileSize = futureFileSize.get();
-            List<Integer> pointCounts = new ArrayList<>(allFiles.size());
-            for(Future<List<Integer>> future : futurePointCounts){
-                pointCounts.addAll(future.get());
+
+            for(Future<Map<String, List<Double>>> futureMap : futureAnalyticsListOfMaps){
+                Map<String, List<Double>> analyticsMap = futureMap.get();
+                pointsPerTimeSeries.addAll(analyticsMap.get("pointsPerTimeSeries"));
+                minimumValuePerTimeSeries.addAll(analyticsMap.get("minimumValuePerTimeSeries"));
+                maximumValuePerTimeSeries.addAll(analyticsMap.get("maximumValuePerTimeSeries"));
+                meanValuePerTimeSeries.addAll(analyticsMap.get("meanValuePerTimeSeries"));
+                sampleCovarianceValuePerTimeSeries.addAll(analyticsMap.get("sampleCovarianceValuePerTimeSeries"));
             }
 
             executorService.shutdown();
@@ -80,39 +93,63 @@ public class TimeSeriesAnalyzer {
                 executorService.shutdownNow();
             }
 
-            // calc values
-            Collections.sort(pointCounts);
+            // calc set statistics
+            Collections.sort(pointsPerTimeSeries);
 
-            long numberOfTotalPoints = 0L;
-            for(Integer pointsPerTimeSeries : pointCounts){
-                numberOfTotalPoints += (long)pointsPerTimeSeries;
+            double numberOfTotalPoints = 0d;
+            for(Double points : pointsPerTimeSeries){
+                numberOfTotalPoints += points;
             }
-            int numberOfTimeSeries = pointCounts.size();
-            int minNumberOfPointsPerTimeSeries = Collections.min(pointCounts);
-            int maxNumberOfPointsPerTimeSeries = Collections.max(pointCounts);
-            int averagePointsPerTimeSeries = (int)(numberOfTotalPoints / (long)numberOfTimeSeries);
-            int medianPointsPerTimeSeries = pointCounts.get(pointCounts.size() / 2);
 
-            //set values
+            int numberOfTimeSeries = pointsPerTimeSeries.size();
+            double minNumberOfPointsPerTimeSeries = Collections.min(pointsPerTimeSeries);
+            double maxNumberOfPointsPerTimeSeries = Collections.max(pointsPerTimeSeries);
+            double averagePointsPerTimeSeries = numberOfTotalPoints / numberOfTimeSeries;
+            double medianPointsPerTimeSeries = pointsPerTimeSeries.get(pointsPerTimeSeries.size() / 2);
+
+            //calc value statistics
+            Collections.sort(meanValuePerTimeSeries);
+            Collections.sort(sampleCovarianceValuePerTimeSeries);
+
+            double minValueOfAllTimeSeries = Collections.min(minimumValuePerTimeSeries);
+            double maxValueOfAllTimeSeries = Collections.max(maximumValuePerTimeSeries);
+
+            double meanValueofAllTimeSeries = 0d;
+            for(Double meanValue : meanValuePerTimeSeries){
+                meanValueofAllTimeSeries += meanValue;
+            }
+            meanValueofAllTimeSeries /= meanValuePerTimeSeries.size();
+            double medianOfAllMeanValues = meanValuePerTimeSeries.get(meanValuePerTimeSeries.size() / 2);
+
+            double meanSampleCovarianceOfAllTimeSeries = 0d;
+            for(Double s_2 : sampleCovarianceValuePerTimeSeries){
+                meanSampleCovarianceOfAllTimeSeries += s_2;
+            }
+            meanSampleCovarianceOfAllTimeSeries /= sampleCovarianceValuePerTimeSeries.size();
+            double medianSampleCovarianceOfAllTimeSeries = sampleCovarianceValuePerTimeSeries.get(sampleCovarianceValuePerTimeSeries.size() / 2);
+
+
+            //set data set stats
             timeSeriesStatistics.setDate(Instant.now().toString());
             timeSeriesStatistics.setMeasurements(measurements);
             timeSeriesStatistics.setTotalSizeInBytes(totalFileSize);
             timeSeriesStatistics.setNumberOfTimeSeries(numberOfTimeSeries);
-            timeSeriesStatistics.setNumberOfTotalPoints(numberOfTotalPoints);
-            timeSeriesStatistics.setMinNumberOfPointsPerTimeSeries(minNumberOfPointsPerTimeSeries);
-            timeSeriesStatistics.setMaxNumberOfPointsPerTimeSeries(maxNumberOfPointsPerTimeSeries);
-            timeSeriesStatistics.setAveragePointsPerTimeSeries(averagePointsPerTimeSeries);
-            timeSeriesStatistics.setMedianPointsPerTimeSeries(medianPointsPerTimeSeries);
+            timeSeriesStatistics.setNumberOfTotalPoints((long)numberOfTotalPoints);
+            timeSeriesStatistics.setMinNumberOfPointsPerTimeSeries((long)minNumberOfPointsPerTimeSeries);
+            timeSeriesStatistics.setMaxNumberOfPointsPerTimeSeries((long)maxNumberOfPointsPerTimeSeries);
+            timeSeriesStatistics.setAveragePointsPerTimeSeries((long)averagePointsPerTimeSeries);
+            timeSeriesStatistics.setMedianPointsPerTimeSeries((long)medianPointsPerTimeSeries);
+
+            //set value set stats
+            timeSeriesStatistics.setMinValueOfAllTimeSeries(minValueOfAllTimeSeries);
+            timeSeriesStatistics.setMaxValueOfAllTimeSeries(maxValueOfAllTimeSeries);
+            timeSeriesStatistics.setMeanValueofAllTimeSeries(meanValueofAllTimeSeries);
+            timeSeriesStatistics.setMedianOfAllMeanValues(medianOfAllMeanValues);
+            timeSeriesStatistics.setMeanSampleCovarianceOfAllTimeSeries(meanSampleCovarianceOfAllTimeSeries);
+            timeSeriesStatistics.setMedianSampleCovarianceOfAllTimeSeries(medianSampleCovarianceOfAllTimeSeries);
 
             // write to file
-            File statsFile = new File(statsFilePath);
-            ObjectMapper mapper = new ObjectMapper();
-            final String statisticsString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(timeSeriesStatistics);
-            if(statsFile.exists()){
-                Files.write(statsFile.toPath(), Arrays.asList(statisticsString), StandardOpenOption.APPEND);
-            } else {
-                Files.write(statsFile.toPath(), Arrays.asList(statisticsString), StandardOpenOption.CREATE);
-            }
+            writeStatsJson(timeSeriesStatistics);
 
         } catch (Exception e) {
             logger.error("Error retrieving results from threads:" + e.getLocalizedMessage());
@@ -145,35 +182,129 @@ public class TimeSeriesAnalyzer {
         }
     }
 
-    private class AnalyzerThread implements Callable<List<Integer>>{
+    private class AnalyzerThread implements Callable<Map<String, List<Double>>>{
 
+        private final int id;
         private List<File> files;
         private final int BATCHSIZE = 25;
 
-        public AnalyzerThread(List<File> files){
+        public AnalyzerThread(int id, List<File> files){
+            this.id = id;
             this.files = files;
         }
 
         @Override
-        public List<Integer> call() {
-            List<Integer> pointsPerTimeSeries = new ArrayList<>(files.size());
+        public Map<String, List<Double>> call() {
+            List<Double> pointsPerTimeSeries = new ArrayList<>(files.size());
+            List<Double> minimumValuePerTimeSeries = new ArrayList<>(files.size());
+            List<Double> maximumValuePerTimeSeries = new ArrayList<>(files.size());
+            List<Double> meanValuePerTimeSeries = new ArrayList<>(files.size());
+            List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(files.size());
 
             List<TimeSeries> timeSeries;
             int from = 0;
             for(int i = BATCHSIZE; i < files.size(); i = i + BATCHSIZE){
-                    timeSeries = JsonTimeSeriesHandler.getInstance().readTimeSeriesJson(files.subList(from, i).toArray(new File[]{}));
-                    from = i;
+                logger.info("Thread {}, reading timeseries from {} to {}", id, from, i);
 
-                    for(TimeSeries ts : timeSeries){
-                        pointsPerTimeSeries.add(ts.getPoints().size());
-                    }
+                timeSeries = JsonTimeSeriesHandler.getInstance().readTimeSeriesJson(files.subList(from, i).toArray(new File[]{}));
+                from = i;
+                Map<String, List<Double>> valueAnalytics = analyzeValues(timeSeries);
+
+                pointsPerTimeSeries.addAll(valueAnalytics.get("pointsPerTimeSeries"));
+                minimumValuePerTimeSeries.addAll(valueAnalytics.get("minimumValuePerTimeSeries"));
+                maximumValuePerTimeSeries.addAll(valueAnalytics.get("maximumValuePerTimeSeries"));
+                meanValuePerTimeSeries.addAll(valueAnalytics.get("meanValuePerTimeSeries"));
+                sampleCovarianceValuePerTimeSeries.addAll(valueAnalytics.get("sampleCovarianceValuePerTimeSeries"));
+
             }
             timeSeries = JsonTimeSeriesHandler.getInstance().readTimeSeriesJson(files.subList(from, files.size()).toArray(new File[]{}));
+            // get last analytics for left over points and add the previous analytics to the map
+            Map<String, List<Double>> valueAnalytics = analyzeValues(timeSeries);
+            valueAnalytics.get("pointsPerTimeSeries").addAll(pointsPerTimeSeries);
+            valueAnalytics.get("minimumValuePerTimeSeries").addAll(minimumValuePerTimeSeries);
+            valueAnalytics.get("maximumValuePerTimeSeries").addAll(maximumValuePerTimeSeries);
+            valueAnalytics.get("meanValuePerTimeSeries").addAll(meanValuePerTimeSeries);
+            valueAnalytics.get("sampleCovarianceValuePerTimeSeries").addAll(sampleCovarianceValuePerTimeSeries);
+
+            return valueAnalytics;
+
+        }
+
+        private Map<String, List<Double>> analyzeValues(List<TimeSeries> timeSeries){
+            List<Double> pointsPerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> minimumValuePerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> maximumValuePerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> meanValuePerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(timeSeries.size());
             for(TimeSeries ts : timeSeries){
-                pointsPerTimeSeries.add(ts.getPoints().size());
+                pointsPerTimeSeries.add((double)ts.getPoints().size());
+
+                // analyze values
+                double min = Double.MAX_VALUE;
+                double max = Double.MIN_VALUE;
+                double sum = 0d;
+                try {
+                    for (TimeSeriesPoint point : ts.getPoints()) {
+                        if (!point.getValue().isNaN()) {
+                            sum += point.getValue();
+                            if (point.getValue().compareTo(min) < 0) {
+                                min = point.getValue();
+                            }
+                            if (point.getValue().compareTo(max) > 0) {
+                                max = point.getValue();
+                            }
+                        }
+                    }
+                } catch (Exception e){
+                    logger.error("Error calculating point value statistics: {}", e.getLocalizedMessage());
+                }
+
+                minimumValuePerTimeSeries.add(min);
+                maximumValuePerTimeSeries.add(max);
+
+                //sample covariance -> https://de.wikipedia.org/wiki/Korrigierte_Stichprobenvarianz
+                double mean = sum / ts.getPoints().size();
+                double sum_for_sample_covariance = 0d;
+                try {
+                    for (TimeSeriesPoint point : ts.getPoints()) {
+                        if (!point.getValue().isNaN()) {
+                            sum_for_sample_covariance += Math.pow((point.getValue() - mean),2);
+                        }
+                    }
+                } catch (Exception e){
+                    logger.error("Error calculating sample covariance: {}", e.getLocalizedMessage());
+                }
+                double sample_covariance = sum_for_sample_covariance / (ts.getPoints().size() -1 );
+
+                meanValuePerTimeSeries.add(mean);
+                sampleCovarianceValuePerTimeSeries.add(sample_covariance);
+
+
             }
 
-            return pointsPerTimeSeries;
+            Map<String, List<Double>> valueAnalytics = new HashMap<>();
+            valueAnalytics.put("pointsPerTimeSeries", pointsPerTimeSeries);
+            valueAnalytics.put("minimumValuePerTimeSeries", minimumValuePerTimeSeries);
+            valueAnalytics.put("maximumValuePerTimeSeries", maximumValuePerTimeSeries);
+            valueAnalytics.put("meanValuePerTimeSeries", meanValuePerTimeSeries);
+            valueAnalytics.put("sampleCovarianceValuePerTimeSeries", sampleCovarianceValuePerTimeSeries);
+
+            return valueAnalytics;
+        }
+    }
+
+    private void writeStatsJson(TimeSeriesStatistics timeSeriesStatistics){
+        File statsFile = new File(statsFilePath);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            final String statisticsString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(timeSeriesStatistics);
+            if (statsFile.exists()) {
+                Files.write(statsFile.toPath(), Arrays.asList(statisticsString), StandardOpenOption.APPEND);
+            } else {
+                Files.write(statsFile.toPath(), Arrays.asList(statisticsString), StandardOpenOption.CREATE);
+            }
+        } catch (Exception e){
+            logger.error("Error writing stats to json file: {}", e.getLocalizedMessage());
         }
     }
 
