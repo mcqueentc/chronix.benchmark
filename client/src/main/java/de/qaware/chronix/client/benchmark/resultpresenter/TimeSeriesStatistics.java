@@ -11,13 +11,22 @@ public class TimeSeriesStatistics {
 
     private String date;
     private List<String> measurements;
+    // data set stats
     private long totalSizeInBytes;
     private int numberOfTimeSeries;
     private long numberOfTotalPoints;
-    private int minNumberOfPointsPerTimeSeries;
-    private int maxNumberOfPointsPerTimeSeries;
-    private int averagePointsPerTimeSeries;
-    private int medianPointsPerTimeSeries;
+    private long minNumberOfPointsPerTimeSeries;
+    private long maxNumberOfPointsPerTimeSeries;
+    private long averagePointsPerTimeSeries;
+    private long medianPointsPerTimeSeries;
+
+    // data value stats
+    private double minValueOfAllTimeSeries;
+    private double maxValueOfAllTimeSeries;
+    private double meanValueofAllTimeSeries;
+    private double medianOfAllMeanValues;
+    private double meanSampleCovarianceOfAllTimeSeries;
+    private double medianSampleCovarianceOfAllTimeSeries;
 
 
     public TimeSeriesStatistics(){
@@ -36,19 +45,19 @@ public class TimeSeriesStatistics {
         return numberOfTotalPoints;
     }
 
-    public int getMinNumberOfPointsPerTimeSeries() {
+    public long getMinNumberOfPointsPerTimeSeries() {
         return minNumberOfPointsPerTimeSeries;
     }
 
-    public int getMaxNumberOfPointsPerTimeSeries() {
+    public long getMaxNumberOfPointsPerTimeSeries() {
         return maxNumberOfPointsPerTimeSeries;
     }
 
-    public int getAveragePointsPerTimeSeries() {
+    public long getAveragePointsPerTimeSeries() {
         return averagePointsPerTimeSeries;
     }
 
-    public int getMedianPointsPerTimeSeries() {
+    public long getMedianPointsPerTimeSeries() {
         return medianPointsPerTimeSeries;
     }
 
@@ -64,19 +73,19 @@ public class TimeSeriesStatistics {
         this.numberOfTotalPoints = numberOfTotalPoints;
     }
 
-    public void setMinNumberOfPointsPerTimeSeries(int minNumberOfPointsPerTimeSeries) {
+    public void setMinNumberOfPointsPerTimeSeries(long minNumberOfPointsPerTimeSeries) {
         this.minNumberOfPointsPerTimeSeries = minNumberOfPointsPerTimeSeries;
     }
 
-    public void setMaxNumberOfPointsPerTimeSeries(int maxNumberOfPointsPerTimeSeries) {
+    public void setMaxNumberOfPointsPerTimeSeries(long maxNumberOfPointsPerTimeSeries) {
         this.maxNumberOfPointsPerTimeSeries = maxNumberOfPointsPerTimeSeries;
     }
 
-    public void setAveragePointsPerTimeSeries(int averagePointsPerTimeSeries) {
+    public void setAveragePointsPerTimeSeries(long averagePointsPerTimeSeries) {
         this.averagePointsPerTimeSeries = averagePointsPerTimeSeries;
     }
 
-    public void setMedianPointsPerTimeSeries(int medianPointsPerTimeSeries) {
+    public void setMedianPointsPerTimeSeries(long medianPointsPerTimeSeries) {
         this.medianPointsPerTimeSeries = medianPointsPerTimeSeries;
     }
 
@@ -94,5 +103,53 @@ public class TimeSeriesStatistics {
 
     public void setMeasurements(List<String> measurements) {
         this.measurements = measurements;
+    }
+
+    public double getMinValueOfAllTimeSeries() {
+        return minValueOfAllTimeSeries;
+    }
+
+    public void setMinValueOfAllTimeSeries(double minValueOfAllTimeSeries) {
+        this.minValueOfAllTimeSeries = minValueOfAllTimeSeries;
+    }
+
+    public double getMaxValueOfAllTimeSeries() {
+        return maxValueOfAllTimeSeries;
+    }
+
+    public void setMaxValueOfAllTimeSeries(double maxValueOfAllTimeSeries) {
+        this.maxValueOfAllTimeSeries = maxValueOfAllTimeSeries;
+    }
+
+    public double getMeanValueofAllTimeSeries() {
+        return meanValueofAllTimeSeries;
+    }
+
+    public void setMeanValueofAllTimeSeries(double meanValueofAllTimeSeries) {
+        this.meanValueofAllTimeSeries = meanValueofAllTimeSeries;
+    }
+
+    public double getMedianOfAllMeanValues() {
+        return medianOfAllMeanValues;
+    }
+
+    public void setMedianOfAllMeanValues(double medianOfAllMeanValues) {
+        this.medianOfAllMeanValues = medianOfAllMeanValues;
+    }
+
+    public double getMeanSampleCovarianceOfAllTimeSeries() {
+        return meanSampleCovarianceOfAllTimeSeries;
+    }
+
+    public void setMeanSampleCovarianceOfAllTimeSeries(double meanSampleCovarianceOfAllTimeSeries) {
+        this.meanSampleCovarianceOfAllTimeSeries = meanSampleCovarianceOfAllTimeSeries;
+    }
+
+    public double getMedianSampleCovarianceOfAllTimeSeries() {
+        return medianSampleCovarianceOfAllTimeSeries;
+    }
+
+    public void setMedianSampleCovarianceOfAllTimeSeries(double medianSampleCovarianceOfAllTimeSeries) {
+        this.medianSampleCovarianceOfAllTimeSeries = medianSampleCovarianceOfAllTimeSeries;
     }
 }
