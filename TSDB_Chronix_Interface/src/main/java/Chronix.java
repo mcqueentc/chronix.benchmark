@@ -220,6 +220,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
                     query = new SolrQuery(queryString);
                     //query.setRows(Integer.MAX_VALUE);
+                    //logger.info("SolrQueryString: {}", query.getQuery());
 
 
                     switch (function) {
@@ -271,7 +272,8 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                             Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, queryObject);
                             List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
                             if (!resultList.isEmpty()) {
-                                resultList.forEach(ts -> queryResults.add(ts.toString()));
+                                resultList.forEach(ts -> queryResults.add(ts.toString() + "; Points: " + String.join(", ", ts.points().collect(Collectors.toList()).toString())));
+                                //resultList.forEach(ts -> logger.info("Points: {}", ts.points().collect(Collectors.toList())));
                                 // debug //TODO erase
                                 //queryResults.add("Chronix time range millis: " + timeSeriesMetaData.getStart() + " -> " + timeSeriesMetaData.getEnd() + "\n");
                                 //queryResults.add("Query: " + queryObject);
