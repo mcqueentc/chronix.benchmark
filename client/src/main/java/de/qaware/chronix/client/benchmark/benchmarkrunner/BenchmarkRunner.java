@@ -48,7 +48,7 @@ public class BenchmarkRunner {
             + "downloaded_benchmark_records";
     private final String recordFileName = "benchmarkRecords.json";
     private final int BENCHMARK_TIMESERIES_METADATA_SIZE = 400;
-    private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1400;
+    private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1600;
     private BenchmarkRunnerHelper benchmarkRunnerHelper;
     private QueryHandler queryHandler;
     private JsonTimeSeriesHandler jsonTimeSeriesHandler;
