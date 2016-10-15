@@ -64,9 +64,11 @@ public class TSDBInterfaceHandler {
         File directory = new File(interfaceDirectory);
         if(directory.exists()){
             File[] fileList = directory.listFiles();
-            for(File file : fileList){
-                if(file.getName().endsWith(".jar")) {
-                    interfaces.put(file.getName().replaceFirst(".jar", ""), file);
+            if(fileList != null) {
+                for (File file : fileList) {
+                    if (file.getName().endsWith(".jar")) {
+                        interfaces.put(file.getName().replaceFirst(".jar", ""), file);
+                    }
                 }
             }
         }
