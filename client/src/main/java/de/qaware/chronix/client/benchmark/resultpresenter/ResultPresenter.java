@@ -64,4 +64,24 @@ public class ResultPresenter {
            logger.error("Error generating json string: " + e.getLocalizedMessage());
         }
     }
+
+    public void analyzeTimeSeries(File timeSeriesDirectory){
+        if(timeSeriesDirectory != null && timeSeriesDirectory.exists() && timeSeriesDirectory.isDirectory()) {
+            List<File> measurements = new LinkedList<>();
+            measurements.add(timeSeriesDirectory);
+
+            TimeSeriesAnalyzer timeSeriesAnalyzer = new TimeSeriesAnalyzer();
+            TimeSeriesStatistics statistics = timeSeriesAnalyzer.analyzeJsonTimeSeries(measurements);
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                final String statisticsJsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(statistics);
+                System.out.println(statisticsJsonString);
+
+            } catch (Exception e) {
+                logger.error("Error generating json string: " + e.getLocalizedMessage());
+            }
+        } else {
+            logger.error(timeSeriesDirectory + "is not a directory or does not exist.");
+        }
+    }
 }
