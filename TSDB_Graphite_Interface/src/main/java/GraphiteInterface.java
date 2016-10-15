@@ -277,7 +277,7 @@ public class GraphiteInterface implements BenchmarkDataSource<GraphiteQuery>{
 
     private String escapeGraphiteMetricName(String metricName) {
         //String prefix = escape(metadata.joinWithoutMetric(), ".");
-        String metric = escape(metricName, ".").replaceAll("%", "Percent").replaceAll("-", ".").replaceAll("\\.+", ".");
+        String metric = escape(metricName, ".").replaceAll("%", "Percent").replaceAll("-", ".").replaceAll("\\.+", ".").replaceAll("@",".");
 
         if(metric.charAt(metric.length() -1 ) == '.'){
             metric = metric.substring(0, metric.length() - 1 );

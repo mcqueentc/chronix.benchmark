@@ -219,7 +219,7 @@ public class InfluxDB implements BenchmarkDataSource<String> {
     }
 
     private String escapeInfluxDBMetricName(String metricName) {
-        String result = metricName.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)","_").replaceAll("(-)", "_").replaceAll("%","Percent");
+        String result = metricName.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#)","_").replaceAll("(-)", "_").replaceAll("%","Percent").replaceAll("@","_at_");
         if(result.charAt(result.length() -1 ) == '_'){
             result = result.substring(0, result.length() -1 );
         }

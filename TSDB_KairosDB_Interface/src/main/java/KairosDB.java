@@ -247,7 +247,7 @@ public class KairosDB implements BenchmarkDataSource<QueryBuilder>{
     }
 
     public static String escapeKairosDB(String metric) {
-        String escapedString = escape(metric, ".").replaceAll("\\.\\.", ".");
+        String escapedString = escape(metric, ".").replaceAll("\\.\\.", ".").replaceAll("@",".");
         escapedString = escapedString.replaceAll("%", "Percent");
         //Remove point if it is the first character
         if (escapedString.indexOf(".") == 0) {

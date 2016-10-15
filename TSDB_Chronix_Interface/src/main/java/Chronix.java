@@ -303,7 +303,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
 
 
     public static String escape(String metric) {
-        String result = metric.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#|-)", "_");
+        String result = metric.replaceAll("(\\s|\\.|:|=|,|/|\\\\|\\*|\\(|\\)|_|#|-)", "_").replaceAll("@","_at_");
         result = ClientUtils.escapeQueryChars(result);
         result = result.replaceAll("\\\\\\*", "*");
         if(result.charAt(result.length() -1 ) == '_'){

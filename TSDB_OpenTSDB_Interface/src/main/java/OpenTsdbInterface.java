@@ -292,7 +292,7 @@ public class OpenTsdbInterface implements BenchmarkDataSource<OpenTsdbQuery> {
     }
 
     public String openTSDBEscapeValue(String value) {
-        String escapedString = escape(value, ".").replaceAll("\\.\\.", ".").trim();
+        String escapedString = escape(value, ".").replaceAll("\\.\\.", ".").replaceAll("@",".").trim();
         escapedString = escapedString.replaceAll("%", "Percent").trim();
         escapedString = escapedString.replaceAll(":", "").trim();
         escapedString = escapedString.replaceAll("\"", "").trim();
