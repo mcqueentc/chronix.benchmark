@@ -57,7 +57,7 @@ public class TSDBInterfaceHandler {
     private void makeInterfaceDirectory(){
         File directory = new File(interfaceDirectory);
         if(!directory.exists()){
-            directory.mkdir();
+            directory.mkdirs();
         }
     }
 
