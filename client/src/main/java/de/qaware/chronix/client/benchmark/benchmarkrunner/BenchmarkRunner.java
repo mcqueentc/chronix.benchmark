@@ -47,6 +47,7 @@ public class BenchmarkRunner {
             + File.separator
             + "downloaded_benchmark_records";
     private final String recordFileName = "benchmarkRecords.json";
+    private final int BENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY = 50;
     private final int BENCHMARK_TIMESERIES_METADATA_SIZE = 400;
     private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1600;
     private BenchmarkRunnerHelper benchmarkRunnerHelper;
@@ -207,8 +208,11 @@ public class BenchmarkRunner {
                     //do the query
                     System.out.println();
                     logger.info("Performing query on random time series number: {} with function: {}", entry.getKey(), queryFunction);
-                    List<String> results = queryWithFunction(server, querID, entry.getValue(), queryFunction, randomPercentile, tsdbQueryList);
-
+                    if(queryFunction == QueryFunction.QUERY_ONLY){
+                        List<String> results = queryWithFunction(server, querID, entry.getValue().subList(0, BENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY), queryFunction, randomPercentile, tsdbQueryList);
+                    } else {
+                        List<String> results = queryWithFunction(server, querID, entry.getValue(), queryFunction, randomPercentile, tsdbQueryList);
+                    }
                     listCounter++;
                     //TODO log results into log file
 
