@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -20,6 +19,7 @@ import static java.nio.file.StandardCopyOption.*;
  * Created by mcqueen666 on 08.08.16.
  *
  */
+@SuppressWarnings("unchecked")
 public class TSDBInterfaceHandler {
 
     private static TSDBInterfaceHandler instance;
@@ -53,6 +53,7 @@ public class TSDBInterfaceHandler {
         return interfaceDirectory;
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void makeInterfaceDirectory(){
         File directory = new File(interfaceDirectory);
         if(!directory.exists()){
@@ -94,7 +95,7 @@ public class TSDBInterfaceHandler {
                             if(name.lastIndexOf(".class") != -1) {
                                 name = name.substring(0, name.lastIndexOf(".class"));
                             }
-                            if (name.indexOf("/")!= -1) {
+                            if (name.contains("/")) {
                                 name = name.replaceAll("/", ".");
                             }
                             classes.add(name);
@@ -218,7 +219,8 @@ public class TSDBInterfaceHandler {
                         URLClassLoader classLoader = new URLClassLoader(new URL[] {classFile.toURI().toURL()},TSDBInterfaceHandler.class.getClassLoader());
                         Class<?> tsdbInterface = classLoader.loadClass(className);
                         Class<? extends BenchmarkDataSource> castedTsdbInterface = tsdbInterface.asSubclass(BenchmarkDataSource.class);
-                        BenchmarkDataSource<Object> castedTsdbInterfaceInstance = castedTsdbInterface.newInstance();
+                        BenchmarkDataSource<Object> castedTsdbInterfaceInstance;
+                        castedTsdbInterfaceInstance = castedTsdbInterface.newInstance();
                         return  castedTsdbInterfaceInstance;
                     }
 
