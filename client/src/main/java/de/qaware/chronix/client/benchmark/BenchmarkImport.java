@@ -2,6 +2,7 @@ package de.qaware.chronix.client.benchmark;
 
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
@@ -85,6 +86,7 @@ public class BenchmarkImport {
         try {
             BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
             for (File directory : importDirectories) {
+                JsonTimeSeriesHandler.getInstance().deleteTimeSeriesMetaDataJsonFile(directory.getName());
                 System.out.println("\nImporting directory: " + directory);
                 benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
             }
@@ -102,4 +104,5 @@ public class BenchmarkImport {
         System.out.println("Example:        import localhost 25 0 -t someTsdb -d /home/someUser/chronixBenchmark/timeseries_records/someFolder");
         System.out.println("NOTICE: paths have to be absolute paths!");
     }
+
 }
