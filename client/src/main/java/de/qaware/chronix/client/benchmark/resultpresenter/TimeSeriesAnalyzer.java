@@ -55,6 +55,8 @@ public class TimeSeriesAnalyzer {
             }
         }
 
+        Collections.shuffle(allFiles);
+
         List<Double> pointsPerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> minimumValuePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> maximumValuePerTimeSeries = new ArrayList<>(allFiles.size());
@@ -65,8 +67,8 @@ public class TimeSeriesAnalyzer {
         Future<Long> futureFileSize = executorService.submit(new FileSizeCalculator(allFiles));
 
         List<Future<Map<String, List<Double>>>> futureAnalyticsListOfMaps = new LinkedList<>();
-        int threadId = 1;
-        int batchsize = allFiles.size() / oSMXBean.getAvailableProcessors() - 1;
+        int threadId = 0;
+        int batchsize = allFiles.size() / oSMXBean.getAvailableProcessors();
         int from = 0;
         for(int i = batchsize; i < allFiles.size(); i = i + batchsize){
             futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId++, allFiles.subList(from, i))));
@@ -101,7 +103,10 @@ public class TimeSeriesAnalyzer {
                 numberOfTotalPoints += points;
             }
 
-            int numberOfTimeSeries = pointsPerTimeSeries.size();
+            int numberOfTimeSeries = 1;
+            if(pointsPerTimeSeries.size() > 0){
+                numberOfTimeSeries = pointsPerTimeSeries.size();
+            }
             double minNumberOfPointsPerTimeSeries = Collections.min(pointsPerTimeSeries);
             double maxNumberOfPointsPerTimeSeries = Collections.max(pointsPerTimeSeries);
             double averagePointsPerTimeSeries = numberOfTotalPoints / numberOfTimeSeries;
@@ -118,14 +123,18 @@ public class TimeSeriesAnalyzer {
             for(Double meanValue : meanValuePerTimeSeries){
                 meanValueofAllTimeSeries += meanValue;
             }
-            meanValueofAllTimeSeries /= meanValuePerTimeSeries.size();
+            if(meanValuePerTimeSeries.size() > 0) {
+                meanValueofAllTimeSeries /= meanValuePerTimeSeries.size();
+            }
             double medianOfAllMeanValues = meanValuePerTimeSeries.get(meanValuePerTimeSeries.size() / 2);
 
             double meanSampleCovarianceOfAllTimeSeries = 0d;
             for(Double s_2 : sampleCovarianceValuePerTimeSeries){
                 meanSampleCovarianceOfAllTimeSeries += s_2;
             }
-            meanSampleCovarianceOfAllTimeSeries /= sampleCovarianceValuePerTimeSeries.size();
+            if(sampleCovarianceValuePerTimeSeries.size() > 0) {
+                meanSampleCovarianceOfAllTimeSeries /= sampleCovarianceValuePerTimeSeries.size();
+            }
             double medianSampleCovarianceOfAllTimeSeries = sampleCovarianceValuePerTimeSeries.get(sampleCovarianceValuePerTimeSeries.size() / 2);
 
 
@@ -178,6 +187,7 @@ public class TimeSeriesAnalyzer {
                     }
                 }
             }
+            logger.info("File size calculator finished.");
             return byteSum;
         }
     }
@@ -204,7 +214,7 @@ public class TimeSeriesAnalyzer {
             List<TimeSeries> timeSeries;
             int from = 0;
             for(int i = BATCHSIZE; i < files.size(); i = i + BATCHSIZE){
-                logger.info("Thread {}, reading timeseries from {} to {}", id, from, i);
+                logger.info("Thread {}, reading timeseries from {} to {}, left {}", id, from, i, files.size() - i);
 
                 timeSeries = JsonTimeSeriesHandler.getInstance().readTimeSeriesJson(files.subList(from, i).toArray(new File[]{}));
                 from = i;
@@ -226,6 +236,7 @@ public class TimeSeriesAnalyzer {
             valueAnalytics.get("meanValuePerTimeSeries").addAll(meanValuePerTimeSeries);
             valueAnalytics.get("sampleCovarianceValuePerTimeSeries").addAll(sampleCovarianceValuePerTimeSeries);
 
+            logger.info("Thread {} finished.", id);
             return valueAnalytics;
 
         }
@@ -263,7 +274,10 @@ public class TimeSeriesAnalyzer {
                 maximumValuePerTimeSeries.add(max);
 
                 //sample covariance -> https://de.wikipedia.org/wiki/Korrigierte_Stichprobenvarianz
-                double mean = sum / ts.getPoints().size();
+                double mean = 0d;
+                if(ts.getPoints().size() > 0) {
+                    mean = sum / ts.getPoints().size();
+                }
                 double sum_for_sample_covariance = 0d;
                 try {
                     for (TimeSeriesPoint point : ts.getPoints()) {
@@ -274,7 +288,10 @@ public class TimeSeriesAnalyzer {
                 } catch (Exception e){
                     logger.error("Error calculating sample covariance: {}", e.getLocalizedMessage());
                 }
-                double sample_covariance = sum_for_sample_covariance / (ts.getPoints().size() -1 );
+                double sample_covariance = 0d;
+                if(ts.getPoints().size() > 1) {
+                    sample_covariance = sum_for_sample_covariance / (ts.getPoints().size() - 1);
+                }
 
                 meanValuePerTimeSeries.add(mean);
                 sampleCovarianceValuePerTimeSeries.add(sample_covariance);
