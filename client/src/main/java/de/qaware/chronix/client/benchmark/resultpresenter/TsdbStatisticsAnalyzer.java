@@ -3,6 +3,7 @@ package de.qaware.chronix.client.benchmark.resultpresenter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
+import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +163,14 @@ public class TsdbStatisticsAnalyzer {
                         }
                     }
                     // work done
+                    BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
                     tsdbStatistics = new TsdbStatistics(tsdbName, queryFunctionStatisticsList);
+                    tsdbStatistics.setNumberOfTimeSeriesPerQuery(benchmarkRunner.getBENCHMARK_TIMESERIES_METADATA_SIZE());
+                    tsdbStatistics.setNumberOfTimeSeriesPer_QUERY_ONLY_Function(benchmarkRunner.getBENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY());
+                    tsdbStatistics.setNumberOfQueriesPerQueryFunction(benchmarkRunner.getNUMBER_OF_BENCHMARK_METADATA_LISTS() / BenchmarkDataSource.QueryFunction.values().length);
+                    tsdbStatistics.setTotalNumberOfPerformedQueries(benchmarkRunner.getNUMBER_OF_BENCHMARK_METADATA_LISTS());
+                    tsdbStatistics.setTotalNumberOfPerformedImports(benchmarkRecordsPerQueryFunction.get("import").size());
+
                 }
             }
 
