@@ -25,7 +25,8 @@ public class BenchmarkStatistics {
                 }
                 break;
             case "benchmark":
-                //TODO
+                ResultPresenter.getInstance().doBenchmarkRecordsAnalysis();
+                break;
         }
     }
 
