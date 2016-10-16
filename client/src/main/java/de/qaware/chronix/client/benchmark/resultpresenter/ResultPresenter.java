@@ -1,15 +1,21 @@
 package de.qaware.chronix.client.benchmark.resultpresenter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
+import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Created by mcqueen666 on 20.06.16.
@@ -84,4 +90,25 @@ public class ResultPresenter {
             logger.error(timeSeriesDirectory + "is not a directory or does not exist.");
         }
     }
+
+    public void doBenchmarkRecordsAnalysis(){
+        TsdbStatisticsAnalyzer tsdbStatisticsAnalyzer = new TsdbStatisticsAnalyzer(statisticsDirectory);
+        List<TsdbStatistics> tsdbStatisticsList = tsdbStatisticsAnalyzer.analyzeBenchmarkRecords();
+        if(tsdbStatisticsList != null && ! tsdbStatisticsList.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                for(TsdbStatistics tsdbStatistics : tsdbStatisticsList){
+                    final String tsdbStatisticsJsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tsdbStatistics);
+                    System.out.println(tsdbStatisticsJsonString);
+                }
+
+            } catch (Exception e) {
+                logger.error("Error generating json sting: {}", e.getLocalizedMessage());
+            }
+        } else {
+            logger.info("No benchmark statistics found");
+        }
+    }
+
+
 }
