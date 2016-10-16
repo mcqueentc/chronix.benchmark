@@ -73,6 +73,26 @@ public class BenchmarkRunner {
         return instance;
     }
 
+    public String getRecordFileDirectory() {
+        return recordFileDirectory;
+    }
+
+    public String getRecordFileName() {
+        return recordFileName;
+    }
+
+    public int getBENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY() {
+        return BENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY;
+    }
+
+    public int getBENCHMARK_TIMESERIES_METADATA_SIZE() {
+        return BENCHMARK_TIMESERIES_METADATA_SIZE;
+    }
+
+    public int getNUMBER_OF_BENCHMARK_METADATA_LISTS() {
+        return NUMBER_OF_BENCHMARK_METADATA_LISTS;
+    }
+
     /**
      * Downloads the benchmark records from the given server.
      *
