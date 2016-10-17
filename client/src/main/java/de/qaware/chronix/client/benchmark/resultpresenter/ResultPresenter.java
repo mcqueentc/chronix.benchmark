@@ -86,6 +86,7 @@ public class ResultPresenter {
     }
 
     public void doBenchmarkRecordsAnalysis(){
+        logger.info("Analyzing benchmark records ...");
         TsdbStatisticsAnalyzer tsdbStatisticsAnalyzer = new TsdbStatisticsAnalyzer(statisticsDirectory);
         List<TsdbStatistics> tsdbStatisticsList = tsdbStatisticsAnalyzer.analyzeBenchmarkRecords();
         if(tsdbStatisticsList != null && ! tsdbStatisticsList.isEmpty()) {
