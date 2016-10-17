@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
@@ -28,6 +29,14 @@ public class TsdbStatisticsAnalyzer {
         this.statisticsDirectory = statisticsDirectory;
         logger = LoggerFactory.getLogger(TsdbStatisticsAnalyzer.class);
         tsdbStatisticsFilename = "tsdb_analytics.json";
+    }
+
+    public String getStatisticsDirectory() {
+        return statisticsDirectory;
+    }
+
+    public String getTsdbStatisticsFilename() {
+        return tsdbStatisticsFilename;
     }
 
     public List<TsdbStatistics> analyzeBenchmarkRecords(){
@@ -91,7 +100,7 @@ public class TsdbStatisticsAnalyzer {
         return null;
     }
 
-    private void saveTsdbStatistics(List<TsdbStatistics> tsdbStatisticsList){
+    private synchronized void saveTsdbStatistics(List<TsdbStatistics> tsdbStatisticsList){
         File statsDirectory = new File(statisticsDirectory);
         File tsdbStatisticsFile = new File(statisticsDirectory + File.separator + tsdbStatisticsFilename);
 
@@ -109,6 +118,22 @@ public class TsdbStatisticsAnalyzer {
         } catch (Exception e){
             logger.error("Error saving tsdb statistics to json file");
         }
+    }
+
+    public synchronized List<TsdbStatistics> readTsdbStatistics(){
+        List<TsdbStatistics> tsdbStatisticsList = null;
+        File tsdbStatisticsFile = new File(statisticsDirectory + File.separator + tsdbStatisticsFilename);
+        if(tsdbStatisticsFile.exists()){
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                tsdbStatisticsList = mapper.readValue(tsdbStatisticsFile, new TypeReference<List<TsdbStatistics>>() {});
+
+            } catch (Exception e) {
+                logger.error("Error reading tsdb statistics file: {}",e.getLocalizedMessage());
+            }
+        }
+
+        return tsdbStatisticsList;
     }
 
     private class TsdbStatsAnalyzerRunner implements Callable<TsdbStatistics>{
