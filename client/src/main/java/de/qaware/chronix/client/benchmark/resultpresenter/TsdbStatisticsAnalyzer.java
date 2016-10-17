@@ -367,11 +367,11 @@ public class TsdbStatisticsAnalyzer {
                 queryFunctionStatistics.setMeanDiskWrite_inBytes(diskWritesSum / diskWrites.size());
                 Collections.sort(diskWrites);
                 queryFunctionStatistics.setMedianDiskWrite_inBytes(diskWrites.get(diskWrites.size() / 2));
-                queryFunctionStatistics.setTotalDiskWrite_inBytes(diskReadsSum);
+                queryFunctionStatistics.setTotalDiskWrite_inBytes(diskWritesSum);
             } else {
                 queryFunctionStatistics.setMeanDiskWrite_inBytes(diskWritesSum);
-                queryFunctionStatistics.setMedianDiskWrite_inBytes(diskReadsSum);
-                queryFunctionStatistics.setTotalDiskWrite_inBytes(diskReadsSum);
+                queryFunctionStatistics.setMedianDiskWrite_inBytes(diskWritesSum);
+                queryFunctionStatistics.setTotalDiskWrite_inBytes(diskWritesSum);
             }
 
             //disk read
