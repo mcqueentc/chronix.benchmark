@@ -39,11 +39,16 @@ public class TsdbStatisticsAnalyzer {
         return tsdbStatisticsFilename;
     }
 
-    public boolean tsdbStatisticsFileExists(){
+    boolean tsdbStatisticsFileExists(){
         File tsdbStatisticsFile = new File(statisticsDirectory + File.separator + tsdbStatisticsFilename);
         return tsdbStatisticsFile.exists();
     }
 
+    /**
+     * Analyzes the benchmark records download from the benchmark server.
+     *
+     * @return list of tsdb statistics
+     */
     public List<TsdbStatistics> analyzeBenchmarkRecords(){
         File recordFile = new File(BenchmarkRunner.getInstance().getRecordFileDirectory()
                 + File.separator

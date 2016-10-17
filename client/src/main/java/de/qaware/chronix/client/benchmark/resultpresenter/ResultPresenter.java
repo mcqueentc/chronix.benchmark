@@ -43,6 +43,9 @@ public class ResultPresenter {
         return statisticsDirectory;
     }
 
+    /**
+     * Analyzes all json time series saved at chronixBenchmark/timeseries_records
+     */
     public void analyzeTimeSeries(){
         File directory = new File(JsonTimeSeriesHandler.getInstance().getTimeSeriesJsonRecordDirectoryPath());
         File[] files = directory.listFiles();
@@ -65,6 +68,11 @@ public class ResultPresenter {
         }
     }
 
+    /**
+     * Analyzes json time series in given directory.
+     *
+     * @param timeSeriesDirectory the absolute directory path to the time series to analyse.
+     */
     public void analyzeTimeSeries(File timeSeriesDirectory){
         if(timeSeriesDirectory != null && timeSeriesDirectory.exists() && timeSeriesDirectory.isDirectory()) {
             List<File> measurements = new LinkedList<>();
@@ -85,6 +93,9 @@ public class ResultPresenter {
         }
     }
 
+    /**
+     * Analyzes and prints the benchmark records download from benchmark server.
+     */
     public void doBenchmarkRecordsAnalysis(){
         logger.info("Analyzing benchmark records ...");
         TsdbStatisticsAnalyzer tsdbStatisticsAnalyzer = new TsdbStatisticsAnalyzer(statisticsDirectory);
@@ -105,6 +116,9 @@ public class ResultPresenter {
         }
     }
 
+    /**
+     * Plots bar charts of the analyzed tsdb statistics to jpeg files to chronixBenchmark/statistics/bar_plots
+     */
     public void plotBenchmarkStatistics(){
         TsdbStatisticsAnalyzer tsdbStatisticsAnalyzer = new TsdbStatisticsAnalyzer(statisticsDirectory);
         if(! tsdbStatisticsAnalyzer.tsdbStatisticsFileExists()){
