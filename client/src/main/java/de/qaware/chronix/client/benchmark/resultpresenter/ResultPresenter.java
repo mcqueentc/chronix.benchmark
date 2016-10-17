@@ -2,6 +2,8 @@ package de.qaware.chronix.client.benchmark.resultpresenter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.resultpresenter.plot.StatisticsBarPlotter;
+import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,8 +109,16 @@ public class ResultPresenter {
         if(! tsdbStatisticsAnalyzer.tsdbStatisticsFileExists()){
             doBenchmarkRecordsAnalysis();
         }
+        // plot for queryfunctions.
+        List<String> queryFunctions = new ArrayList<>(QueryFunction.values().length);
+        for(QueryFunction function : QueryFunction.values()){
+            queryFunctions.add(function.toString());
+        }
         StatisticsBarPlotter statisticsBarPlotter = new StatisticsBarPlotter(statisticsDirectory);
-        statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions();
+        statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions(queryFunctions);
+
+        //plot for import only
+        statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions(Collections.singletonList("import"));
     }
 
 }
