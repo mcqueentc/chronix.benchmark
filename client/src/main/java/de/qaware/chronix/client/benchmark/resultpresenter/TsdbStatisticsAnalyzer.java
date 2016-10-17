@@ -278,6 +278,7 @@ public class TsdbStatisticsAnalyzer {
 
             queryFunctionStatistics = new QueryFunctionStatistics(queryfunction);
             //query time
+            queryFunctionStatistics.setTotalQueryTimePerQueryFunction_inMilliseconds(queryTimesSum);
             if(queryTimes.size() > 1) {
                 queryFunctionStatistics.setMeanQueryTime_inMilliseconds(queryTimesSum / queryTimes.size());
                 Collections.sort(queryTimes);

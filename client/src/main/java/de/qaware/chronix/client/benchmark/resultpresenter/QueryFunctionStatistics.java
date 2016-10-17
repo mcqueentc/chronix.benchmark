@@ -12,6 +12,7 @@ public class QueryFunctionStatistics {
 
     private long meanQueryTime_inMilliseconds;
     private long medianQueryTime_inMilliseconds;
+    private long totalQueryTimePerQueryFunction_inMilliseconds;
 
     private double meanTotalCpuUsagePerQuery_inPercent;
     private double medianTotalCpuUsagePerQuery_inPercent;
@@ -273,5 +274,13 @@ public class QueryFunctionStatistics {
 
     public void setMedianLatency_inMilliseconds(long medianLatency_inMilliseconds) {
         this.medianLatency_inMilliseconds = medianLatency_inMilliseconds;
+    }
+
+    public long getTotalQueryTimePerQueryFunction_inMilliseconds() {
+        return totalQueryTimePerQueryFunction_inMilliseconds;
+    }
+
+    public void setTotalQueryTimePerQueryFunction_inMilliseconds(long totalQueryTimePerQueryFunction_inMilliseconds) {
+        this.totalQueryTimePerQueryFunction_inMilliseconds = totalQueryTimePerQueryFunction_inMilliseconds;
     }
 }
