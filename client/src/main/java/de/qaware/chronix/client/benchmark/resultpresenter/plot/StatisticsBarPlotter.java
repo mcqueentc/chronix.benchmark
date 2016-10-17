@@ -41,36 +41,43 @@ public class StatisticsBarPlotter {
         }
     }
 
-    public void plotTsdbStatisticsForQueryFunctions(){
-        Map<String, List<PlotData>> plotDataPerMeasurement = new HashMap<>();
-        plotDataPerMeasurement.put("mean query time", new LinkedList<>());
-        plotDataPerMeasurement.put("median query time", new LinkedList<>());
+    public void plotTsdbStatisticsForQueryFunctions(List<String> includeQueryFunctions){
+        if(includeQueryFunctions != null && !includeQueryFunctions.isEmpty()) {
+            Map<String, List<PlotData>> plotDataPerMeasurement = new HashMap<>();
+            plotDataPerMeasurement.put("mean query time", new LinkedList<>());
+            plotDataPerMeasurement.put("median query time", new LinkedList<>());
 
-        // build up data for plotting
-        for(TsdbStatistics tsdbStatistics : tsdbStatisticsList){
-            for(QueryFunctionStatistics queryFunctionStatistics : tsdbStatistics.getQueryFunctionStatisticsList()){
-                if(! queryFunctionStatistics.getQueryFunction().equals("import")) {
-                    plotDataPerMeasurement.get("mean query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanQueryTime_inMilliseconds(), "ms"));
-                    plotDataPerMeasurement.get("median query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianQueryTime_inMilliseconds(), "ms"));
+            // build up data for plotting
+            for (TsdbStatistics tsdbStatistics : tsdbStatisticsList) {
+                for (QueryFunctionStatistics queryFunctionStatistics : tsdbStatistics.getQueryFunctionStatisticsList()) {
+                    if (includeQueryFunctions.contains(queryFunctionStatistics.getQueryFunction())) {
+                        plotDataPerMeasurement.get("mean query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanQueryTime_inMilliseconds(), "ms"));
+                        plotDataPerMeasurement.get("median query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianQueryTime_inMilliseconds(), "ms"));
+                    }
                 }
             }
-        }
 
-        //plot the data per measurement
-        for(Map.Entry<String, List<PlotData>> entry : plotDataPerMeasurement.entrySet()){
-            plotTsdbStatisticsForMeasurement(entry.getKey(), "query function", entry.getValue().get(0).getUnit(), entry.getValue());
-        }
+            //plot the data per measurement
+            for (Map.Entry<String, List<PlotData>> entry : plotDataPerMeasurement.entrySet()) {
+                plotTsdbStatisticsForMeasurement(entry.getKey(), "query function", entry.getValue().get(0).getUnit(), entry.getValue());
+            }
 
-        logger.info("Done!");
+            logger.info("Done!");
+        } else {
+            logger.error("No query functions given to include in bar plots");
+        }
 
     }
 
     private void plotTsdbStatisticsForMeasurement(String measurement, String xAxisName, String yAxisName, List<PlotData> plotDataList){
         if(plotDataList != null && ! plotDataList.isEmpty()){
             // Prepare the data set /* barDataset.setValue(26, "Chronix", "count"); */
+            List<String> functionNames = new LinkedList<>();
             DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
             for(PlotData data : plotDataList){
                 barDataset.setValue(data.getValue(), data.getTsdbName(), data.getQueryFunction());
+                if( ! functionNames.contains(data.getQueryFunction()))
+                functionNames.add(data.getQueryFunction());
             }
 
             //Create the chart
@@ -87,7 +94,8 @@ public class StatisticsBarPlotter {
 
             //save to file
             try {
-                String fileName = measurement.replaceAll(" ", "_") + ".jpg";
+                String functions = String.join("_", functionNames);
+                String fileName = measurement.replaceAll(" ", "_") + "_" + functions +  "_.jpg";
                 ChartUtilities.saveChartAsJPEG(
                         new File(statisticsBarPlotDirectory + File.separator + fileName),
                         chart,
