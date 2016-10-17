@@ -1,21 +1,13 @@
 package de.qaware.chronix.client.benchmark.resultpresenter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
-import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.client.benchmark.resultpresenter.plot.StatisticsBarPlotter;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Created by mcqueen666 on 20.06.16.
@@ -110,5 +102,13 @@ public class ResultPresenter {
         }
     }
 
+    public void plotBenchmarkStatistics(){
+        TsdbStatisticsAnalyzer tsdbStatisticsAnalyzer = new TsdbStatisticsAnalyzer(statisticsDirectory);
+        if(! tsdbStatisticsAnalyzer.tsdbStatisticsFileExists()){
+            doBenchmarkRecordsAnalysis();
+        }
+        StatisticsBarPlotter statisticsBarPlotter = new StatisticsBarPlotter(statisticsDirectory);
+        statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions();
+    }
 
 }
