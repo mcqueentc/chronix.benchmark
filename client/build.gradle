@@ -24,6 +24,9 @@ dependencies {
     // http://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.21'
 
+    // https://mvnrepository.com/artifact/org.jfree/jfreechart
+    compile group: 'org.jfree', name: 'jfreechart', version: '1.0.19'
+
 
     compile project(':shared')
     compile project(':DatabaseInterface')
