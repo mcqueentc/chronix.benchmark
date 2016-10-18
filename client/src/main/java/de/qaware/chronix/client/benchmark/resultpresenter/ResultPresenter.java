@@ -125,12 +125,22 @@ public class ResultPresenter {
             doBenchmarkRecordsAnalysis();
         }
         // plot for queryfunctions.
-        List<String> queryFunctions = new ArrayList<>(QueryFunction.values().length);
+        List<String> queryFunctions = new ArrayList<>(QueryFunction.values().length-1);
         for(QueryFunction function : QueryFunction.values()){
-            queryFunctions.add(function.toString());
+            if(function != QueryFunction.QUERY_ONLY) {
+                queryFunctions.add(function.toString());
+            }
         }
+
         StatisticsBarPlotter statisticsBarPlotter = new StatisticsBarPlotter(statisticsDirectory);
+        //plot the aggregation functions
         statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions(queryFunctions);
+
+        //plot range query
+        queryFunctions.clear();
+        queryFunctions.add(QueryFunction.QUERY_ONLY.toString());
+        statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions(queryFunctions);
+
 
         //plot for import only
         statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions(Collections.singletonList("import"));

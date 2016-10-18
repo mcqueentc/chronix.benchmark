@@ -1,8 +1,11 @@
 package de.qaware.chronix.client.benchmark.resultpresenter.plot;
 
+import de.qaware.chronix.client.benchmark.BenchmarkImport;
+import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.client.benchmark.resultpresenter.QueryFunctionStatistics;
 import de.qaware.chronix.client.benchmark.resultpresenter.TsdbStatistics;
 import de.qaware.chronix.client.benchmark.resultpresenter.TsdbStatisticsAnalyzer;
+import de.qaware.chronix.database.BenchmarkDataSource;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -142,8 +145,20 @@ public class StatisticsBarPlotter {
             }
 
             //plot the data per measurement
+            BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
+            int normalTsQuerySize = benchmarkRunner.getBENCHMARK_TIMESERIES_METADATA_SIZE();
+            int rangeQueryTsSize = benchmarkRunner.getBENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY();
+            String importBatchSize = BenchmarkImport.readBatchSize();
             for (Map.Entry<String, List<PlotData>> entry : plotDataPerMeasurement.entrySet()) {
-                plotTsdbStatisticsForMeasurement(entry.getKey(), "query function", entry.getValue().get(0).getUnit(), entry.getValue());
+                if(includeQueryFunctions.size() == 1 && includeQueryFunctions.get(0).equals("import")){
+                    plotTsdbStatisticsForMeasurement(entry.getKey(), "query [TS count = " + importBatchSize + "]", entry.getValue().get(0).getUnit(), entry.getValue());
+
+                } else if(includeQueryFunctions.size() == 1 && includeQueryFunctions.get(0).equals(BenchmarkDataSource.QueryFunction.QUERY_ONLY.toString())){
+                    plotTsdbStatisticsForMeasurement(entry.getKey(), "query [TS count = " + rangeQueryTsSize + "]", entry.getValue().get(0).getUnit(), entry.getValue());
+
+                } else {
+                    plotTsdbStatisticsForMeasurement(entry.getKey(), "query [TS count = " + normalTsQuerySize + "]", entry.getValue().get(0).getUnit(), entry.getValue());
+                }
             }
 
             logger.info("Plots for " + String.join(",", includeQueryFunctions) + " done.");
