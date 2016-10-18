@@ -8,6 +8,10 @@ import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -84,6 +88,7 @@ public class BenchmarkImport {
         }
 
         try {
+            saveBatchSize(batchSize);
             BenchmarkRunner benchmarkRunner = BenchmarkRunner.getInstance();
             for (File directory : importDirectories) {
                 JsonTimeSeriesHandler.getInstance().deleteTimeSeriesMetaDataJsonFile(directory.getName());
@@ -103,6 +108,29 @@ public class BenchmarkImport {
         System.out.println("Import usage:   import [server] [batchSize] [fromFile] -t [tsdbName1] -t [tsdbName2] ... -d [directoryToImport1] -d [directoryToImport2] ...");
         System.out.println("Example:        import localhost 25 0 -t someTsdb -d /home/someUser/chronixBenchmark/timeseries_records/someFolder");
         System.out.println("NOTICE: paths have to be absolute paths!");
+    }
+
+    private static void saveBatchSize(int batchSize){
+        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
+        File batchSizeFile = new File(serverConfigAccessor.getConfigDirectory() + "import_batchSize");
+        String[] size = {String.valueOf(batchSize)};
+        try {
+            Files.write(batchSizeFile.toPath(), Arrays.asList(size), StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            System.err.println("Error saving file for batch size.");
+        }
+    }
+
+    public static String readBatchSize(){
+        String batchSize = "";
+        ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
+        File batchSizeFile = new File(serverConfigAccessor.getConfigDirectory() + "import_batchSize");
+        try {
+            batchSize = new String(Files.readAllBytes(batchSizeFile.toPath()));
+        } catch (IOException e) {
+            System.err.println("Error reading file for batch size.");
+        }
+        return batchSize;
     }
 
 }
