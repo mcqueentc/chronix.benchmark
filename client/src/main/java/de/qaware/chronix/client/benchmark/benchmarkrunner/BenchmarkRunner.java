@@ -182,7 +182,7 @@ public class BenchmarkRunner {
             for(String result : results){
                 resultList.add(result);
             }
-            resultList.add("\n");
+            //resultList.add("\n");
             Collections.addAll(resultList, results);
 
         }
