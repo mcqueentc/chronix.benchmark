@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.*;
@@ -62,6 +61,10 @@ public class TimeSeriesAnalyzer {
         List<Double> maximumValuePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> meanValuePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> measurementDurationPerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(allFiles.size());
+
 
         // start the threads
         Future<Long> futureFileSize = executorService.submit(new FileSizeCalculator(allFiles));
@@ -88,6 +91,10 @@ public class TimeSeriesAnalyzer {
                 maximumValuePerTimeSeries.addAll(analyticsMap.get("maximumValuePerTimeSeries"));
                 meanValuePerTimeSeries.addAll(analyticsMap.get("meanValuePerTimeSeries"));
                 sampleCovarianceValuePerTimeSeries.addAll(analyticsMap.get("sampleCovarianceValuePerTimeSeries"));
+                meanValueChangeRatePerTimeSeries.addAll(analyticsMap.get("meanValueChangeRatePerTimeSeries"));
+                measurementDurationPerTimeSeries.addAll(analyticsMap.get("measurementDurationPerTimeSeries"));
+                meanSamplingIntervalPerTimeSeries.addAll(analyticsMap.get("meanSamplingIntervalPerTimeSeries"));
+
             }
 
             executorService.shutdown();
@@ -137,6 +144,29 @@ public class TimeSeriesAnalyzer {
             }
             double medianSampleCovarianceOfAllTimeSeries = sampleCovarianceValuePerTimeSeries.get(sampleCovarianceValuePerTimeSeries.size() / 2);
 
+            double meanValueChangeRateOfAllTimeseries = 0d;
+            for(Double changeRate : meanValueChangeRatePerTimeSeries){
+                meanValueChangeRateOfAllTimeseries += changeRate;
+            }
+            if(meanValueChangeRatePerTimeSeries.size() > 0){
+                meanValueChangeRateOfAllTimeseries /= meanValueChangeRatePerTimeSeries.size();
+            }
+
+            double meanMeasurementDurationOfAllTimeSeries = 0d;
+            for(Double duration : measurementDurationPerTimeSeries){
+                meanMeasurementDurationOfAllTimeSeries += duration;
+            }
+            if(measurementDurationPerTimeSeries.size() > 0){
+                meanMeasurementDurationOfAllTimeSeries /= measurementDurationPerTimeSeries.size();
+            }
+
+            double meanSamplingIntervalOfAllTimeSeries = 0d;
+            for(Double interval : meanSamplingIntervalPerTimeSeries){
+                meanSamplingIntervalOfAllTimeSeries += interval;
+            }
+            if(meanSamplingIntervalPerTimeSeries.size() > 0){
+                meanSamplingIntervalOfAllTimeSeries /= meanSamplingIntervalPerTimeSeries.size();
+            }
 
             //set data set stats
             timeSeriesStatistics.setDate(Instant.now().toString());
@@ -152,10 +182,13 @@ public class TimeSeriesAnalyzer {
             //set value set stats
             timeSeriesStatistics.setMinValueOfAllTimeSeries(minValueOfAllTimeSeries);
             timeSeriesStatistics.setMaxValueOfAllTimeSeries(maxValueOfAllTimeSeries);
-            timeSeriesStatistics.setMeanValueofAllTimeSeries(meanValueofAllTimeSeries);
+            timeSeriesStatistics.setMeanValueOfAllTimeSeries(meanValueofAllTimeSeries);
             timeSeriesStatistics.setMedianOfAllMeanValues(medianOfAllMeanValues);
             timeSeriesStatistics.setMeanSampleCovarianceOfAllTimeSeries(meanSampleCovarianceOfAllTimeSeries);
             timeSeriesStatistics.setMedianSampleCovarianceOfAllTimeSeries(medianSampleCovarianceOfAllTimeSeries);
+            timeSeriesStatistics.setMeanValueChangeRateOfAllTimeSeries(meanValueChangeRateOfAllTimeseries);
+            timeSeriesStatistics.setMeanMeasurementDurationOfAllTimeSeries_inSeconds(meanMeasurementDurationOfAllTimeSeries);
+            timeSeriesStatistics.setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(meanSamplingIntervalOfAllTimeSeries);
 
             // write to file
             writeStatsJson(timeSeriesStatistics);
@@ -210,6 +243,9 @@ public class TimeSeriesAnalyzer {
             List<Double> maximumValuePerTimeSeries = new ArrayList<>(files.size());
             List<Double> meanValuePerTimeSeries = new ArrayList<>(files.size());
             List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(files.size());
+            List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(files.size());
+            List<Double> measurementDurationPerTimeSeries = new ArrayList<>(files.size());
+            List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(files.size());
 
             List<TimeSeries> timeSeries;
             int from = 0;
@@ -225,6 +261,9 @@ public class TimeSeriesAnalyzer {
                 maximumValuePerTimeSeries.addAll(valueAnalytics.get("maximumValuePerTimeSeries"));
                 meanValuePerTimeSeries.addAll(valueAnalytics.get("meanValuePerTimeSeries"));
                 sampleCovarianceValuePerTimeSeries.addAll(valueAnalytics.get("sampleCovarianceValuePerTimeSeries"));
+                meanValueChangeRatePerTimeSeries.addAll(valueAnalytics.get("meanValueChangeRatePerTimeSeries"));
+                measurementDurationPerTimeSeries.addAll(valueAnalytics.get("measurementDurationPerTimeSeries"));
+                meanSamplingIntervalPerTimeSeries.addAll(valueAnalytics.get("meanSamplingIntervalPerTimeSeries"));
 
             }
             timeSeries = JsonTimeSeriesHandler.getInstance().readTimeSeriesJson(files.subList(from, files.size()).toArray(new File[]{}));
@@ -235,6 +274,9 @@ public class TimeSeriesAnalyzer {
             valueAnalytics.get("maximumValuePerTimeSeries").addAll(maximumValuePerTimeSeries);
             valueAnalytics.get("meanValuePerTimeSeries").addAll(meanValuePerTimeSeries);
             valueAnalytics.get("sampleCovarianceValuePerTimeSeries").addAll(sampleCovarianceValuePerTimeSeries);
+            valueAnalytics.get("meanValueChangeRatePerTimeSeries").addAll(meanValueChangeRatePerTimeSeries);
+            valueAnalytics.get("measurementDurationPerTimeSeries").addAll(measurementDurationPerTimeSeries);
+            valueAnalytics.get("meanSamplingIntervalPerTimeSeries").addAll(meanSamplingIntervalPerTimeSeries);
 
             logger.info("Thread {} finished.", id);
             return valueAnalytics;
@@ -247,6 +289,9 @@ public class TimeSeriesAnalyzer {
             List<Double> maximumValuePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> meanValuePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> measurementDurationPerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(timeSeries.size());
             for(TimeSeries ts : timeSeries){
                 pointsPerTimeSeries.add((double)ts.getPoints().size());
 
@@ -279,10 +324,27 @@ public class TimeSeriesAnalyzer {
                     mean = sum / ts.getPoints().size();
                 }
                 double sum_for_sample_covariance = 0d;
+                double lastChangedValue = ts.getPoints().get(0).getValue();
+                double changeCounter = 0d;
+                double sum_for_sampling_interval = 0d;
+                long previousTimeStamp = ts.getPoints().get(0).getTimeStamp();
                 try {
                     for (TimeSeriesPoint point : ts.getPoints()) {
                         if (!point.getValue().isNaN()) {
                             sum_for_sample_covariance += Math.pow((point.getValue() - mean),2);
+
+                            // calc meanValueChangeRatePerTimeSeries (count if value changes)
+                            if(point.getValue().compareTo(lastChangedValue) != 0){
+                                changeCounter++;
+                                lastChangedValue = point.getValue();
+                            }
+
+                            //calc sampling interval (points are sorted)
+                            if(point.getTimeStamp() != previousTimeStamp){
+                                sum_for_sampling_interval += (point.getTimeStamp() - previousTimeStamp);
+                                previousTimeStamp = point.getTimeStamp();
+                            }
+
                         }
                     }
                 } catch (Exception e){
@@ -296,6 +358,24 @@ public class TimeSeriesAnalyzer {
                 meanValuePerTimeSeries.add(mean);
                 sampleCovarianceValuePerTimeSeries.add(sample_covariance);
 
+                // calc meanValueChangeRatePerTimeSeries
+                if(changeCounter != 0d){
+                    meanValueChangeRatePerTimeSeries.add(ts.getPoints().size() / changeCounter);
+                } else {
+                    meanValueChangeRatePerTimeSeries.add(changeCounter);
+                }
+
+                // measurementDurationPerTimeSeries
+                measurementDurationPerTimeSeries.add((double)(ts.getEnd() - ts.getStart()));
+
+                // meanSamplingIntervalPerTimeSeries (point.size() - 1 comparisons)
+                meanSamplingIntervalPerTimeSeries.add(sum_for_sampling_interval / ts.getPoints().size() - 1);
+                /*
+            List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(timeSeries.size());
+
+            valueAnalytics.get("meanSamplingIntervalPerTimeSeries").addAll(meanSamplingIntervalPerTimeSeries);
+                 */
+
 
             }
 
@@ -305,6 +385,9 @@ public class TimeSeriesAnalyzer {
             valueAnalytics.put("maximumValuePerTimeSeries", maximumValuePerTimeSeries);
             valueAnalytics.put("meanValuePerTimeSeries", meanValuePerTimeSeries);
             valueAnalytics.put("sampleCovarianceValuePerTimeSeries", sampleCovarianceValuePerTimeSeries);
+            valueAnalytics.put("meanValueChangeRatePerTimeSeries", meanValueChangeRatePerTimeSeries);
+            valueAnalytics.put("measurementDurationPerTimeSeries", measurementDurationPerTimeSeries);
+            valueAnalytics.put("meanSamplingIntervalPerTimeSeries", meanSamplingIntervalPerTimeSeries);
 
             return valueAnalytics;
         }
