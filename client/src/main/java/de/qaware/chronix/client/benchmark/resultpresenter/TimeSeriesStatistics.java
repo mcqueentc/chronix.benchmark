@@ -23,10 +23,13 @@ public class TimeSeriesStatistics {
     // data value stats
     private double minValueOfAllTimeSeries;
     private double maxValueOfAllTimeSeries;
-    private double meanValueofAllTimeSeries;
+    private double meanValueOfAllTimeSeries;
     private double medianOfAllMeanValues;
     private double meanSampleCovarianceOfAllTimeSeries;
     private double medianSampleCovarianceOfAllTimeSeries;
+    private double meanValueChangeRateOfAllTimeSeries;
+    private double meanMeasurementDurationOfAllTimeSeries_inSeconds;
+    private double meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
 
 
     public TimeSeriesStatistics(){
@@ -121,12 +124,12 @@ public class TimeSeriesStatistics {
         this.maxValueOfAllTimeSeries = maxValueOfAllTimeSeries;
     }
 
-    public double getMeanValueofAllTimeSeries() {
-        return meanValueofAllTimeSeries;
+    public double getMeanValueOfAllTimeSeries() {
+        return meanValueOfAllTimeSeries;
     }
 
-    public void setMeanValueofAllTimeSeries(double meanValueofAllTimeSeries) {
-        this.meanValueofAllTimeSeries = meanValueofAllTimeSeries;
+    public void setMeanValueOfAllTimeSeries(double meanValueOfAllTimeSeries) {
+        this.meanValueOfAllTimeSeries = meanValueOfAllTimeSeries;
     }
 
     public double getMedianOfAllMeanValues() {
@@ -151,5 +154,29 @@ public class TimeSeriesStatistics {
 
     public void setMedianSampleCovarianceOfAllTimeSeries(double medianSampleCovarianceOfAllTimeSeries) {
         this.medianSampleCovarianceOfAllTimeSeries = medianSampleCovarianceOfAllTimeSeries;
+    }
+
+    public double getMeanValueChangeRateOfAllTimeSeries() {
+        return meanValueChangeRateOfAllTimeSeries;
+    }
+
+    public void setMeanValueChangeRateOfAllTimeSeries(double meanValueChangeRateOfAllTimeSeries) {
+        this.meanValueChangeRateOfAllTimeSeries = meanValueChangeRateOfAllTimeSeries;
+    }
+
+    public double getMeanMeasurementDurationOfAllTimeSeries_inSeconds() {
+        return meanMeasurementDurationOfAllTimeSeries_inSeconds;
+    }
+
+    public void setMeanMeasurementDurationOfAllTimeSeries_inSeconds(double meanMeasurementDurationOfAllTimeSeries_inSeconds) {
+        this.meanMeasurementDurationOfAllTimeSeries_inSeconds = meanMeasurementDurationOfAllTimeSeries_inSeconds;
+    }
+
+    public double getMeanSamplingIntervalOfAllTimeSeries_inMilliseconds() {
+        return meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
+    }
+
+    public void setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(double meanSamplingIntervalOfAllTimeSeries_inMilliseconds) {
+        this.meanSamplingIntervalOfAllTimeSeries_inMilliseconds = meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
     }
 }
