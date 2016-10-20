@@ -25,11 +25,11 @@ public class TimeSeriesStatistics {
     private double maxValueOfAllTimeSeries;
     private double meanValueOfAllTimeSeries;
     private double medianOfAllMeanValues;
-    private double meanSampleCovarianceOfAllTimeSeries;
-    private double medianSampleCovarianceOfAllTimeSeries;
-    private double meanValueChangeRateOfAllTimeSeries;
-    private double meanMeasurementDurationOfAllTimeSeries_inSeconds;
-    private double meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
+    private long meanSampleStandardDeviationOfAllTimeSeries;
+    private long medianSampleStandardDeviationOfAllTimeSeries;
+    private long meanValueChangeRateOfAllTimeSeries;
+    private long meanMeasurementDurationOfAllTimeSeries_inSeconds;
+    private long meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
 
 
     public TimeSeriesStatistics(){
@@ -140,43 +140,43 @@ public class TimeSeriesStatistics {
         this.medianOfAllMeanValues = medianOfAllMeanValues;
     }
 
-    public double getMeanSampleCovarianceOfAllTimeSeries() {
-        return meanSampleCovarianceOfAllTimeSeries;
+    public long getMeanSampleStandardDeviationOfAllTimeSeries() {
+        return meanSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public void setMeanSampleCovarianceOfAllTimeSeries(double meanSampleCovarianceOfAllTimeSeries) {
-        this.meanSampleCovarianceOfAllTimeSeries = meanSampleCovarianceOfAllTimeSeries;
+    public void setMeanSampleStandardDeviationOfAllTimeSeries(long meanSampleStandardDeviationOfAllTimeSeries) {
+        this.meanSampleStandardDeviationOfAllTimeSeries = meanSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public double getMedianSampleCovarianceOfAllTimeSeries() {
-        return medianSampleCovarianceOfAllTimeSeries;
+    public long getMedianSampleStandardDeviationOfAllTimeSeries() {
+        return medianSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public void setMedianSampleCovarianceOfAllTimeSeries(double medianSampleCovarianceOfAllTimeSeries) {
-        this.medianSampleCovarianceOfAllTimeSeries = medianSampleCovarianceOfAllTimeSeries;
+    public void setMedianSampleStandardDeviationOfAllTimeSeries(long medianSampleStandardDeviationOfAllTimeSeries) {
+        this.medianSampleStandardDeviationOfAllTimeSeries = medianSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public double getMeanValueChangeRateOfAllTimeSeries() {
+    public long getMeanValueChangeRateOfAllTimeSeries() {
         return meanValueChangeRateOfAllTimeSeries;
     }
 
-    public void setMeanValueChangeRateOfAllTimeSeries(double meanValueChangeRateOfAllTimeSeries) {
+    public void setMeanValueChangeRateOfAllTimeSeries(long meanValueChangeRateOfAllTimeSeries) {
         this.meanValueChangeRateOfAllTimeSeries = meanValueChangeRateOfAllTimeSeries;
     }
 
-    public double getMeanMeasurementDurationOfAllTimeSeries_inSeconds() {
+    public long getMeanMeasurementDurationOfAllTimeSeries_inSeconds() {
         return meanMeasurementDurationOfAllTimeSeries_inSeconds;
     }
 
-    public void setMeanMeasurementDurationOfAllTimeSeries_inSeconds(double meanMeasurementDurationOfAllTimeSeries_inSeconds) {
+    public void setMeanMeasurementDurationOfAllTimeSeries_inSeconds(long meanMeasurementDurationOfAllTimeSeries_inSeconds) {
         this.meanMeasurementDurationOfAllTimeSeries_inSeconds = meanMeasurementDurationOfAllTimeSeries_inSeconds;
     }
 
-    public double getMeanSamplingIntervalOfAllTimeSeries_inMilliseconds() {
+    public long getMeanSamplingIntervalOfAllTimeSeries_inMilliseconds() {
         return meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
     }
 
-    public void setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(double meanSamplingIntervalOfAllTimeSeries_inMilliseconds) {
+    public void setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(long meanSamplingIntervalOfAllTimeSeries_inMilliseconds) {
         this.meanSamplingIntervalOfAllTimeSeries_inMilliseconds = meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
     }
 }

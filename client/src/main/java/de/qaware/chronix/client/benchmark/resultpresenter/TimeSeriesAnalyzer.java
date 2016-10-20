@@ -184,11 +184,11 @@ public class TimeSeriesAnalyzer {
             timeSeriesStatistics.setMaxValueOfAllTimeSeries(maxValueOfAllTimeSeries);
             timeSeriesStatistics.setMeanValueOfAllTimeSeries(meanValueofAllTimeSeries);
             timeSeriesStatistics.setMedianOfAllMeanValues(medianOfAllMeanValues);
-            timeSeriesStatistics.setMeanSampleCovarianceOfAllTimeSeries(meanSampleCovarianceOfAllTimeSeries);
-            timeSeriesStatistics.setMedianSampleCovarianceOfAllTimeSeries(medianSampleCovarianceOfAllTimeSeries);
-            timeSeriesStatistics.setMeanValueChangeRateOfAllTimeSeries(meanValueChangeRateOfAllTimeseries);
-            timeSeriesStatistics.setMeanMeasurementDurationOfAllTimeSeries_inSeconds(meanMeasurementDurationOfAllTimeSeries);
-            timeSeriesStatistics.setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(meanSamplingIntervalOfAllTimeSeries);
+            timeSeriesStatistics.setMeanSampleStandardDeviationOfAllTimeSeries((long)(Math.sqrt(meanSampleCovarianceOfAllTimeSeries)));
+            timeSeriesStatistics.setMedianSampleStandardDeviationOfAllTimeSeries((long)(Math.sqrt(medianSampleCovarianceOfAllTimeSeries)));
+            timeSeriesStatistics.setMeanValueChangeRateOfAllTimeSeries((long)meanValueChangeRateOfAllTimeseries);
+            timeSeriesStatistics.setMeanMeasurementDurationOfAllTimeSeries_inSeconds((long)(meanMeasurementDurationOfAllTimeSeries / 1000));
+            timeSeriesStatistics.setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds((long)meanSamplingIntervalOfAllTimeSeries);
 
             // write to file
             writeStatsJson(timeSeriesStatistics);
@@ -325,7 +325,7 @@ public class TimeSeriesAnalyzer {
                 }
                 double sum_for_sample_covariance = 0d;
                 double lastChangedValue = ts.getPoints().get(0).getValue();
-                double changeCounter = 0d;
+                double changeCounter = 0L;
                 double sum_for_sampling_interval = 0d;
                 long previousTimeStamp = ts.getPoints().get(0).getTimeStamp();
                 try {
