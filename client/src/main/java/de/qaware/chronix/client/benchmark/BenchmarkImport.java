@@ -1,7 +1,10 @@
 package de.qaware.chronix.client.benchmark;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.database.BenchmarkDataSource;
+import de.qaware.chronix.shared.DataModels.BenchmarkSetupVariables;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
 import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
@@ -110,13 +113,20 @@ public class BenchmarkImport {
         System.out.println("NOTICE: paths have to be absolute paths!");
     }
 
-    private static void saveBatchSize(int batchSize){
+    private static synchronized void saveBatchSize(int batchSize){
         ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
-        File batchSizeFile = new File(serverConfigAccessor.getConfigDirectory() + "import_batchSize");
-        String[] size = {String.valueOf(batchSize)};
+        ObjectMapper mapper = new ObjectMapper();
+        File setupFile = new File(serverConfigAccessor.getConfigDirectory() + "benchmark_setup.json");
+
         try {
-            Files.write(batchSizeFile.toPath(), Arrays.asList(size), StandardOpenOption.CREATE);
-        } catch (IOException e) {
+            BenchmarkSetupVariables benchmarkSetupVariables = new BenchmarkSetupVariables();
+            if(setupFile.exists()){
+                benchmarkSetupVariables = mapper.readValue(setupFile, new TypeReference<BenchmarkSetupVariables>(){});
+            }
+            benchmarkSetupVariables.setImportTimeSeriesBatchSize(batchSize);
+
+            mapper.writerWithDefaultPrettyPrinter().writeValue(setupFile, benchmarkSetupVariables);
+        } catch (Exception e) {
             System.err.println("Error saving file for batch size.");
         }
     }
@@ -124,10 +134,14 @@ public class BenchmarkImport {
     public static String readBatchSize(){
         String batchSize = "";
         ServerConfigAccessor serverConfigAccessor = ServerConfigAccessor.getInstance();
-        File batchSizeFile = new File(serverConfigAccessor.getConfigDirectory() + "import_batchSize");
+        ObjectMapper mapper = new ObjectMapper();
+        File setupFile = new File(serverConfigAccessor.getConfigDirectory() + "benchmark_setup.json");
         try {
-            batchSize = new String(Files.readAllBytes(batchSizeFile.toPath()));
-        } catch (IOException e) {
+            if(setupFile.exists()){
+                BenchmarkSetupVariables benchmarkSetupVariables = mapper.readValue(setupFile, new TypeReference<BenchmarkSetupVariables>(){});
+                batchSize = String.valueOf(benchmarkSetupVariables.getImportTimeSeriesBatchSize());
+            }
+        } catch (Exception e) {
             System.err.println("Error reading file for batch size.");
         }
         return batchSize;

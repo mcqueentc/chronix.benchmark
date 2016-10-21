@@ -2,10 +2,12 @@ package de.qaware.chronix.client.benchmark.benchmarkrunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import de.qaware.chronix.client.benchmark.BenchmarkDataSetGenerator;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
+import de.qaware.chronix.shared.DataModels.BenchmarkSetupVariables;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
@@ -47,9 +49,9 @@ public class BenchmarkRunner {
             + File.separator
             + "downloaded_benchmark_records";
     private final String recordFileName = "benchmarkRecords.json";
-    private final int BENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY = 50;
-    private final int BENCHMARK_TIMESERIES_METADATA_SIZE = 400;
-    private final int NUMBER_OF_BENCHMARK_METADATA_LISTS = 1600;
+    private int BENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY;
+    private int BENCHMARK_TIMESERIES_METADATA_SIZE;
+    private int NUMBER_OF_BENCHMARK_METADATA_LISTS;
     private BenchmarkRunnerHelper benchmarkRunnerHelper;
     private QueryHandler queryHandler;
     private JsonTimeSeriesHandler jsonTimeSeriesHandler;
@@ -63,6 +65,10 @@ public class BenchmarkRunner {
         if(!recordFileDirecotry.exists()){
             recordFileDirecotry.mkdirs();
         }
+        BenchmarkSetupVariables benchmarkSetupVariables = BenchmarkDataSetGenerator.readBenchmarkSetupVariables();
+        this.BENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY = benchmarkSetupVariables.getBENCHMARK_TIMESERIES_METADATA_SIZE_QUERY_ONLY();
+        this.BENCHMARK_TIMESERIES_METADATA_SIZE = benchmarkSetupVariables.getBENCHMARK_TIMESERIES_METADATA_SIZE();
+        this.NUMBER_OF_BENCHMARK_METADATA_LISTS = benchmarkSetupVariables.getNUMBER_OF_BENCHMARK_METADATA_LISTS();
 
     }
 
@@ -203,11 +209,6 @@ public class BenchmarkRunner {
      */
     public void doBenchmarkQuery(String server, List<String> tsdbQueryList){
         if(server != null && tsdbQueryList != null && ! tsdbQueryList.isEmpty()){
-            // should there be no benchmark meta data, generate it.
-            if(! jsonTimeSeriesHandler.benchmarkMetaDataExists()){
-                logger.info("Benchmark data does not exist -> generating ... ");
-                generateBenchmarkTimeSeriesMetaDataLists(NUMBER_OF_BENCHMARK_METADATA_LISTS, BENCHMARK_TIMESERIES_METADATA_SIZE);
-            }
 
             int listFunctionRatio = (NUMBER_OF_BENCHMARK_METADATA_LISTS / QueryFunction.values().length);
             int queryFunctionNumber = 0;
@@ -272,16 +273,6 @@ public class BenchmarkRunner {
             }
         }
         return resultList;
-    }
-
-    private void generateBenchmarkTimeSeriesMetaDataLists(int numberOfLists, int listSize){
-        if(numberOfLists > 0 && listSize > 0){
-            TimeSeriesCounter timeSeriesCounter = TimeSeriesCounter.getInstance();
-            for(int i = 0; i < numberOfLists; i++){
-                List<TimeSeriesMetaData> metaDataList = timeSeriesCounter.getRandomTimeSeriesMetaData(listSize);
-                jsonTimeSeriesHandler.writeBenchmarkTimeSeriesMetaDataJson(metaDataList, i);
-            }
-        }
     }
 
 
