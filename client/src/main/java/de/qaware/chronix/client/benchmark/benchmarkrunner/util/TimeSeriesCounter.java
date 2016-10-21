@@ -111,7 +111,10 @@ public class TimeSeriesCounter {
         List<TimeSeriesMetaData> metaDataList = new ArrayList<>(size);
         if(!timeSeriesMetaDataList.isEmpty()){
             Random random = new Random();
+            int maxRetryCount = 10000;
+            int retryCount = 0;
             for(int i = 0; i < size; i++){
+                if(retryCount >= maxRetryCount)break;
                 TimeSeriesMetaData ts = timeSeriesMetaDataList.get(random.nextInt(timeSeriesMetaDataList.size()));
                 TimeSeriesMetaData randomMetaData = new TimeSeriesMetaData(ts);
                 /*logger.info("random ts: Measurement: {}, MetricName: {}, Start: {}, End: {}",
@@ -145,6 +148,9 @@ public class TimeSeriesCounter {
                             ts.getEnd());*/
 
                     metaDataList.add(randomMetaData);
+                } else {
+                    i--; // ugly quick fix
+                    retryCount++; // prevent possible endless loop
                 }
                 /*else {
                     // time series only contains one point, adjust end for kairosdb to not get error during query
