@@ -16,6 +16,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,5 +51,15 @@ public class StatsCollectorResource {
 
     }
 
+    @GET
+    @Path("delete/benchmarkrecords")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response deleteBenchmarkRecords(){
+        StatsCollector statsCollector = StatsCollector.getInstance();
+        if(statsCollector.deleteBenchmarkRecords()){
+            return Response.ok().entity("Benchmark record file on server deleted.").build();
+        }
+        return Response.serverError().entity("Could not delete benchmark record file on server.").build();
+    }
 
 }

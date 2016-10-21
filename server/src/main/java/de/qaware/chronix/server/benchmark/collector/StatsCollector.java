@@ -91,6 +91,38 @@ public class StatsCollector {
         }
     }
 
+    public boolean deleteBenchmarkRecords(){
+        boolean isDeleted = false;
+        int elapsedTime = 0;
+        //wait until statsWriters job queue is empty or max wait time has elapsed.
+        while(!blockingDequeWriteJobs.isEmpty() && elapsedTime < MAX_WAIT_TIME){
+            try {
+                Thread.sleep(WAIT_TIME_SLICE);
+                elapsedTime += WAIT_TIME_SLICE;
+            } catch (InterruptedException e) {
+                logger.error("StatsCollector: Error waiting on writers job queue: {}",e.getLocalizedMessage());
+            }
+        }
+        if(elapsedTime < MAX_WAIT_TIME){
+            ObjectMapper mapper = new ObjectMapper();
+            File benchmarkRecordFile = new File(recordDirectory + recordFile);
+            if(benchmarkRecordFile.exists()){
+                try {
+                    isDeleted = benchmarkRecordFile.delete();
+                } catch (Exception e) {
+                    logger.error("StatsCollector: Error reading from benchmark record file: {}",e.getLocalizedMessage());
+                }
+            } else {
+                isDeleted = true;
+            }
+
+        } else {
+            logger.error("StatsCollector: Error waiting on writers job queue: max wait time elapsed.");
+        }
+
+        return isDeleted;
+    }
+
     /**
      * Reads the benchmark record file and returns a list of BenchmarkRecords.
      *
