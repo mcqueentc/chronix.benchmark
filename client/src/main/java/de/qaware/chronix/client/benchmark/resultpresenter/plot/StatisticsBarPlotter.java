@@ -97,8 +97,8 @@ public class StatisticsBarPlotter {
                 for (QueryFunctionStatistics queryFunctionStatistics : tsdbStatistics.getQueryFunctionStatisticsList()) {
                     if (includeQueryFunctions.contains(queryFunctionStatistics.getQueryFunction())) {
                         // query time
-                        plotDataPerMeasurement.get("mean query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanQueryTime_inMilliseconds() / 1000, "s"));
-                        plotDataPerMeasurement.get("median query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianQueryTime_inMilliseconds() / 1000, "s"));
+                        plotDataPerMeasurement.get("mean query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanQueryTime_inMilliseconds(), "ms"));
+                        plotDataPerMeasurement.get("median query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianQueryTime_inMilliseconds(), "ms"));
                         plotDataPerMeasurement.get("total query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds() / (1000*60), "min"));
 
                         // cpu usage
@@ -137,8 +137,8 @@ public class StatisticsBarPlotter {
                         plotDataPerMeasurement.get("total total network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalNetworkUpload_inBytes() / (1024*1024), "MiB"));
 
                         // latency
-                        plotDataPerMeasurement.get("mean latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanLatency_inMilliseconds() / 1000, "s"));
-                        plotDataPerMeasurement.get("median latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianLatency_inMilliseconds() / 1000, "s"));
+                        plotDataPerMeasurement.get("mean latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanLatency_inMilliseconds(), "ms"));
+                        plotDataPerMeasurement.get("median latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianLatency_inMilliseconds(), "ms"));
 
                     }
                 }
