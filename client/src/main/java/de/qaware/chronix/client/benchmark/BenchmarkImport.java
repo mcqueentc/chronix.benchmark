@@ -99,7 +99,14 @@ public class BenchmarkImport {
                 benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
             }
 
-            System.out.println("\nDownloading benchmark records from server successful: " +  benchmarkRunner.getBenchmarkRecordsFromServer(server));
+            if(benchmarkRunner.getBenchmarkRecordsFromServer(server)){
+                System.out.println("\nDownloading benchmark records from server successful.");
+                benchmarkRunner.deleteBenchmarkRecordsOnServer(server);
+            } else {
+                System.out.println("\nDownloading benchmark records from server was not successful.");
+            }
+
+
 
         } catch (Exception e){
             System.err.println("Error importing on " + server + ": " + e.getLocalizedMessage());
