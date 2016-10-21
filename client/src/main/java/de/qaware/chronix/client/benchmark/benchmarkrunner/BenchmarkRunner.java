@@ -128,6 +128,30 @@ public class BenchmarkRunner {
         return false;
     }
 
+    public boolean deleteBenchmarkRecordsOnServer(String serverAddress){
+        boolean isDeleted = false;
+        try {
+            Client client = ClientBuilder.newBuilder().build();
+            final WebTarget target = client.target("http://"
+                    + serverAddress
+                    + ":"
+                    + Configurator.getInstance().getApplicationPort()
+                    + "/collector/delete/benchmarkrecords"
+            );
+            final Response response = target.request(MediaType.TEXT_PLAIN_TYPE).get();
+            String anwser = response.readEntity(String.class);
+            int statusCode = response.getStatus();
+            client.close();
+
+            logger.info("{}", anwser);
+            if(statusCode == 200) isDeleted = true;
+
+        } catch (Exception e){
+            logger.error("Error deleting benchmark records on server: {}", e.getLocalizedMessage());
+        }
+        return isDeleted;
+    }
+
     /**
      * Imports time series to all tsdbs on given server.
      *
@@ -279,7 +303,7 @@ public class BenchmarkRunner {
     private void saveBenchmarkRecords(List<BenchmarkRecord> benchmarkRecords){
         ObjectMapper mapper = new ObjectMapper();
         File recordFile = new File(recordFileDirectory + File.separator + recordFileName);
-        recordFile.delete();
+        //recordFile.delete();
         for(BenchmarkRecord benchmarkRecord : benchmarkRecords) {
 
             Long latency = queryHandler.getLatencyForQueryID(Pair.of(benchmarkRecord.getQueryID(), benchmarkRecord.getTsdbName()));
