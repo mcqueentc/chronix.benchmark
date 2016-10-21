@@ -272,7 +272,9 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                             Stream<MetricTimeSeries> resultStream = chronixClient.stream(solrClient, queryObject);
                             List<MetricTimeSeries> resultList = resultStream.collect(Collectors.toList());
                             if (!resultList.isEmpty()) {
-                                resultList.forEach(ts -> queryResults.add(ts.toString() + ", Points:" + ts.points().collect(Collectors.toList())      ));
+                                resultList.forEach(ts -> queryResults.add(ts.toString()));
+
+                                //resultList.forEach(ts -> queryResults.add(ts.toString() + ", Points:" + ts.points().collect(Collectors.toList())      ));
 
                                 //resultList.forEach(ts -> queryResults.add(ts.toString() + "; Points: " + String.join(", ", ts.points().collect(Collectors.toList()).toString())));
                                 //resultList.forEach(ts -> logger.info("Points: {}", ts.points().collect(Collectors.toList())));
