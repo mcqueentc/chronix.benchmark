@@ -2,6 +2,8 @@ package de.qaware.chronix.client.benchmark;
 
 import de.qaware.chronix.client.ClientMenu;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
+import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,12 @@ public class BenchmarkQueryMeasurement {
         tsdbList = serverTsdbMap.get(server);
         if(tsdbList.isEmpty()){
             System.err.println("No implemented tsdb interfaces found for your entries -> aborting");
+            return;
+        }
+
+        if(!JsonTimeSeriesHandler.getInstance().benchmarkMetaDataExists()){
+            System.out.println("No data found to run the benchmark. Please first generate a data set:");
+            BenchmarkDataSetGenerator.printUsage();
             return;
         }
 
