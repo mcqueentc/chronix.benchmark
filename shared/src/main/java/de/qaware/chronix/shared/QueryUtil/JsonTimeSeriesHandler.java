@@ -104,6 +104,26 @@ public class JsonTimeSeriesHandler {
             return true;
     }
 
+    public boolean deleteBenchmarkTimeSeriesMetaDataJson(){
+        File dir = new File(BenchmarkTimeSeriesMetaDataDirectoryPath);
+        if(dir.exists()) {
+            try {
+                File[] files = dir.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (!file.delete()) return false;
+                    }
+                }
+
+                return dir.delete();
+            } catch (Exception e){
+                logger.error("Error deleting file or directory, {}", e.getLocalizedMessage());
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Writes a benchmark time series meta data list to a json file into directory benchmark_timeseries_metadata.
      * The json file is named with given sequence number.
