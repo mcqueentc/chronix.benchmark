@@ -57,6 +57,12 @@ Client:
 	- example:   
 	`java -jar client.jar start localhost someTsdb` 
 	`java -jar client.jar import localhost 25 0 -t someTsdb -d /path/chronixBenchmark/timeseries_records/someFolder`  
+
+## Generating benchmark data
+- From the previously imported data generate a set of random time series which will be queried in later benchmarks
+	- `java -jar client.jar generate [timeSeries_count_per_query] [total_count_of_queries] [timeSeries_count_per_rangeQuery]`
+	- example:  
+	`java -jar client.jar generate 400 1600 50`
 	
 ## Running the benchmark  
 - Start the TSDB(s) you want to benchmark: (example)
