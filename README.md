@@ -24,7 +24,7 @@ A benchmark for Chronix and other time series databases (TSDB)
 - In terminal go to that folder and start the server:  
 `java -Xmx8g -jar server.jar DropWizardServer.yaml`  
 
-Client:  
+#####Client:  
 
 - Download the benchmark client part(link)
 - Unzip the downloaded file to a folder of your liking.
@@ -51,7 +51,7 @@ Client:
 	* `java -jar client.jar convert [csvFilesDirectory1] [csvFilesDirectory2] ... `  
 
 ## Importing data  
-- In terminal import the converted data to the TSDBs on the benchmark server: (adjust batchSize if run out of memory)
+- In terminal import the converted data to the TSDBs on the benchmark server: (adjust batchSize if you run out of memory)
 	- `java -jar client.jar import [server] [batchSize] [fromFile] -t [tsdbName1] -t [tsdbName2] ... -d [directoryToImport1] -d [directoryToImport2] ...
 `
 	- example:   
