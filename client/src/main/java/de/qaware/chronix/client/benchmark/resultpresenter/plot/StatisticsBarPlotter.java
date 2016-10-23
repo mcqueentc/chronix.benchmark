@@ -99,7 +99,7 @@ public class StatisticsBarPlotter {
                         // query time
                         plotDataPerMeasurement.get("mean query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanQueryTime_inMilliseconds(), "ms"));
                         plotDataPerMeasurement.get("median query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianQueryTime_inMilliseconds(), "ms"));
-                        plotDataPerMeasurement.get("total query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds() / (1000*60), "min"));
+                        plotDataPerMeasurement.get("total query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds() / (1000), "s"));
 
                         // cpu usage
                         plotDataPerMeasurement.get("mean total cpu usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanTotalCpuUsagePerQuery_inPercent(), "%"));
@@ -107,9 +107,9 @@ public class StatisticsBarPlotter {
                         plotDataPerMeasurement.get("maximum recorded cpu usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMaximumCpuUsageRecorded_inPercent(), "%"));
 
                         // disk usage
-                        plotDataPerMeasurement.get("mean disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskUsagePerQuery_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("median disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskUsagePerQuery_inBytes()/ (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("maximum recorded disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMaximumDiskUsageRecorded_inBytes() / (1024*1024*1024), "GiB"));
+                        plotDataPerMeasurement.get("mean disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskUsagePerQuery_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("median disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskUsagePerQuery_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("maximum recorded disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMaximumDiskUsageRecorded_inBytes() / (1024*10244), "MiB"));
 
                         // memory usage
                         plotDataPerMeasurement.get("mean total memory usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanTotalMemoryUsage_inPercent(), "%"));
@@ -117,24 +117,24 @@ public class StatisticsBarPlotter {
                         plotDataPerMeasurement.get("maximum recorded memory usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMaximumMemoryUsageRecorded_inPercent(), "%"));
 
                         // disk write
-                        plotDataPerMeasurement.get("mean disk write").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskWrite_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("median disk write").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskWrite_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("total disk write").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalDiskWrite_inBytes() / (1024*1024), "MiB"));
+                        plotDataPerMeasurement.get("mean disk write").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskWrite_inBytes() , "Byte"));
+                        plotDataPerMeasurement.get("median disk write").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskWrite_inBytes() , "Byte"));
+                        plotDataPerMeasurement.get("total disk write").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalDiskWrite_inBytes() , "Byte"));
 
                         // disk write
-                        plotDataPerMeasurement.get("mean disk read").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskRead_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("median disk read").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskRead_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("total disk read").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalDiskRead_inBytes() / (1024*1024), "MiB"));
+                        plotDataPerMeasurement.get("mean disk read").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskRead_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("median disk read").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskRead_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("total disk read").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalDiskRead_inBytes() , "Byte"));
 
                         // network download
-                        plotDataPerMeasurement.get("mean network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanNetworkDownload_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("median network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianNetworkDownload_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("total total network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalNetworkDownload_inBytes() / (1024*1024), "MiB"));
+                        plotDataPerMeasurement.get("mean network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanNetworkDownload_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("median network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianNetworkDownload_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("total total network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalNetworkDownload_inBytes(), "Byte"));
 
                         // network upload
-                        plotDataPerMeasurement.get("mean network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanNetworkUpload_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("median network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianNetworkUpload_inBytes() / (1024*1024), "MiB"));
-                        plotDataPerMeasurement.get("total total network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalNetworkUpload_inBytes() / (1024*1024), "MiB"));
+                        plotDataPerMeasurement.get("mean network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanNetworkUpload_inBytes() , "Byte"));
+                        plotDataPerMeasurement.get("median network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianNetworkUpload_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("total total network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalNetworkUpload_inBytes(), "Byte"));
 
                         // latency
                         plotDataPerMeasurement.get("mean latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanLatency_inMilliseconds(), "ms"));
