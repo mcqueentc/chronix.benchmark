@@ -102,12 +102,12 @@ public interface BenchmarkDataSource<T> {
     T getQueryObject(BenchmarkQuery benchmarkQuery);
 
     /**
-     * Generates a complete import query string to import a time series.
+     * Import all points of a time series.
      *
      * @apiNote This method WILL be part of the benchmark measurement.
      *
      * @param timeSeries the time series to import.
-     * @return the complete import query string.
+     * @return the import answer.
      */
     String importDataPoints(TimeSeries timeSeries);
 
