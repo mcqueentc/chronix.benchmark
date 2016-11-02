@@ -28,8 +28,8 @@ dependencies {
     compile group: 'org.jfree', name: 'jfreechart', version: '1.0.19'
 
 
-    compile project(':shared')
-    compile project(':DatabaseInterface')
+    compile project(':chronix-benchmark-shared')
+    compile project(':chronix-benchmark-interface')
 }
 
 shadowJar  {
