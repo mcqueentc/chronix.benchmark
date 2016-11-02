@@ -1,0 +1,45 @@
+plugins {
+    id 'java' // or 'groovy' Must be explicitly applied
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = 'de.qaware.chronix.client.ClientMenu'
+
+group 'de.qaware.chronix'
+version '1.0-SNAPSHOT'
+
+
+
+
+
+
+dependencies {
+
+    //dropwizard
+    compile 'io.dropwizard:dropwizard-core:0.9.2'
+
+    // http://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.21'
+
+    // https://mvnrepository.com/artifact/org.jfree/jfreechart
+    compile group: 'org.jfree', name: 'jfreechart', version: '1.0.19'
+
+
+    compile project(':shared')
+    compile project(':DatabaseInterface')
+}
+
+shadowJar  {
+    mergeServiceFiles()
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}

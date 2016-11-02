@@ -1,0 +1,34 @@
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    version = '1.0'
+}
+
+group 'de.qaware.chronix'
+version '1.0-SNAPSHOT'
+
+
+
+
+subprojects {
+
+    repositories {
+        mavenCentral()
+
+        maven {
+            url "http://dl.bintray.com/chronix/maven"
+        }
+    }
+
+    dependencies {
+        //Logging
+        compile 'org.slf4j:slf4j-api:1.7.12'
+        compile 'org.slf4j:jcl-over-slf4j:1.7.12'
+        compile 'org.apache.logging.log4j:log4j-api:2.5'
+        compile 'org.apache.logging.log4j:log4j-core:2.5'
+
+        compile 'org.apache.commons:commons-lang3:3.4'
+        compile 'org.apache.commons:commons-compress:1.9'
+    }
+
+}

@@ -1,0 +1,11 @@
+rootProject.name = 'chronix.benchmark'
+include 'client'
+include 'server'
+include 'shared'
+include 'DatabaseInterface'
+include 'TSDB_Chronix_Interface'
+include 'TSDB_InfluxDB_Interface'
+include 'TSDB_KairosDB_Interface'
+include 'TSDB_OpenTSDB_Interface'
+include 'TSDB_Graphite_Interface'
+
