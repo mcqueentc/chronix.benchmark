@@ -1,7 +1,7 @@
 rootProject.name = 'chronix.benchmark'
 include 'chronix-benchmark-client'
 include 'chronix-benchmark-server'
-include 'chronix-benchmark-shared'
+include 'chronix-benchmark-common'
 include 'chronix-benchmark-interface'
 include 'chronix-benchmark-chronix_impl'
 include 'chronix-benchmark-influxdb_impl'

@@ -31,12 +31,12 @@ public class HelloClient {
 
 
     public static void main(String[] args){
-        /*if(args.length < 3){
+       /* *//*if(args.length < 3){
             System.out.println("Usage: java -jar client-<version>-all.jar [absoulutPath] [http://<serverAddress>] [portNumber]");
             return;
         }
 
-*/
+*//*
 
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -118,7 +118,7 @@ public class HelloClient {
             tsdata.add("p2");
             //serverConfigRecord.setTimeSeriesDataFolders(tsdata);
 
-/*
+*//*
             ServerConfigRecord serverConfigRecord2 = new ServerConfigRecord("www.fau.cs.de");
             serverConfigRecord2.setTsdbBuildRecords(buildOptionses);
             serverConfigRecord2.setTsdbRunRecords(runOptionses);
@@ -126,7 +126,7 @@ public class HelloClient {
             tsdata2.add("p3");
             tsdata2.add("p4");
             serverConfigRecord2.setTimeSeriesDataFolders(tsdata2);
-*/
+*//*
             LinkedList<ServerConfigRecord> records = new LinkedList<>();
             records.add(serverConfigRecord);
             //records.add(serverConfigRecord2);
@@ -182,7 +182,7 @@ public class HelloClient {
         // show server record
 
         LinkedList<ServerConfigRecord> readRecord = serverConfigAccessor.getServerConfigRecords();
- /*
+ *//*
         for(ServerConfigRecord r : readRecord){
 
 
@@ -215,7 +215,7 @@ public class HelloClient {
                 }
             }
         }
- */
+ *//*
 
         // Test file upload
 
@@ -251,7 +251,7 @@ public class HelloClient {
             return;
         }
 
-/*
+*//*
         // import test
         for(ServerConfigRecord r : readRecord){
             LinkedList<String> externalImpls = r.getExternalTimeSeriesDataBaseImplementations();
@@ -275,7 +275,7 @@ public class HelloClient {
                 }
             }
         }
-*/
+*//*
 
 
 
@@ -309,28 +309,28 @@ public class HelloClient {
                 }
 
 
-                /*String[] measurements = queryHandler.getMeasurement(server);
+                *//*String[] measurements = queryHandler.getMeasurement(server);
                 for(String m : measurements){
                     System.out.println("Measurement: " + m);
-                }*/
+                }*//*
 
             }
         }
 
 
 
-/*
+*//*
         System.out.println(System.getProperty("user.home"));
         System.out.println(sun.awt.OSInfo.getOSType());
         File dir = new File(System.getProperty("user.home") + "/Desktop/chronix");
         if(dir.isDirectory()){
             System.out.println("getPath() = " + dir.getPath());
         }
-*/
+*//*
 
 
 
-///*
+//*//*
         //test build container
         //String commandFileName = "chronix.build";
         //final Client client = ClientBuilder.newBuilder().build();
@@ -349,24 +349,24 @@ public class HelloClient {
         //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/start");
         //final Response response = target.request().post(Entity.json(chronix));
 
-///*
+//*//*
 
 
 
-//*/
+/*//*//*
 
 
         //stop test
         //String[] answers = configurator.stopDockerContainer(server,"chronix");
 
-/*
+*//*
         // build test
         DockerBuildOptions chronix = new DockerBuildOptions("chronix","-t");
         String[] answers = configurator.buildDockerContainer(server,chronix);
 
         //final WebTarget target = client.target("http://192.168.2.100:9003/configurator/docker/build");
         //final Response response = target.request().post(Entity.json(chronix));
-*/
+*//*
 
         // upload test
         //String[] answers = configurator.uploadFiles("localhost",System.getProperty("user.home") + "/Documents/BA_workspace/docker/chronix");
@@ -382,16 +382,16 @@ public class HelloClient {
         //System.out.println(response.getStatus() + " : " + op);
 
 
-///*
+//*//*
         //String[] answers = response.readEntity(String[].class);
         //System.out.println("Server status: " + response.getStatus());
         //System.out.println(response.readEntity(String.class));
 
-//*/
+/*//*//*
 
 
 
-/*
+*//*
         // test start container
         String command = "docker run -d -p 8983:8983 chronix";
         final Client client = ClientBuilder.newBuilder().build();
@@ -401,10 +401,10 @@ public class HelloClient {
         for(String answer : answers){
             System.out.println(answer);
         }
-*/
+*//*
 
 
-/*
+*//*
         // test exec
         List<String> result = new LinkedList<String>();
         String[] command = {"/bin/sh","-c","ping -c 4 google.com"};
@@ -427,9 +427,9 @@ public class HelloClient {
             System.out.println(line);
         }
 
+*//*
+
 */
-
-
 
     }
 }
