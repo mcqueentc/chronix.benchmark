@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ChronixDB/chronix.benchmark.svg?branch=master)](https://travis-ci.org/ChronixDB/chronix.benchmark)
+
 # Chronix benchmark
 A benchmark for Chronix and other time series databases (TSDB)
 
