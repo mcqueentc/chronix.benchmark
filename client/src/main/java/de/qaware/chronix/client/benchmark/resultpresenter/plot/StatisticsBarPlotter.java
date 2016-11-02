@@ -109,7 +109,7 @@ public class StatisticsBarPlotter {
                         // disk usage
                         plotDataPerMeasurement.get("mean disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskUsagePerQuery_inBytes(), "Byte"));
                         plotDataPerMeasurement.get("median disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskUsagePerQuery_inBytes(), "Byte"));
-                        plotDataPerMeasurement.get("maximum recorded disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMaximumDiskUsageRecorded_inBytes() / (1024*10244), "MiB"));
+                        plotDataPerMeasurement.get("maximum recorded disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMaximumDiskUsageRecorded_inBytes() / (1024*1024), "MiB"));
 
                         // memory usage
                         plotDataPerMeasurement.get("mean total memory usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanTotalMemoryUsage_inPercent(), "%"));
