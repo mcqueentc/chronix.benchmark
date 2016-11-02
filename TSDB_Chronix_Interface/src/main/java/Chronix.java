@@ -1,5 +1,5 @@
 import de.qaware.chronix.ChronixClient;
-import de.qaware.chronix.converter.KassiopeiaSimpleConverter;
+import de.qaware.chronix.converter.MetricTimeSeriesConverter;
 import de.qaware.chronix.database.*;
 import de.qaware.chronix.solr.client.ChronixSolrStorage;
 import de.qaware.chronix.timeseries.MetricTimeSeries;
@@ -77,7 +77,7 @@ public class Chronix implements BenchmarkDataSource<SolrQuery>{
                 };
 
 
-                chronixClient = new ChronixClient<>(new KassiopeiaSimpleConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
+                chronixClient = new ChronixClient<>(new MetricTimeSeriesConverter(), new ChronixSolrStorage<>(200, groupBy, reduce));
 
 
                 isSetup = true;
