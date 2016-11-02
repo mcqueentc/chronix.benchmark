@@ -10,7 +10,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group 'de.qaware.chronix'
 version '1.0-SNAPSHOT'
 
-mainClassName = 'OpenTsdbInterface'
+mainClassName = 'InfluxDB'
 
 repositories {
     mavenCentral()
@@ -19,12 +19,13 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
-    //Open TSDB
-    compile 'org.glassfish.jersey.core:jersey-client:2.23.2'
-    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.23.2'
+    //InfluxDB
+    compile 'org.influxdb:influxdb-java:2.2'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.google.guava:guava:19.0'
+    compile 'com.squareup.okhttp:okhttp:2.7.5'
 
-
-    compile project(':DatabaseInterface')
+    compile project(':chronix-benchmark-interface')
 }
 
 shadowJar  {

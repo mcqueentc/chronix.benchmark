@@ -10,7 +10,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 group 'de.qaware.chronix'
 version '1.0-SNAPSHOT'
 
-mainClassName = 'InfluxDB'
+mainClassName = 'Chronix'
 
 repositories {
     mavenCentral()
@@ -18,14 +18,14 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    // Chronix
+    compile 'de.qaware.chronix:chronix-api:0.1'
+    compile 'de.qaware.chronix:chronix-server-client:0.3'
+    compile 'de.qaware.chronix:chronix-timeseries:0.3'
+    compile 'de.qaware.chronix:chronix-timeseries-converter:0.3'
+    compile 'org.apache.solr:solr-solrj:6.1.0'
 
-    //InfluxDB
-    compile 'org.influxdb:influxdb-java:2.2'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'com.google.guava:guava:19.0'
-    compile 'com.squareup.okhttp:okhttp:2.7.5'
-
-    compile project(':DatabaseInterface')
+    compile project(':chronix-benchmark-interface')
 }
 
 shadowJar  {
