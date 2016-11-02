@@ -8,8 +8,6 @@ group 'de.qaware.chronix'
 version '1.0-SNAPSHOT'
 
 
-
-
 subprojects {
 
     repositories {
@@ -31,4 +29,7 @@ subprojects {
         compile 'org.apache.commons:commons-compress:1.9'
     }
 
+}
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
 }
