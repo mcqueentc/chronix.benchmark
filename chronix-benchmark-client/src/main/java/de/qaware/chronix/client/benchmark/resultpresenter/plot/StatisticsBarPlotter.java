@@ -220,16 +220,20 @@ public class StatisticsBarPlotter {
         for(TsdbStatistics tsdbStatistics : tsdbStatisticsList){
             for(QueryFunctionStatistics queryFunctionStatistics : tsdbStatistics.getQueryFunctionStatisticsList()){
                 if(queryFunctionStatistics.getQueryFunction().equals("import")){
-                    double throughput_inMiB_per_Second = (timeSeriesStatistics.getTotalSizeUnzippedInBytes()/(1024*1024)) / (queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds()/1000);
+                    double throughput_inMiB_per_Second = (double)(timeSeriesStatistics.getTotalSizeUnzippedInBytes()/(1024*1024)) / (double)(queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds()/1000);
                     barDataset.setValue(throughput_inMiB_per_Second, tsdbStatistics.getTsdbName(), "import throughput");
-
+                    /*logger.info("total size: {}; total time: {}; throughput: {}; tsdbName: {}",
+                            timeSeriesStatistics.getTotalSizeUnzippedInBytes(),
+                            queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds(),
+                            throughput_inMiB_per_Second,
+                            tsdbStatistics.getTsdbName());*/
                 }
             }
         }
 
         //Create the chart
         JFreeChart chart = ChartFactory.createBarChart(
-                "data throughput",
+                "data throughput during import",
                 "TSDB",
                 "MiB/s",
                 barDataset,
