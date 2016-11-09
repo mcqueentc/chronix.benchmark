@@ -2,7 +2,6 @@ package de.qaware.chronix.client.benchmark.resultpresenter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.resultpresenter.plot.StatisticsBarPlotter;
-import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
 import org.slf4j.Logger;
@@ -141,9 +140,51 @@ public class ResultPresenter {
         queryFunctions.add(QueryFunction.QUERY_ONLY.toString());
         statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions(queryFunctions);
 
-
         //plot for import only
         statisticsBarPlotter.plotTsdbStatisticsForQueryFunctions(Collections.singletonList("import"));
+
+
+        //plot throughput
+        TimeSeriesStatistics throughputTimeSeriesStatistics = getTimeSeriesStatisticsForThroughput();
+        if(throughputTimeSeriesStatistics != null){
+            statisticsBarPlotter.plotThroughput(throughputTimeSeriesStatistics);
+        } else {
+            logger.info("No TimeSeriesStatistics for plotting found!");
+        }
+
+
+    }
+
+    private TimeSeriesStatistics getTimeSeriesStatisticsForThroughput(){
+        TimeSeriesStatistics throughputTimeSeriesStatistics = null;
+
+        // get imported measurements
+        List<String> measurementNames = new LinkedList<>();
+        File[] measurementDirs = new File(JsonTimeSeriesHandler.getInstance().getTimeSeriesMetaDataRecordDirectoryPath()).listFiles();
+        if(measurementDirs != null){
+            for(File measurement : measurementDirs){
+                if(measurement.isFile() && measurement.getName().endsWith(".json")){
+                    measurementNames.add(measurement.getName().replaceAll(".json", ""));
+                }
+            }
+        }
+        Collections.sort(measurementNames);
+        String importedMeasurements = String.join("_", measurementNames);
+
+        // get the stats for imported data set.
+        List<TimeSeriesStatistics> timeSeriesStatisticsList = new TimeSeriesAnalyzer().readStatsJson();
+        for(TimeSeriesStatistics timeSeriesStatistics : timeSeriesStatisticsList){
+            List<String> recordedMeasurements = timeSeriesStatistics.getMeasurements();
+            Collections.sort(recordedMeasurements);
+            String joinedRecordedMeasurements = String.join("_", recordedMeasurements);
+
+            if(joinedRecordedMeasurements.equals(importedMeasurements)){
+                throughputTimeSeriesStatistics = timeSeriesStatistics;
+                break;
+            }
+
+        }
+        return throughputTimeSeriesStatistics;
     }
 
 }
