@@ -7,6 +7,7 @@ import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesPoint;
 import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,10 +247,9 @@ public class TimeSeriesAnalyzer {
             long fileSize = 0L;
             try {
                 InputStream inputStream = new GZIPInputStream(new FileInputStream(file));
-                File tmp = new File(statisticsDirectory + File.separator + "tmp_ts_"+id+".json");
-                Files.copy(inputStream, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                fileSize = tmp.length();
-                tmp.delete();
+                byte[] bytes = IOUtils.toByteArray(inputStream);
+                fileSize = bytes.length;
+
                 inputStream.close();
             } catch (IOException e) {
                 logger.error("FileSizeCalculator {}: Error calculating unzipped file size for file: {}",id,file.getName());
