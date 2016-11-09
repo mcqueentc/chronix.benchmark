@@ -74,29 +74,44 @@ public class TimeSeriesAnalyzer {
         List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(allFiles.size());
 
 
-        //split filesize workload
-        // start the threads
-        Future<Pair<Long, Long>> futureFileSize1 = executorService.submit(new FileSizeCalculator(1, allFiles.subList(0, allFiles.size() / 2 )));
-        Future<Pair<Long, Long>> futureFileSize2 = executorService.submit(new FileSizeCalculator(2, allFiles.subList(allFiles.size() / 2, allFiles.size())));
-
-        List<Future<Map<String, List<Double>>>> futureAnalyticsListOfMaps = new LinkedList<>();
-        int threadId = 0;
+        //split workload
         int batchsize = allFiles.size() / oSMXBean.getAvailableProcessors();
+
+        // start the filesize threads
+        List<Future<Pair<Long,Long>>> futureFileSizeList = new LinkedList<>();
+        int threadId = 0;
         int from = 0;
         for(int i = batchsize; i < allFiles.size(); i = i + batchsize){
-            futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId++, allFiles.subList(from, i))));
+            futureFileSizeList.add(executorService.submit(new FileSizeCalculator(threadId++, allFiles.subList(from, i))));
+            from = i;
+        }
+        futureFileSizeList.add(executorService.submit(new FileSizeCalculator(threadId, allFiles.subList(from, allFiles.size()))));
 
+        //collect filesizes
+        Long totalFileSize = 0L;
+        Long totalFileSizeUnzipped = 0L;
+        for(Future<Pair<Long,Long>> futureFileSize : futureFileSizeList){
+            try {
+                totalFileSize += futureFileSize.get().getFirst();
+                totalFileSizeUnzipped += futureFileSize.get().getSecond();
+            } catch (Exception e) {
+                logger.error("Error retrieving results from thread with exception: {}",e.getLocalizedMessage());
+            }
+
+        }
+
+        // start time series analyzer
+        List<Future<Map<String, List<Double>>>> futureAnalyticsListOfMaps = new LinkedList<>();
+        threadId = 0;
+        from = 0;
+        for(int i = batchsize; i < allFiles.size(); i = i + batchsize){
+            futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId++, allFiles.subList(from, i))));
             from = i;
         }
         futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId, allFiles.subList(from, allFiles.size()))));
 
-        // collect results
+        // collect analyzer results
         try {
-            Long totalFileSize = futureFileSize1.get().getFirst();
-            totalFileSize += futureFileSize2.get().getFirst();
-            Long totalFileSizeUnzipped = futureFileSize1.get().getSecond();
-            totalFileSizeUnzipped += futureFileSize2.get().getSecond();
-
             for(Future<Map<String, List<Double>>> futureMap : futureAnalyticsListOfMaps){
                 Map<String, List<Double>> analyticsMap = futureMap.get();
                 pointsPerTimeSeries.addAll(analyticsMap.get("pointsPerTimeSeries"));
