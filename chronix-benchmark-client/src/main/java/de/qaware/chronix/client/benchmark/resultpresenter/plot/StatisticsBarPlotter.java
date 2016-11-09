@@ -2,9 +2,7 @@ package de.qaware.chronix.client.benchmark.resultpresenter.plot;
 
 import de.qaware.chronix.client.benchmark.BenchmarkImport;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
-import de.qaware.chronix.client.benchmark.resultpresenter.QueryFunctionStatistics;
-import de.qaware.chronix.client.benchmark.resultpresenter.TsdbStatistics;
-import de.qaware.chronix.client.benchmark.resultpresenter.TsdbStatisticsAnalyzer;
+import de.qaware.chronix.client.benchmark.resultpresenter.*;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -44,6 +42,11 @@ public class StatisticsBarPlotter {
         }
     }
 
+    /**
+     * Generates bar plots for calculated metrics and saves them to chronixBenchmark/statistics/bar_plots/
+     *
+     * @param includeQueryFunctions the QueryFunctions for which a par plot should be generated.
+     */
     public void plotTsdbStatisticsForQueryFunctions(List<String> includeQueryFunctions){
         if(includeQueryFunctions != null && !includeQueryFunctions.isEmpty()) {
             logger.info("Plotting for " + String.join(",", includeQueryFunctions) + " ...");
@@ -205,6 +208,50 @@ public class StatisticsBarPlotter {
                 logger.error("Error saving chart to file: " + e.getLocalizedMessage());
             }
         }
+    }
+
+    /**
+     * Generates a bar plot for the import data throughput and saves it to chronixBenchmark/statistics/bar_plots/throughput.jpg
+     *
+     * @param timeSeriesStatistics the TimeSeriesStatistics for the imported data set.
+     */
+    public void plotThroughput(TimeSeriesStatistics timeSeriesStatistics){
+        DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
+        for(TsdbStatistics tsdbStatistics : tsdbStatisticsList){
+            for(QueryFunctionStatistics queryFunctionStatistics : tsdbStatistics.getQueryFunctionStatisticsList()){
+                if(queryFunctionStatistics.getQueryFunction().equals("import")){
+                    double throughput_inMiB_per_Second = (timeSeriesStatistics.getTotalSizeUnzippedInBytes()/(1024*1024)) / (queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds()/1000);
+                    barDataset.setValue(throughput_inMiB_per_Second, tsdbStatistics.getTsdbName(), "import throughput");
+
+                }
+            }
+        }
+
+        //Create the chart
+        JFreeChart chart = ChartFactory.createBarChart(
+                "data throughput",
+                "TSDB",
+                "MiB/s",
+                barDataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
+        );
+
+        //save to file
+        try {
+            String fileName = "throughput.jpg";
+            ChartUtilities.saveChartAsJPEG(
+                    new File(statisticsBarPlotDirectory + File.separator + fileName),
+                    chart,
+                    CHART_WIDTH,
+                    CHART_HEIGHT);
+
+        } catch (Exception e){
+            logger.error("Error saving chart to file: " + e.getLocalizedMessage());
+        }
+
     }
 
 
