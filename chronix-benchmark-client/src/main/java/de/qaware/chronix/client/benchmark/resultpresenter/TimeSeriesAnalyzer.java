@@ -73,8 +73,10 @@ public class TimeSeriesAnalyzer {
         List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(allFiles.size());
 
 
+        //split filesize workload
         // start the threads
-        Future<Pair<Long, Long>> futureFileSize = executorService.submit(new FileSizeCalculator(allFiles));
+        Future<Pair<Long, Long>> futureFileSize1 = executorService.submit(new FileSizeCalculator(1, allFiles.subList(0, allFiles.size() / 2 )));
+        Future<Pair<Long, Long>> futureFileSize2 = executorService.submit(new FileSizeCalculator(2, allFiles.subList(allFiles.size() / 2, allFiles.size())));
 
         List<Future<Map<String, List<Double>>>> futureAnalyticsListOfMaps = new LinkedList<>();
         int threadId = 0;
@@ -89,8 +91,10 @@ public class TimeSeriesAnalyzer {
 
         // collect results
         try {
-            Long totalFileSize = futureFileSize.get().getFirst();
-            Long totalFileSizeUnzipped = futureFileSize.get().getSecond();
+            Long totalFileSize = futureFileSize1.get().getFirst();
+            totalFileSize += futureFileSize2.get().getFirst();
+            Long totalFileSizeUnzipped = futureFileSize1.get().getSecond();
+            totalFileSizeUnzipped += futureFileSize2.get().getSecond();
 
             for(Future<Map<String, List<Double>>> futureMap : futureAnalyticsListOfMaps){
                 Map<String, List<Double>> analyticsMap = futureMap.get();
@@ -211,14 +215,17 @@ public class TimeSeriesAnalyzer {
 
     private class FileSizeCalculator implements Callable<Pair<Long, Long>> {
 
+        private int id;
         private List<File> allFiles;
 
-        public FileSizeCalculator(List<File> allFiles){
+        public FileSizeCalculator(int id, List<File> allFiles){
+            this.id = id;
             this.allFiles = allFiles;
         }
 
         @Override
         public Pair<Long, Long> call() {
+            logger.info("FileSizeCalculator {} started ... ", id);
             long byteSum = 0L;
             long byteSumUnzipped = 0L;
             for(File file : allFiles){
@@ -227,11 +234,11 @@ public class TimeSeriesAnalyzer {
                         byteSum += file.length();
                         byteSumUnzipped += calcUnzippedFileSize(file);
                     } catch (Exception e){
-                        //ignore
+                        logger.error("FileSizeCalculator {}: Error calculating file size for file: {}",id,file.getName());
                     }
                 }
             }
-            logger.info("File size calculator finished.");
+            logger.info("FileSizeCalculator {} finished.", id);
             return Pair.of(byteSum, byteSumUnzipped);
         }
 
@@ -239,12 +246,12 @@ public class TimeSeriesAnalyzer {
             long fileSize = 0L;
             try {
                 InputStream inputStream = new GZIPInputStream(new FileInputStream(file));
-                File tmp = new File(statisticsDirectory + File.separator + "tmp_ts.json");
+                File tmp = new File(statisticsDirectory + File.separator + "tmp_ts_"+id+".json");
                 Files.copy(inputStream, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 fileSize = tmp.length();
                 tmp.delete();
             } catch (IOException e) {
-                // ignore
+                logger.error("FileSizeCalculator {}: Error calculating unzipped file size for file: {}",id,file.getName());
             }
             return fileSize;
         }
