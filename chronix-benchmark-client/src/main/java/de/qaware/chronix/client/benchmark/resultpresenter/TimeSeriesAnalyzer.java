@@ -1,5 +1,6 @@
 package de.qaware.chronix.client.benchmark.resultpresenter;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
@@ -430,6 +431,26 @@ public class TimeSeriesAnalyzer {
         } catch (Exception e){
             logger.error("Error writing stats to json file: {}", e.getLocalizedMessage());
         }
+    }
+
+    /**
+     * Reads the time series statistics file.
+     *
+     * @return list of time series statistics or null if an error occurred.
+     */
+    public List<TimeSeriesStatistics> readStatsJson(){
+        File statsFile = new File(statsFilePath);
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<TimeSeriesStatistics> timeSeriesStatisticsList = null;
+
+        try {
+            timeSeriesStatisticsList = mapper.readValue(statsFile, new TypeReference<List<TimeSeriesStatistics>>(){});
+        } catch (IOException e) {
+            logger.error("Error reading time series statistics file: " + e.getLocalizedMessage());
+        }
+
+        return timeSeriesStatisticsList;
     }
 
 
