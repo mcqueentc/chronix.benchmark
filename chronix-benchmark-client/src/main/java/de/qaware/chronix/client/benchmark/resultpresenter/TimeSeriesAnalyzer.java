@@ -251,8 +251,8 @@ public class TimeSeriesAnalyzer {
                 fileSize = bytes.length;
 
                 inputStream.close();
-            } catch (IOException e) {
-                logger.error("FileSizeCalculator {}: Error calculating unzipped file size for file: {}",id,file.getName());
+            } catch (Exception e) {
+                logger.error("FileSizeCalculator {}: Error calculating unzipped file size for file: {} with exception: {}",id,file.getName(),e.getLocalizedMessage());
             }
             return fileSize;
         }
