@@ -250,6 +250,7 @@ public class TimeSeriesAnalyzer {
                 Files.copy(inputStream, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 fileSize = tmp.length();
                 tmp.delete();
+                inputStream.close();
             } catch (IOException e) {
                 logger.error("FileSizeCalculator {}: Error calculating unzipped file size for file: {}",id,file.getName());
             }
