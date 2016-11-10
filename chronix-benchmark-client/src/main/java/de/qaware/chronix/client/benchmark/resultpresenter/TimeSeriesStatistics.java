@@ -13,6 +13,7 @@ public class TimeSeriesStatistics {
     private List<String> measurements;
     // data set stats
     private long totalSizeInBytes;
+    private long totalSizeUnzippedInBytes;
     private int numberOfTimeSeries;
     private long numberOfTotalPoints;
     private long minNumberOfPointsPerTimeSeries;
@@ -178,5 +179,13 @@ public class TimeSeriesStatistics {
 
     public void setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(long meanSamplingIntervalOfAllTimeSeries_inMilliseconds) {
         this.meanSamplingIntervalOfAllTimeSeries_inMilliseconds = meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
+    }
+
+    public long getTotalSizeUnzippedInBytes() {
+        return totalSizeUnzippedInBytes;
+    }
+
+    public void setTotalSizeUnzippedInBytes(long totalSizeUnzippedInBytes) {
+        this.totalSizeUnzippedInBytes = totalSizeUnzippedInBytes;
     }
 }

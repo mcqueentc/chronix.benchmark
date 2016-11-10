@@ -1,20 +1,29 @@
 package de.qaware.chronix.client.benchmark.resultpresenter;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesPoint;
+import de.qaware.chronix.shared.DataModels.Pair;
 import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by mcqueen666 on 10.10.16.
@@ -66,24 +75,44 @@ public class TimeSeriesAnalyzer {
         List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(allFiles.size());
 
 
-        // start the threads
-        Future<Long> futureFileSize = executorService.submit(new FileSizeCalculator(allFiles));
-
-        List<Future<Map<String, List<Double>>>> futureAnalyticsListOfMaps = new LinkedList<>();
-        int threadId = 0;
+        //split workload
         int batchsize = allFiles.size() / oSMXBean.getAvailableProcessors();
+
+        // start the filesize threads
+        List<Future<Pair<Long,Long>>> futureFileSizeList = new LinkedList<>();
+        int threadId = 0;
         int from = 0;
         for(int i = batchsize; i < allFiles.size(); i = i + batchsize){
-            futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId++, allFiles.subList(from, i))));
+            futureFileSizeList.add(executorService.submit(new FileSizeCalculator(threadId++, allFiles.subList(from, i))));
+            from = i;
+        }
+        futureFileSizeList.add(executorService.submit(new FileSizeCalculator(threadId, allFiles.subList(from, allFiles.size()))));
 
+        //collect filesizes
+        Long totalFileSize = 0L;
+        Long totalFileSizeUnzipped = 0L;
+        for(Future<Pair<Long,Long>> futureFileSize : futureFileSizeList){
+            try {
+                totalFileSize += futureFileSize.get().getFirst();
+                totalFileSizeUnzipped += futureFileSize.get().getSecond();
+            } catch (Exception e) {
+                logger.error("Error retrieving results from thread with exception: {}",e.getLocalizedMessage());
+            }
+
+        }
+
+        // start time series analyzer
+        List<Future<Map<String, List<Double>>>> futureAnalyticsListOfMaps = new LinkedList<>();
+        threadId = 0;
+        from = 0;
+        for(int i = batchsize; i < allFiles.size(); i = i + batchsize){
+            futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId++, allFiles.subList(from, i))));
             from = i;
         }
         futureAnalyticsListOfMaps.add(executorService.submit(new AnalyzerThread(threadId, allFiles.subList(from, allFiles.size()))));
 
-        // collect results
+        // collect analyzer results
         try {
-            Long totalFileSize = futureFileSize.get();
-
             for(Future<Map<String, List<Double>>> futureMap : futureAnalyticsListOfMaps){
                 Map<String, List<Double>> analyticsMap = futureMap.get();
                 pointsPerTimeSeries.addAll(analyticsMap.get("pointsPerTimeSeries"));
@@ -172,6 +201,7 @@ public class TimeSeriesAnalyzer {
             timeSeriesStatistics.setDate(Instant.now().toString());
             timeSeriesStatistics.setMeasurements(measurements);
             timeSeriesStatistics.setTotalSizeInBytes(totalFileSize);
+            timeSeriesStatistics.setTotalSizeUnzippedInBytes(totalFileSizeUnzipped);
             timeSeriesStatistics.setNumberOfTimeSeries(numberOfTimeSeries);
             timeSeriesStatistics.setNumberOfTotalPoints((long)numberOfTotalPoints);
             timeSeriesStatistics.setMinNumberOfPointsPerTimeSeries((long)minNumberOfPointsPerTimeSeries);
@@ -200,28 +230,47 @@ public class TimeSeriesAnalyzer {
         return timeSeriesStatistics;
     }
 
-    private class FileSizeCalculator implements Callable<Long> {
+    private class FileSizeCalculator implements Callable<Pair<Long, Long>> {
 
+        private int id;
         private List<File> allFiles;
 
-        public FileSizeCalculator(List<File> allFiles){
+        public FileSizeCalculator(int id, List<File> allFiles){
+            this.id = id;
             this.allFiles = allFiles;
         }
 
         @Override
-        public Long call() {
+        public Pair<Long, Long> call() {
+            logger.info("FileSizeCalculator {} started ... ", id);
             long byteSum = 0L;
+            long byteSumUnzipped = 0L;
             for(File file : allFiles){
                 if(file != null && file.isFile() && file.getName().endsWith(".gz")){
                     try {
                         byteSum += file.length();
+                        byteSumUnzipped += calcUnzippedFileSize(file);
                     } catch (Exception e){
-                        //ignore
+                        logger.error("FileSizeCalculator {}: Error calculating file size for file: {}",id,file.getName());
                     }
                 }
             }
-            logger.info("File size calculator finished.");
-            return byteSum;
+            logger.info("FileSizeCalculator {} finished.", id);
+            return Pair.of(byteSum, byteSumUnzipped);
+        }
+
+        private long calcUnzippedFileSize(File file){
+            long fileSize = 0L;
+            try {
+                InputStream inputStream = new GZIPInputStream(new FileInputStream(file));
+                byte[] bytes = IOUtils.toByteArray(inputStream);
+                fileSize = bytes.length;
+
+                inputStream.close();
+            } catch (Exception e) {
+                logger.error("FileSizeCalculator {}: Error calculating unzipped file size for file: {} with exception: {}",id,file.getName(),e.getLocalizedMessage());
+            }
+            return fileSize;
         }
     }
 
@@ -406,6 +455,34 @@ public class TimeSeriesAnalyzer {
         } catch (Exception e){
             logger.error("Error writing stats to json file: {}", e.getLocalizedMessage());
         }
+    }
+
+    /**
+     * Reads the time series statistics file.
+     *
+     * @return list of time series statistics or null if an error occurred.
+     */
+    public List<TimeSeriesStatistics> readStatsJson(){
+        File statsFile = new File(statsFilePath);
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<TimeSeriesStatistics> timeSeriesStatisticsList = new LinkedList<>();
+
+        try {
+            InputStream inputStream = new FileInputStream(statsFile);
+            JsonFactory jsonFactory = new JsonFactory();
+            for(Iterator it = mapper.readValues(jsonFactory.createParser(inputStream), TimeSeriesStatistics.class); it.hasNext();){
+                TimeSeriesStatistics nextItem = ((TimeSeriesStatistics) it.next());
+                timeSeriesStatisticsList.add(nextItem);
+                //logger.info("read timeSeries statistic: {}",nextItem);
+            }
+
+            //timeSeriesStatisticsList = mapper.readValue(statsFile, new TypeReference<List<TimeSeriesStatistics>>(){});
+        } catch (IOException e) {
+            logger.error("Error reading time series statistics file: " + e.getLocalizedMessage());
+        }
+
+        return timeSeriesStatisticsList;
     }
 
 

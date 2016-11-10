@@ -27,6 +27,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jfree/jfreechart
     compile group: 'org.jfree', name: 'jfreechart', version: '1.0.19'
 
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
 
     compile project(':chronix-benchmark-common')
     compile project(':chronix-benchmark-interface')

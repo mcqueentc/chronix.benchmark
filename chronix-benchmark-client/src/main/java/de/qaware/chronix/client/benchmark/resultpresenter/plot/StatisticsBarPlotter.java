@@ -2,9 +2,7 @@ package de.qaware.chronix.client.benchmark.resultpresenter.plot;
 
 import de.qaware.chronix.client.benchmark.BenchmarkImport;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
-import de.qaware.chronix.client.benchmark.resultpresenter.QueryFunctionStatistics;
-import de.qaware.chronix.client.benchmark.resultpresenter.TsdbStatistics;
-import de.qaware.chronix.client.benchmark.resultpresenter.TsdbStatisticsAnalyzer;
+import de.qaware.chronix.client.benchmark.resultpresenter.*;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -44,6 +42,11 @@ public class StatisticsBarPlotter {
         }
     }
 
+    /**
+     * Generates bar plots for calculated metrics and saves them to chronixBenchmark/statistics/bar_plots/
+     *
+     * @param includeQueryFunctions the QueryFunctions for which a par plot should be generated.
+     */
     public void plotTsdbStatisticsForQueryFunctions(List<String> includeQueryFunctions){
         if(includeQueryFunctions != null && !includeQueryFunctions.isEmpty()) {
             logger.info("Plotting for " + String.join(",", includeQueryFunctions) + " ...");
@@ -97,9 +100,9 @@ public class StatisticsBarPlotter {
                 for (QueryFunctionStatistics queryFunctionStatistics : tsdbStatistics.getQueryFunctionStatisticsList()) {
                     if (includeQueryFunctions.contains(queryFunctionStatistics.getQueryFunction())) {
                         // query time
-                        plotDataPerMeasurement.get("mean query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanQueryTime_inMilliseconds(), "ms"));
-                        plotDataPerMeasurement.get("median query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianQueryTime_inMilliseconds(), "ms"));
-                        plotDataPerMeasurement.get("total query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds() / (1000), "s"));
+                        plotDataPerMeasurement.get("mean query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getMeanQueryTime_inMilliseconds()) / 1000.0, "s"));
+                        plotDataPerMeasurement.get("median query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getMedianQueryTime_inMilliseconds()) / 1000.0, "s"));
+                        plotDataPerMeasurement.get("total query time").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds()) / 1000.0, "s"));
 
                         // cpu usage
                         plotDataPerMeasurement.get("mean total cpu usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanTotalCpuUsagePerQuery_inPercent(), "%"));
@@ -109,7 +112,7 @@ public class StatisticsBarPlotter {
                         // disk usage
                         plotDataPerMeasurement.get("mean disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanDiskUsagePerQuery_inBytes(), "Byte"));
                         plotDataPerMeasurement.get("median disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianDiskUsagePerQuery_inBytes(), "Byte"));
-                        plotDataPerMeasurement.get("maximum recorded disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMaximumDiskUsageRecorded_inBytes() / (1024*1024), "MiB"));
+                        plotDataPerMeasurement.get("maximum recorded disk usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getMaximumDiskUsageRecorded_inBytes()) / (1024.0 * 1024.0 * 1024.0), "GiB"));
 
                         // memory usage
                         plotDataPerMeasurement.get("mean total memory usage").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanTotalMemoryUsage_inPercent(), "%"));
@@ -129,16 +132,16 @@ public class StatisticsBarPlotter {
                         // network download
                         plotDataPerMeasurement.get("mean network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanNetworkDownload_inBytes(), "Byte"));
                         plotDataPerMeasurement.get("median network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianNetworkDownload_inBytes(), "Byte"));
-                        plotDataPerMeasurement.get("total total network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalNetworkDownload_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("total total network download").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getTotalNetworkDownload_inBytes()) / (1024.0 * 1024.0 * 1024.0), "GiB"));
 
                         // network upload
                         plotDataPerMeasurement.get("mean network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanNetworkUpload_inBytes() , "Byte"));
                         plotDataPerMeasurement.get("median network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianNetworkUpload_inBytes(), "Byte"));
-                        plotDataPerMeasurement.get("total total network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getTotalNetworkUpload_inBytes(), "Byte"));
+                        plotDataPerMeasurement.get("total total network upload").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getTotalNetworkUpload_inBytes()) / (1024.0 * 1024.0 * 1024.0), "GiB"));
 
                         // latency
-                        plotDataPerMeasurement.get("mean latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMeanLatency_inMilliseconds(), "ms"));
-                        plotDataPerMeasurement.get("median latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), queryFunctionStatistics.getMedianLatency_inMilliseconds(), "ms"));
+                        plotDataPerMeasurement.get("mean latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getMeanLatency_inMilliseconds()) / 1000.0, "s"));
+                        plotDataPerMeasurement.get("median latency").add(new PlotData(tsdbStatistics.getTsdbName(), queryFunctionStatistics.getQueryFunction(), (double)(queryFunctionStatistics.getMedianLatency_inMilliseconds()) / 1000.0, "s"));
 
                     }
                 }
@@ -205,6 +208,54 @@ public class StatisticsBarPlotter {
                 logger.error("Error saving chart to file: " + e.getLocalizedMessage());
             }
         }
+    }
+
+    /**
+     * Generates a bar plot for the import data throughput and saves it to chronixBenchmark/statistics/bar_plots/throughput.jpg
+     *
+     * @param timeSeriesStatistics the TimeSeriesStatistics for the imported data set.
+     */
+    public void plotThroughput(TimeSeriesStatistics timeSeriesStatistics){
+        DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
+        for(TsdbStatistics tsdbStatistics : tsdbStatisticsList){
+            for(QueryFunctionStatistics queryFunctionStatistics : tsdbStatistics.getQueryFunctionStatisticsList()){
+                if(queryFunctionStatistics.getQueryFunction().equals("import")){
+                    double throughput_inMiB_per_Second = (double)(timeSeriesStatistics.getTotalSizeUnzippedInBytes()/(1024*1024)) / (double)(queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds()/1000);
+                    barDataset.setValue(throughput_inMiB_per_Second, tsdbStatistics.getTsdbName(), "import throughput");
+                    /*logger.info("total size: {}; total time: {}; throughput: {}; tsdbName: {}",
+                            timeSeriesStatistics.getTotalSizeUnzippedInBytes(),
+                            queryFunctionStatistics.getTotalQueryTimePerQueryFunction_inMilliseconds(),
+                            throughput_inMiB_per_Second,
+                            tsdbStatistics.getTsdbName());*/
+                }
+            }
+        }
+
+        //Create the chart
+        JFreeChart chart = ChartFactory.createBarChart(
+                "data throughput during import",
+                "TSDB",
+                "MiB/s",
+                barDataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
+        );
+
+        //save to file
+        try {
+            String fileName = "throughput.jpg";
+            ChartUtilities.saveChartAsJPEG(
+                    new File(statisticsBarPlotDirectory + File.separator + fileName),
+                    chart,
+                    CHART_WIDTH,
+                    CHART_HEIGHT);
+
+        } catch (Exception e){
+            logger.error("Error saving chart to file: " + e.getLocalizedMessage());
+        }
+
     }
 
 
