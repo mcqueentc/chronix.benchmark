@@ -1,13 +1,13 @@
 package de.qaware.chronix.client.benchmark.resultpresenter;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesPoint;
-import de.qaware.chronix.shared.DataModels.Pair;
-import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.DataModels.Pair;
+import de.qaware.chronix.common.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.math.ChronixMath;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.*;
@@ -69,6 +68,7 @@ public class TimeSeriesAnalyzer {
         List<Double> minimumValuePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> maximumValuePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> meanValuePerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> medianValuePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> measurementDurationPerTimeSeries = new ArrayList<>(allFiles.size());
@@ -119,6 +119,7 @@ public class TimeSeriesAnalyzer {
                 minimumValuePerTimeSeries.addAll(analyticsMap.get("minimumValuePerTimeSeries"));
                 maximumValuePerTimeSeries.addAll(analyticsMap.get("maximumValuePerTimeSeries"));
                 meanValuePerTimeSeries.addAll(analyticsMap.get("meanValuePerTimeSeries"));
+                medianValuePerTimeSeries.addAll(analyticsMap.get("medianValuePerTimeSeries"));
                 sampleCovarianceValuePerTimeSeries.addAll(analyticsMap.get("sampleCovarianceValuePerTimeSeries"));
                 meanValueChangeRatePerTimeSeries.addAll(analyticsMap.get("meanValueChangeRatePerTimeSeries"));
                 measurementDurationPerTimeSeries.addAll(analyticsMap.get("measurementDurationPerTimeSeries"));
@@ -132,7 +133,6 @@ public class TimeSeriesAnalyzer {
             }
 
             // calc set statistics
-            Collections.sort(pointsPerTimeSeries);
 
             double numberOfTotalPoints = 0d;
             for(Double points : pointsPerTimeSeries){
@@ -146,12 +146,9 @@ public class TimeSeriesAnalyzer {
             double minNumberOfPointsPerTimeSeries = Collections.min(pointsPerTimeSeries);
             double maxNumberOfPointsPerTimeSeries = Collections.max(pointsPerTimeSeries);
             double averagePointsPerTimeSeries = numberOfTotalPoints / numberOfTimeSeries;
-            double medianPointsPerTimeSeries = pointsPerTimeSeries.get(pointsPerTimeSeries.size() / 2);
+            double medianPointsPerTimeSeries = ChronixMath.calcMedianFromDouble(pointsPerTimeSeries);
 
             //calc value statistics
-            Collections.sort(meanValuePerTimeSeries);
-            Collections.sort(sampleCovarianceValuePerTimeSeries);
-
             double minValueOfAllTimeSeries = Collections.min(minimumValuePerTimeSeries);
             double maxValueOfAllTimeSeries = Collections.max(maximumValuePerTimeSeries);
 
@@ -162,7 +159,7 @@ public class TimeSeriesAnalyzer {
             if(meanValuePerTimeSeries.size() > 0) {
                 meanValueofAllTimeSeries /= meanValuePerTimeSeries.size();
             }
-            double medianOfAllMeanValues = meanValuePerTimeSeries.get(meanValuePerTimeSeries.size() / 2);
+            double medianValueOfAllTimeSeries = ChronixMath.calcMedianFromDouble(medianValuePerTimeSeries);
 
             double meanSampleCovarianceOfAllTimeSeries = 0d;
             for(Double s_2 : sampleCovarianceValuePerTimeSeries){
@@ -171,7 +168,7 @@ public class TimeSeriesAnalyzer {
             if(sampleCovarianceValuePerTimeSeries.size() > 0) {
                 meanSampleCovarianceOfAllTimeSeries /= sampleCovarianceValuePerTimeSeries.size();
             }
-            double medianSampleCovarianceOfAllTimeSeries = sampleCovarianceValuePerTimeSeries.get(sampleCovarianceValuePerTimeSeries.size() / 2);
+            double medianSampleCovarianceOfAllTimeSeries = ChronixMath.calcMedianFromDouble(sampleCovarianceValuePerTimeSeries);
 
             double meanValueChangeRateOfAllTimeseries = 0d;
             for(Double changeRate : meanValueChangeRatePerTimeSeries){
@@ -206,19 +203,19 @@ public class TimeSeriesAnalyzer {
             timeSeriesStatistics.setNumberOfTotalPoints((long)numberOfTotalPoints);
             timeSeriesStatistics.setMinNumberOfPointsPerTimeSeries((long)minNumberOfPointsPerTimeSeries);
             timeSeriesStatistics.setMaxNumberOfPointsPerTimeSeries((long)maxNumberOfPointsPerTimeSeries);
-            timeSeriesStatistics.setAveragePointsPerTimeSeries((long)averagePointsPerTimeSeries);
-            timeSeriesStatistics.setMedianPointsPerTimeSeries((long)medianPointsPerTimeSeries);
+            timeSeriesStatistics.setAveragePointsPerTimeSeries(averagePointsPerTimeSeries);
+            timeSeriesStatistics.setMedianPointsPerTimeSeries(medianPointsPerTimeSeries);
 
             //set value set stats
             timeSeriesStatistics.setMinValueOfAllTimeSeries(minValueOfAllTimeSeries);
             timeSeriesStatistics.setMaxValueOfAllTimeSeries(maxValueOfAllTimeSeries);
             timeSeriesStatistics.setMeanValueOfAllTimeSeries(meanValueofAllTimeSeries);
-            timeSeriesStatistics.setMedianOfAllMeanValues(medianOfAllMeanValues);
-            timeSeriesStatistics.setMeanSampleStandardDeviationOfAllTimeSeries((long)(Math.sqrt(meanSampleCovarianceOfAllTimeSeries)));
-            timeSeriesStatistics.setMedianSampleStandardDeviationOfAllTimeSeries((long)(Math.sqrt(medianSampleCovarianceOfAllTimeSeries)));
-            timeSeriesStatistics.setMeanValueChangeRateOfAllTimeSeries((long)meanValueChangeRateOfAllTimeseries);
-            timeSeriesStatistics.setMeanMeasurementDurationOfAllTimeSeries_inSeconds((long)(meanMeasurementDurationOfAllTimeSeries / 1000));
-            timeSeriesStatistics.setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds((long)meanSamplingIntervalOfAllTimeSeries);
+            timeSeriesStatistics.setMedianValueOfAllTimeSeries(medianValueOfAllTimeSeries);
+            timeSeriesStatistics.setMeanSampleStandardDeviationOfAllTimeSeries(Math.sqrt(meanSampleCovarianceOfAllTimeSeries));
+            timeSeriesStatistics.setMedianSampleStandardDeviationOfAllTimeSeries(Math.sqrt(medianSampleCovarianceOfAllTimeSeries));
+            timeSeriesStatistics.setMeanValueChangeRateOfAllTimeSeries(meanValueChangeRateOfAllTimeseries);
+            timeSeriesStatistics.setMeanMeasurementDurationOfAllTimeSeries_inSeconds((meanMeasurementDurationOfAllTimeSeries / 1000));
+            timeSeriesStatistics.setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(meanSamplingIntervalOfAllTimeSeries);
 
             // write to file
             writeStatsJson(timeSeriesStatistics);
@@ -291,6 +288,7 @@ public class TimeSeriesAnalyzer {
             List<Double> minimumValuePerTimeSeries = new ArrayList<>(files.size());
             List<Double> maximumValuePerTimeSeries = new ArrayList<>(files.size());
             List<Double> meanValuePerTimeSeries = new ArrayList<>(files.size());
+            List<Double> medianValuePerTimeSeries = new ArrayList<>(files.size());
             List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(files.size());
             List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(files.size());
             List<Double> measurementDurationPerTimeSeries = new ArrayList<>(files.size());
@@ -309,6 +307,7 @@ public class TimeSeriesAnalyzer {
                 minimumValuePerTimeSeries.addAll(valueAnalytics.get("minimumValuePerTimeSeries"));
                 maximumValuePerTimeSeries.addAll(valueAnalytics.get("maximumValuePerTimeSeries"));
                 meanValuePerTimeSeries.addAll(valueAnalytics.get("meanValuePerTimeSeries"));
+                medianValuePerTimeSeries.addAll(valueAnalytics.get("medianValuePerTimeSeries"));
                 sampleCovarianceValuePerTimeSeries.addAll(valueAnalytics.get("sampleCovarianceValuePerTimeSeries"));
                 meanValueChangeRatePerTimeSeries.addAll(valueAnalytics.get("meanValueChangeRatePerTimeSeries"));
                 measurementDurationPerTimeSeries.addAll(valueAnalytics.get("measurementDurationPerTimeSeries"));
@@ -322,6 +321,7 @@ public class TimeSeriesAnalyzer {
             valueAnalytics.get("minimumValuePerTimeSeries").addAll(minimumValuePerTimeSeries);
             valueAnalytics.get("maximumValuePerTimeSeries").addAll(maximumValuePerTimeSeries);
             valueAnalytics.get("meanValuePerTimeSeries").addAll(meanValuePerTimeSeries);
+            valueAnalytics.get("medianValuePerTimeSeries").addAll(medianValuePerTimeSeries);
             valueAnalytics.get("sampleCovarianceValuePerTimeSeries").addAll(sampleCovarianceValuePerTimeSeries);
             valueAnalytics.get("meanValueChangeRatePerTimeSeries").addAll(meanValueChangeRatePerTimeSeries);
             valueAnalytics.get("measurementDurationPerTimeSeries").addAll(measurementDurationPerTimeSeries);
@@ -337,6 +337,7 @@ public class TimeSeriesAnalyzer {
             List<Double> minimumValuePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> maximumValuePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> meanValuePerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> medianValuePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> sampleCovarianceValuePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> measurementDurationPerTimeSeries = new ArrayList<>(timeSeries.size());
@@ -372,6 +373,7 @@ public class TimeSeriesAnalyzer {
                 if(ts.getPoints().size() > 0) {
                     mean = sum / ts.getPoints().size();
                 }
+                double median = ChronixMath.calcMedianFromTimeSeriesPoints(ts.getPoints());
                 double sum_for_sample_covariance = 0d;
                 double lastChangedValue = ts.getPoints().get(0).getValue();
                 double changeCounter = 0L;
@@ -405,6 +407,7 @@ public class TimeSeriesAnalyzer {
                 }
 
                 meanValuePerTimeSeries.add(mean);
+                medianValuePerTimeSeries.add(median);
                 sampleCovarianceValuePerTimeSeries.add(sample_covariance);
 
                 // calc meanValueChangeRatePerTimeSeries
@@ -433,6 +436,7 @@ public class TimeSeriesAnalyzer {
             valueAnalytics.put("minimumValuePerTimeSeries", minimumValuePerTimeSeries);
             valueAnalytics.put("maximumValuePerTimeSeries", maximumValuePerTimeSeries);
             valueAnalytics.put("meanValuePerTimeSeries", meanValuePerTimeSeries);
+            valueAnalytics.put("medianValuePerTimeSeries", medianValuePerTimeSeries);
             valueAnalytics.put("sampleCovarianceValuePerTimeSeries", sampleCovarianceValuePerTimeSeries);
             valueAnalytics.put("meanValueChangeRatePerTimeSeries", meanValueChangeRatePerTimeSeries);
             valueAnalytics.put("measurementDurationPerTimeSeries", measurementDurationPerTimeSeries);

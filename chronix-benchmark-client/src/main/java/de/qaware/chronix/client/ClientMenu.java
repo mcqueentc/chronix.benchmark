@@ -3,8 +3,8 @@ package de.qaware.chronix.client;
 
 import de.qaware.chronix.client.benchmark.*;
 import de.qaware.chronix.client.benchmark.util.*;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
 
 import java.util.*;
 

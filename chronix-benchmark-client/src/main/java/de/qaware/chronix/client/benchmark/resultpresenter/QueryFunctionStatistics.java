@@ -11,7 +11,7 @@ public class QueryFunctionStatistics {
     private String queryFunction;
 
     private long meanQueryTime_inMilliseconds;
-    private long medianQueryTime_inMilliseconds;
+    private double medianQueryTime_inMilliseconds;
     private long totalQueryTimePerQueryFunction_inMilliseconds;
 
     private double meanTotalCpuUsagePerQuery_inPercent;
@@ -19,7 +19,7 @@ public class QueryFunctionStatistics {
     private double maximumCpuUsageRecorded_inPercent;
 
     private long meanDiskUsagePerQuery_inBytes;
-    private long medianDiskUsagePerQuery_inBytes;
+    private double medianDiskUsagePerQuery_inBytes;
     private long maximumDiskUsageRecorded_inBytes;
 
     private double meanMemoryUsagePerQuery_inPercent;
@@ -29,21 +29,21 @@ public class QueryFunctionStatistics {
     private double maximumMemoryUsageRecorded_inPercent;
 
     private long meanDiskWrite_inBytes;
-    private long medianDiskWrite_inBytes;
+    private double medianDiskWrite_inBytes;
     private long totalDiskWrite_inBytes;
     private long meanDiskRead_inBytes;
-    private long medianDiskRead_inBytes;
+    private double medianDiskRead_inBytes;
     private long totalDiskRead_inBytes;
 
     private long meanNetworkDownload_inBytes;
-    private long medianNetworkDownload_inBytes;
+    private double medianNetworkDownload_inBytes;
     private long totalNetworkDownload_inBytes;
     private long meanNetworkUpload_inBytes;
-    private long medianNetworkUpload_inBytes;
+    private double medianNetworkUpload_inBytes;
     private long totalNetworkUpload_inBytes;
 
     private long meanLatency_inMilliseconds;
-    private long medianLatency_inMilliseconds;
+    private double medianLatency_inMilliseconds;
 
     public QueryFunctionStatistics() {
     }
@@ -68,11 +68,11 @@ public class QueryFunctionStatistics {
         this.meanQueryTime_inMilliseconds = meanQueryTime_inMilliseconds;
     }
 
-    public long getMedianQueryTime_inMilliseconds() {
+    public double getMedianQueryTime_inMilliseconds() {
         return medianQueryTime_inMilliseconds;
     }
 
-    public void setMedianQueryTime_inMilliseconds(long medianQueryTime_inMilliseconds) {
+    public void setMedianQueryTime_inMilliseconds(double medianQueryTime_inMilliseconds) {
         this.medianQueryTime_inMilliseconds = medianQueryTime_inMilliseconds;
     }
 
@@ -108,11 +108,11 @@ public class QueryFunctionStatistics {
         this.meanDiskUsagePerQuery_inBytes = meanDiskUsagePerQuery_inBytes;
     }
 
-    public long getMedianDiskUsagePerQuery_inBytes() {
+    public double getMedianDiskUsagePerQuery_inBytes() {
         return medianDiskUsagePerQuery_inBytes;
     }
 
-    public void setMedianDiskUsagePerQuery_inBytes(long medianDiskUsagePerQuery_inBytes) {
+    public void setMedianDiskUsagePerQuery_inBytes(double medianDiskUsagePerQuery_inBytes) {
         this.medianDiskUsagePerQuery_inBytes = medianDiskUsagePerQuery_inBytes;
     }
 
@@ -172,11 +172,11 @@ public class QueryFunctionStatistics {
         this.meanDiskWrite_inBytes = meanDiskWrite_inBytes;
     }
 
-    public long getMedianDiskWrite_inBytes() {
+    public double getMedianDiskWrite_inBytes() {
         return medianDiskWrite_inBytes;
     }
 
-    public void setMedianDiskWrite_inBytes(long medianDiskWrite_inBytes) {
+    public void setMedianDiskWrite_inBytes(double medianDiskWrite_inBytes) {
         this.medianDiskWrite_inBytes = medianDiskWrite_inBytes;
     }
 
@@ -196,11 +196,11 @@ public class QueryFunctionStatistics {
         this.meanDiskRead_inBytes = meanDiskRead_inBytes;
     }
 
-    public long getMedianDiskRead_inBytes() {
+    public double getMedianDiskRead_inBytes() {
         return medianDiskRead_inBytes;
     }
 
-    public void setMedianDiskRead_inBytes(long medianDiskRead_inBytes) {
+    public void setMedianDiskRead_inBytes(double medianDiskRead_inBytes) {
         this.medianDiskRead_inBytes = medianDiskRead_inBytes;
     }
 
@@ -220,11 +220,11 @@ public class QueryFunctionStatistics {
         this.meanNetworkDownload_inBytes = meanNetworkDownload_inBytes;
     }
 
-    public long getMedianNetworkDownload_inBytes() {
+    public double getMedianNetworkDownload_inBytes() {
         return medianNetworkDownload_inBytes;
     }
 
-    public void setMedianNetworkDownload_inBytes(long medianNetworkDownload_inBytes) {
+    public void setMedianNetworkDownload_inBytes(double medianNetworkDownload_inBytes) {
         this.medianNetworkDownload_inBytes = medianNetworkDownload_inBytes;
     }
 
@@ -244,11 +244,11 @@ public class QueryFunctionStatistics {
         this.meanNetworkUpload_inBytes = meanNetworkUpload_inBytes;
     }
 
-    public long getMedianNetworkUpload_inBytes() {
+    public double getMedianNetworkUpload_inBytes() {
         return medianNetworkUpload_inBytes;
     }
 
-    public void setMedianNetworkUpload_inBytes(long medianNetworkUpload_inBytes) {
+    public void setMedianNetworkUpload_inBytes(double medianNetworkUpload_inBytes) {
         this.medianNetworkUpload_inBytes = medianNetworkUpload_inBytes;
     }
 
@@ -268,11 +268,11 @@ public class QueryFunctionStatistics {
         this.meanLatency_inMilliseconds = meanLatency_inMilliseconds;
     }
 
-    public long getMedianLatency_inMilliseconds() {
+    public double getMedianLatency_inMilliseconds() {
         return medianLatency_inMilliseconds;
     }
 
-    public void setMedianLatency_inMilliseconds(long medianLatency_inMilliseconds) {
+    public void setMedianLatency_inMilliseconds(double medianLatency_inMilliseconds) {
         this.medianLatency_inMilliseconds = medianLatency_inMilliseconds;
     }
 

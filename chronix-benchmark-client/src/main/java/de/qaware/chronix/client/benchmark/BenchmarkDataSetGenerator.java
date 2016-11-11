@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.database.TimeSeriesMetaData;
-import de.qaware.chronix.shared.DataModels.BenchmarkSetupVariables;
-import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.DataModels.BenchmarkSetupVariables;
+import de.qaware.chronix.common.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
 
 import java.io.File;
 import java.util.List;

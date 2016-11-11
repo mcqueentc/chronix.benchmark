@@ -1,4 +1,4 @@
-package de.qaware.chronix.shared.QueryUtil;
+package de.qaware.chronix.common.QueryUtil;
 
 import de.qaware.chronix.database.BenchmarkQuery;
 

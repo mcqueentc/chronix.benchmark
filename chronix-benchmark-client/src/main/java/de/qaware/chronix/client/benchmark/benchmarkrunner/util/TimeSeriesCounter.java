@@ -1,6 +1,6 @@
 package de.qaware.chronix.client.benchmark.benchmarkrunner.util;
 
-import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.QueryUtil.JsonTimeSeriesHandler;
 import de.qaware.chronix.database.TimeSeriesMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

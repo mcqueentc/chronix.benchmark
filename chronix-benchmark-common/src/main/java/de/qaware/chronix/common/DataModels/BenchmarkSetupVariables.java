@@ -1,4 +1,4 @@
-package de.qaware.chronix.shared.DataModels;
+package de.qaware.chronix.common.DataModels;
 
 /**
  * Created by mcqueen666 on 21.10.16.

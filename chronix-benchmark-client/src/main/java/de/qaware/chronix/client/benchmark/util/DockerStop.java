@@ -2,8 +2,8 @@ package de.qaware.chronix.client.benchmark.util;
 
 import de.qaware.chronix.client.ClientMenu;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
 
 import java.util.List;
 import java.util.Map;

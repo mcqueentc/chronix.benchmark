@@ -1,18 +1,8 @@
 package Client;
 
-import Docker.BuildDockerContainer;
-import Docker.StartDockerContainer;
-import Docker.UploadDockerFiles;
-import Server.CleanDatabasesOnServerTest;
-import Server.GenerateServerConfigRecord;
-import Server.InterfaceAndConfigUploadTest;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
-import de.qaware.chronix.client.benchmark.benchmarkrunner.util.BenchmarkRunnerHelper;
-import de.qaware.chronix.client.benchmark.benchmarkrunner.util.TimeSeriesCounter;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.database.TimeSeriesMetaData;
-import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.QueryUtil.JsonTimeSeriesHandler;
 
 import java.io.File;
 import java.util.ArrayList;

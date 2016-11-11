@@ -1,9 +1,8 @@
 package Docker;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
-import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.dockerUtil.DockerRunOptions;
 
 import java.util.List;
 

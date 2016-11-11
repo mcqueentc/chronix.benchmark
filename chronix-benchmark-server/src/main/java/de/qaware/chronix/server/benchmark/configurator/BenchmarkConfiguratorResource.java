@@ -1,16 +1,15 @@
 package de.qaware.chronix.server.benchmark.configurator;
 
 
-import com.codahale.metrics.annotation.Timed;
 import de.qaware.chronix.database.BenchmarkDataSource;
 import de.qaware.chronix.server.util.ChronixBoolean;
 import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
-import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
-import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
-import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.common.ServerConfig.TSDBInterfaceHandler;
+import de.qaware.chronix.common.dockerUtil.DockerBuildOptions;
+import de.qaware.chronix.common.dockerUtil.DockerRunOptions;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
 import org.apache.commons.compress.utils.IOUtils;
 //import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;

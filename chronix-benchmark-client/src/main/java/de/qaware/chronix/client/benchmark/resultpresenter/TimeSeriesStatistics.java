@@ -18,79 +18,23 @@ public class TimeSeriesStatistics {
     private long numberOfTotalPoints;
     private long minNumberOfPointsPerTimeSeries;
     private long maxNumberOfPointsPerTimeSeries;
-    private long averagePointsPerTimeSeries;
-    private long medianPointsPerTimeSeries;
+    private double averagePointsPerTimeSeries;
+    private double medianPointsPerTimeSeries;
 
     // data value stats
     private double minValueOfAllTimeSeries;
     private double maxValueOfAllTimeSeries;
     private double meanValueOfAllTimeSeries;
-    private double medianOfAllMeanValues;
-    private long meanSampleStandardDeviationOfAllTimeSeries;
-    private long medianSampleStandardDeviationOfAllTimeSeries;
-    private long meanValueChangeRateOfAllTimeSeries;
-    private long meanMeasurementDurationOfAllTimeSeries_inSeconds;
-    private long meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
+    private double medianValueOfAllTimeSeries;
+    private double meanSampleStandardDeviationOfAllTimeSeries;
+    private double medianSampleStandardDeviationOfAllTimeSeries;
+    private double meanValueChangeRateOfAllTimeSeries;
+    private double meanMeasurementDurationOfAllTimeSeries_inSeconds;
+    private double meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
 
 
     public TimeSeriesStatistics(){
 
-    }
-
-    public long getTotalSizeInBytes() {
-        return totalSizeInBytes;
-    }
-
-    public int getNumberOfTimeSeries() {
-        return numberOfTimeSeries;
-    }
-
-    public long getNumberOfTotalPoints() {
-        return numberOfTotalPoints;
-    }
-
-    public long getMinNumberOfPointsPerTimeSeries() {
-        return minNumberOfPointsPerTimeSeries;
-    }
-
-    public long getMaxNumberOfPointsPerTimeSeries() {
-        return maxNumberOfPointsPerTimeSeries;
-    }
-
-    public long getAveragePointsPerTimeSeries() {
-        return averagePointsPerTimeSeries;
-    }
-
-    public long getMedianPointsPerTimeSeries() {
-        return medianPointsPerTimeSeries;
-    }
-
-    public void setTotalSizeInBytes(long totalSizeInBytes) {
-        this.totalSizeInBytes = totalSizeInBytes;
-    }
-
-    public void setNumberOfTimeSeries(int numberOfTimeSeries) {
-        this.numberOfTimeSeries = numberOfTimeSeries;
-    }
-
-    public void setNumberOfTotalPoints(long numberOfTotalPoints) {
-        this.numberOfTotalPoints = numberOfTotalPoints;
-    }
-
-    public void setMinNumberOfPointsPerTimeSeries(long minNumberOfPointsPerTimeSeries) {
-        this.minNumberOfPointsPerTimeSeries = minNumberOfPointsPerTimeSeries;
-    }
-
-    public void setMaxNumberOfPointsPerTimeSeries(long maxNumberOfPointsPerTimeSeries) {
-        this.maxNumberOfPointsPerTimeSeries = maxNumberOfPointsPerTimeSeries;
-    }
-
-    public void setAveragePointsPerTimeSeries(long averagePointsPerTimeSeries) {
-        this.averagePointsPerTimeSeries = averagePointsPerTimeSeries;
-    }
-
-    public void setMedianPointsPerTimeSeries(long medianPointsPerTimeSeries) {
-        this.medianPointsPerTimeSeries = medianPointsPerTimeSeries;
     }
 
     public String getDate() {
@@ -107,6 +51,70 @@ public class TimeSeriesStatistics {
 
     public void setMeasurements(List<String> measurements) {
         this.measurements = measurements;
+    }
+
+    public long getTotalSizeInBytes() {
+        return totalSizeInBytes;
+    }
+
+    public void setTotalSizeInBytes(long totalSizeInBytes) {
+        this.totalSizeInBytes = totalSizeInBytes;
+    }
+
+    public long getTotalSizeUnzippedInBytes() {
+        return totalSizeUnzippedInBytes;
+    }
+
+    public void setTotalSizeUnzippedInBytes(long totalSizeUnzippedInBytes) {
+        this.totalSizeUnzippedInBytes = totalSizeUnzippedInBytes;
+    }
+
+    public int getNumberOfTimeSeries() {
+        return numberOfTimeSeries;
+    }
+
+    public void setNumberOfTimeSeries(int numberOfTimeSeries) {
+        this.numberOfTimeSeries = numberOfTimeSeries;
+    }
+
+    public long getNumberOfTotalPoints() {
+        return numberOfTotalPoints;
+    }
+
+    public void setNumberOfTotalPoints(long numberOfTotalPoints) {
+        this.numberOfTotalPoints = numberOfTotalPoints;
+    }
+
+    public long getMinNumberOfPointsPerTimeSeries() {
+        return minNumberOfPointsPerTimeSeries;
+    }
+
+    public void setMinNumberOfPointsPerTimeSeries(long minNumberOfPointsPerTimeSeries) {
+        this.minNumberOfPointsPerTimeSeries = minNumberOfPointsPerTimeSeries;
+    }
+
+    public long getMaxNumberOfPointsPerTimeSeries() {
+        return maxNumberOfPointsPerTimeSeries;
+    }
+
+    public void setMaxNumberOfPointsPerTimeSeries(long maxNumberOfPointsPerTimeSeries) {
+        this.maxNumberOfPointsPerTimeSeries = maxNumberOfPointsPerTimeSeries;
+    }
+
+    public double getAveragePointsPerTimeSeries() {
+        return averagePointsPerTimeSeries;
+    }
+
+    public void setAveragePointsPerTimeSeries(double averagePointsPerTimeSeries) {
+        this.averagePointsPerTimeSeries = averagePointsPerTimeSeries;
+    }
+
+    public double getMedianPointsPerTimeSeries() {
+        return medianPointsPerTimeSeries;
+    }
+
+    public void setMedianPointsPerTimeSeries(double medianPointsPerTimeSeries) {
+        this.medianPointsPerTimeSeries = medianPointsPerTimeSeries;
     }
 
     public double getMinValueOfAllTimeSeries() {
@@ -133,59 +141,51 @@ public class TimeSeriesStatistics {
         this.meanValueOfAllTimeSeries = meanValueOfAllTimeSeries;
     }
 
-    public double getMedianOfAllMeanValues() {
-        return medianOfAllMeanValues;
+    public double getMedianValueOfAllTimeSeries() {
+        return medianValueOfAllTimeSeries;
     }
 
-    public void setMedianOfAllMeanValues(double medianOfAllMeanValues) {
-        this.medianOfAllMeanValues = medianOfAllMeanValues;
+    public void setMedianValueOfAllTimeSeries(double medianValueOfAllTimeSeries) {
+        this.medianValueOfAllTimeSeries = medianValueOfAllTimeSeries;
     }
 
-    public long getMeanSampleStandardDeviationOfAllTimeSeries() {
+    public double getMeanSampleStandardDeviationOfAllTimeSeries() {
         return meanSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public void setMeanSampleStandardDeviationOfAllTimeSeries(long meanSampleStandardDeviationOfAllTimeSeries) {
+    public void setMeanSampleStandardDeviationOfAllTimeSeries(double meanSampleStandardDeviationOfAllTimeSeries) {
         this.meanSampleStandardDeviationOfAllTimeSeries = meanSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public long getMedianSampleStandardDeviationOfAllTimeSeries() {
+    public double getMedianSampleStandardDeviationOfAllTimeSeries() {
         return medianSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public void setMedianSampleStandardDeviationOfAllTimeSeries(long medianSampleStandardDeviationOfAllTimeSeries) {
+    public void setMedianSampleStandardDeviationOfAllTimeSeries(double medianSampleStandardDeviationOfAllTimeSeries) {
         this.medianSampleStandardDeviationOfAllTimeSeries = medianSampleStandardDeviationOfAllTimeSeries;
     }
 
-    public long getMeanValueChangeRateOfAllTimeSeries() {
+    public double getMeanValueChangeRateOfAllTimeSeries() {
         return meanValueChangeRateOfAllTimeSeries;
     }
 
-    public void setMeanValueChangeRateOfAllTimeSeries(long meanValueChangeRateOfAllTimeSeries) {
+    public void setMeanValueChangeRateOfAllTimeSeries(double meanValueChangeRateOfAllTimeSeries) {
         this.meanValueChangeRateOfAllTimeSeries = meanValueChangeRateOfAllTimeSeries;
     }
 
-    public long getMeanMeasurementDurationOfAllTimeSeries_inSeconds() {
+    public double getMeanMeasurementDurationOfAllTimeSeries_inSeconds() {
         return meanMeasurementDurationOfAllTimeSeries_inSeconds;
     }
 
-    public void setMeanMeasurementDurationOfAllTimeSeries_inSeconds(long meanMeasurementDurationOfAllTimeSeries_inSeconds) {
+    public void setMeanMeasurementDurationOfAllTimeSeries_inSeconds(double meanMeasurementDurationOfAllTimeSeries_inSeconds) {
         this.meanMeasurementDurationOfAllTimeSeries_inSeconds = meanMeasurementDurationOfAllTimeSeries_inSeconds;
     }
 
-    public long getMeanSamplingIntervalOfAllTimeSeries_inMilliseconds() {
+    public double getMeanSamplingIntervalOfAllTimeSeries_inMilliseconds() {
         return meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
     }
 
-    public void setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(long meanSamplingIntervalOfAllTimeSeries_inMilliseconds) {
+    public void setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(double meanSamplingIntervalOfAllTimeSeries_inMilliseconds) {
         this.meanSamplingIntervalOfAllTimeSeries_inMilliseconds = meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
-    }
-
-    public long getTotalSizeUnzippedInBytes() {
-        return totalSizeUnzippedInBytes;
-    }
-
-    public void setTotalSizeUnzippedInBytes(long totalSizeUnzippedInBytes) {
-        this.totalSizeUnzippedInBytes = totalSizeUnzippedInBytes;
     }
 }

@@ -1,13 +1,10 @@
 package de.qaware.chronix.client.benchmark.queryhandler;
 
-import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.shared.DataModels.ImportRecordWrapper;
-import de.qaware.chronix.shared.DataModels.Pair;
-import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
-import de.qaware.chronix.shared.QueryUtil.CleanCommand;
-import de.qaware.chronix.shared.QueryUtil.ImportRecord;
-import de.qaware.chronix.shared.QueryUtil.QueryRecord;
+import de.qaware.chronix.common.DataModels.ImportRecordWrapper;
+import de.qaware.chronix.common.DataModels.Pair;
+import de.qaware.chronix.common.QueryUtil.CleanCommand;
+import de.qaware.chronix.common.QueryUtil.QueryRecord;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.slf4j.Logger;

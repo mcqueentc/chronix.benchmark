@@ -3,7 +3,7 @@ package de.qaware.chronix.client.benchmark.resultpresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.resultpresenter.plot.StatisticsBarPlotter;
 import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
-import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.QueryUtil.JsonTimeSeriesHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

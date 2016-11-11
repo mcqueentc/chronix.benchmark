@@ -2,7 +2,7 @@ package de.qaware.chronix.client.benchmark;
 
 import de.qaware.chronix.client.ClientMenu;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
-import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.QueryUtil.JsonTimeSeriesHandler;
 
 import java.util.List;
 import java.util.Map;
