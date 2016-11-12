@@ -67,5 +67,46 @@ public class ChronixMath {
         return median;
     }
 
+    public static Double calcStddev(List<Double> collection){
+        Double result = Double.NaN;
+        try {
+            // calc mean
+            double mean = 0.0;
+            for (Double d : collection) {
+                mean += d;
+            }
+            mean /= collection.size();
+
+            //calc stddev
+            double s2 = 0.0;
+            for (Double x : collection) {
+                s2 += Math.pow((x - mean), 2);
+            }
+            s2 /= (collection.size() - 1);
+            result = Math.sqrt(s2);
+        } catch (Exception e){
+            //
+        }
+
+        return result;
+    }
+
+    public static Double calcStddev(List<Double> collection, double mean){
+        Double result = Double.NaN;
+        try {
+            //calc stddev
+            double s2 = 0.0;
+            for (Double x : collection) {
+                s2 += Math.pow((x - mean), 2);
+            }
+            s2 /= (collection.size() - 1);
+            result = Math.sqrt(s2);
+        } catch (Exception e){
+            //
+        }
+
+        return result;
+    }
+
 
 }
