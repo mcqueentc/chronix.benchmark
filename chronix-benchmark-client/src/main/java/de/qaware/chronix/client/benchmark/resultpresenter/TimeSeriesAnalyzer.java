@@ -73,6 +73,7 @@ public class TimeSeriesAnalyzer {
         List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> measurementDurationPerTimeSeries = new ArrayList<>(allFiles.size());
         List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(allFiles.size());
+        List<Double> medianSamplingIntervalPerTimeSeries = new ArrayList<>(allFiles.size());
 
 
         //split workload
@@ -124,6 +125,7 @@ public class TimeSeriesAnalyzer {
                 meanValueChangeRatePerTimeSeries.addAll(analyticsMap.get("meanValueChangeRatePerTimeSeries"));
                 measurementDurationPerTimeSeries.addAll(analyticsMap.get("measurementDurationPerTimeSeries"));
                 meanSamplingIntervalPerTimeSeries.addAll(analyticsMap.get("meanSamplingIntervalPerTimeSeries"));
+                medianSamplingIntervalPerTimeSeries.addAll(analyticsMap.get("medianSamplingIntervalPerTimeSeries"));
 
             }
 
@@ -153,46 +155,33 @@ public class TimeSeriesAnalyzer {
             double maxValueOfAllTimeSeries = Collections.max(maximumValuePerTimeSeries);
 
             double meanValueofAllTimeSeries = 0d;
-            for(Double meanValue : meanValuePerTimeSeries){
-                meanValueofAllTimeSeries += meanValue;
-            }
             if(meanValuePerTimeSeries.size() > 0) {
-                meanValueofAllTimeSeries /= meanValuePerTimeSeries.size();
+                meanValueofAllTimeSeries = ChronixMath.calcMeanFromDouble(meanValuePerTimeSeries);
             }
             double medianValueOfAllTimeSeries = ChronixMath.calcMedianFromDouble(medianValuePerTimeSeries);
 
             double meanSampleCovarianceOfAllTimeSeries = 0d;
-            for(Double s_2 : sampleCovarianceValuePerTimeSeries){
-                meanSampleCovarianceOfAllTimeSeries += s_2;
-            }
             if(sampleCovarianceValuePerTimeSeries.size() > 0) {
-                meanSampleCovarianceOfAllTimeSeries /= sampleCovarianceValuePerTimeSeries.size();
+                meanSampleCovarianceOfAllTimeSeries = ChronixMath.calcMeanFromDouble(sampleCovarianceValuePerTimeSeries);
             }
             double medianSampleCovarianceOfAllTimeSeries = ChronixMath.calcMedianFromDouble(sampleCovarianceValuePerTimeSeries);
 
             double meanValueChangeRateOfAllTimeseries = 0d;
-            for(Double changeRate : meanValueChangeRatePerTimeSeries){
-                meanValueChangeRateOfAllTimeseries += changeRate;
-            }
             if(meanValueChangeRatePerTimeSeries.size() > 0){
-                meanValueChangeRateOfAllTimeseries /= meanValueChangeRatePerTimeSeries.size();
+                meanValueChangeRateOfAllTimeseries = ChronixMath.calcMeanFromDouble(meanValueChangeRatePerTimeSeries);
             }
 
             double meanMeasurementDurationOfAllTimeSeries = 0d;
-            for(Double duration : measurementDurationPerTimeSeries){
-                meanMeasurementDurationOfAllTimeSeries += duration;
-            }
             if(measurementDurationPerTimeSeries.size() > 0){
-                meanMeasurementDurationOfAllTimeSeries /= measurementDurationPerTimeSeries.size();
+                meanMeasurementDurationOfAllTimeSeries = ChronixMath.calcMeanFromDouble(measurementDurationPerTimeSeries);
             }
+            double medianMeasurementDurationOfAllTimeSeries = ChronixMath.calcMedianFromDouble(measurementDurationPerTimeSeries);
 
             double meanSamplingIntervalOfAllTimeSeries = 0d;
-            for(Double interval : meanSamplingIntervalPerTimeSeries){
-                meanSamplingIntervalOfAllTimeSeries += interval;
-            }
             if(meanSamplingIntervalPerTimeSeries.size() > 0){
-                meanSamplingIntervalOfAllTimeSeries /= meanSamplingIntervalPerTimeSeries.size();
+                meanSamplingIntervalOfAllTimeSeries = ChronixMath.calcMeanFromDouble(meanSamplingIntervalPerTimeSeries);
             }
+            double medianSamplingIntervalOfAllTimeSeries = ChronixMath.calcMedianFromDouble(medianSamplingIntervalPerTimeSeries);
 
             //set data set stats
             timeSeriesStatistics.setDate(Instant.now().toString());
@@ -215,7 +204,9 @@ public class TimeSeriesAnalyzer {
             timeSeriesStatistics.setMedianSampleStandardDeviationOfAllTimeSeries(Math.sqrt(medianSampleCovarianceOfAllTimeSeries));
             timeSeriesStatistics.setMeanValueChangeRateOfAllTimeSeries(meanValueChangeRateOfAllTimeseries);
             timeSeriesStatistics.setMeanMeasurementDurationOfAllTimeSeries_inSeconds((meanMeasurementDurationOfAllTimeSeries / 1000));
+            timeSeriesStatistics.setMedianMeasurementDurationOfAllTimeSeries_inSeconds(medianMeasurementDurationOfAllTimeSeries / 1000);
             timeSeriesStatistics.setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(meanSamplingIntervalOfAllTimeSeries);
+            timeSeriesStatistics.setMedianSamplingIntervalOfAllTimeSeries_inMilliseconds(medianSamplingIntervalOfAllTimeSeries);
 
             // write to file
             writeStatsJson(timeSeriesStatistics);
@@ -293,6 +284,7 @@ public class TimeSeriesAnalyzer {
             List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(files.size());
             List<Double> measurementDurationPerTimeSeries = new ArrayList<>(files.size());
             List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(files.size());
+            List<Double> medianSamplingIntervalPerTimeSeries = new ArrayList<>(files.size());
 
             List<TimeSeries> timeSeries;
             int from = 0;
@@ -312,6 +304,7 @@ public class TimeSeriesAnalyzer {
                 meanValueChangeRatePerTimeSeries.addAll(valueAnalytics.get("meanValueChangeRatePerTimeSeries"));
                 measurementDurationPerTimeSeries.addAll(valueAnalytics.get("measurementDurationPerTimeSeries"));
                 meanSamplingIntervalPerTimeSeries.addAll(valueAnalytics.get("meanSamplingIntervalPerTimeSeries"));
+                medianSamplingIntervalPerTimeSeries.addAll(valueAnalytics.get("medianSamplingIntervalPerTimeSeries"));
 
             }
             timeSeries = JsonTimeSeriesHandler.getInstance().readTimeSeriesJson(files.subList(from, files.size()).toArray(new File[]{}));
@@ -326,6 +319,7 @@ public class TimeSeriesAnalyzer {
             valueAnalytics.get("meanValueChangeRatePerTimeSeries").addAll(meanValueChangeRatePerTimeSeries);
             valueAnalytics.get("measurementDurationPerTimeSeries").addAll(measurementDurationPerTimeSeries);
             valueAnalytics.get("meanSamplingIntervalPerTimeSeries").addAll(meanSamplingIntervalPerTimeSeries);
+            valueAnalytics.get("medianSamplingIntervalPerTimeSeries").addAll(medianSamplingIntervalPerTimeSeries);
 
             logger.info("Thread {} finished.", id);
             return valueAnalytics;
@@ -342,6 +336,7 @@ public class TimeSeriesAnalyzer {
             List<Double> meanValueChangeRatePerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> measurementDurationPerTimeSeries = new ArrayList<>(timeSeries.size());
             List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(timeSeries.size());
+            List<Double> medianSamplingIntervalPerTimeSeries = new ArrayList<>(timeSeries.size());
             for(TimeSeries ts : timeSeries){
                 pointsPerTimeSeries.add((double)ts.getPoints().size());
 
@@ -378,6 +373,7 @@ public class TimeSeriesAnalyzer {
                 double lastChangedValue = ts.getPoints().get(0).getValue();
                 double changeCounter = 0L;
                 double sum_for_sampling_interval = 0d;
+                List<Double> sampling_intervals = new ArrayList<>(ts.getPoints().size()-1);
                 long previousTimeStamp = ts.getPoints().get(0).getTimeStamp();
                 try {
                     for (TimeSeriesPoint point : ts.getPoints()) {
@@ -392,7 +388,8 @@ public class TimeSeriesAnalyzer {
 
                             //calc sampling interval (points are sorted)
                             if(point.getTimeStamp() != previousTimeStamp){
-                                sum_for_sampling_interval += (point.getTimeStamp() - previousTimeStamp);
+                                sampling_intervals.add((double)(point.getTimeStamp() - previousTimeStamp));
+                                sum_for_sampling_interval += (double)(point.getTimeStamp() - previousTimeStamp);
                                 previousTimeStamp = point.getTimeStamp();
                             }
 
@@ -422,11 +419,9 @@ public class TimeSeriesAnalyzer {
 
                 // meanSamplingIntervalPerTimeSeries (point.size() - 1 comparisons)
                 meanSamplingIntervalPerTimeSeries.add(sum_for_sampling_interval / ts.getPoints().size() - 1);
-                /*
-            List<Double> meanSamplingIntervalPerTimeSeries = new ArrayList<>(timeSeries.size());
 
-            valueAnalytics.get("meanSamplingIntervalPerTimeSeries").addAll(meanSamplingIntervalPerTimeSeries);
-                 */
+                // medianSamplingIntervalPerTimeSeries
+                medianSamplingIntervalPerTimeSeries.add(ChronixMath.calcMedianFromDouble(sampling_intervals));
 
 
             }
@@ -441,6 +436,7 @@ public class TimeSeriesAnalyzer {
             valueAnalytics.put("meanValueChangeRatePerTimeSeries", meanValueChangeRatePerTimeSeries);
             valueAnalytics.put("measurementDurationPerTimeSeries", measurementDurationPerTimeSeries);
             valueAnalytics.put("meanSamplingIntervalPerTimeSeries", meanSamplingIntervalPerTimeSeries);
+            valueAnalytics.put("medianSamplingIntervalPerTimeSeries", medianSamplingIntervalPerTimeSeries);
 
             return valueAnalytics;
         }
