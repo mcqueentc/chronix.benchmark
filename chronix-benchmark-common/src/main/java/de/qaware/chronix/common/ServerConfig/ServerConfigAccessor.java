@@ -1,15 +1,14 @@
-package de.qaware.chronix.shared.ServerConfig;
+package de.qaware.chronix.common.ServerConfig;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
+import de.qaware.chronix.common.dockerUtil.DockerRunOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by mcqueen666 on 05.08.16.

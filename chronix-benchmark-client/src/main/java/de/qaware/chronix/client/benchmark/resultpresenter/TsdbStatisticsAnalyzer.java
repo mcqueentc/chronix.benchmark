@@ -3,13 +3,13 @@ package de.qaware.chronix.client.benchmark.resultpresenter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
+import de.qaware.chronix.common.math.ChronixMath;
 import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.common.QueryUtil.BenchmarkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
@@ -317,7 +317,7 @@ public class TsdbStatisticsAnalyzer {
             if(queryTimes.size() > 1) {
                 queryFunctionStatistics.setMeanQueryTime_inMilliseconds(queryTimesSum / queryTimes.size());
                 Collections.sort(queryTimes);
-                queryFunctionStatistics.setMedianQueryTime_inMilliseconds(queryTimes.get(queryTimes.size() / 2));
+                queryFunctionStatistics.setMedianQueryTime_inMilliseconds(ChronixMath.calcMedianFromLong(queryTimes));
             } else {
                 queryFunctionStatistics.setMeanQueryTime_inMilliseconds(queryTimesSum);
                 queryFunctionStatistics.setMedianQueryTime_inMilliseconds(queryTimesSum);
@@ -327,7 +327,7 @@ public class TsdbStatisticsAnalyzer {
             if(totalCpuUsages.size() > 1) {
                 queryFunctionStatistics.setMeanTotalCpuUsagePerQuery_inPercent(totalCpuUsagesSum / totalCpuUsages.size());
                 Collections.sort(totalCpuUsages);
-                queryFunctionStatistics.setMedianTotalCpuUsagePerQuery_inPercent(totalCpuUsages.get(totalCpuUsages.size() / 2));
+                queryFunctionStatistics.setMedianTotalCpuUsagePerQuery_inPercent(ChronixMath.calcMedianFromDouble(totalCpuUsages));
                 queryFunctionStatistics.setMaximumCpuUsageRecorded_inPercent(totalCpuUsages.get(totalCpuUsages.size()-1));
             } else {
                 queryFunctionStatistics.setMeanTotalCpuUsagePerQuery_inPercent(totalCpuUsagesSum);
@@ -339,7 +339,7 @@ public class TsdbStatisticsAnalyzer {
             if(diskUsages.size() > 1){
                 queryFunctionStatistics.setMeanDiskUsagePerQuery_inBytes(diskUsagesSum / diskUsages.size());
                 Collections.sort(diskUsages);
-                queryFunctionStatistics.setMedianDiskUsagePerQuery_inBytes(diskUsages.get(diskUsages.size() / 2));
+                queryFunctionStatistics.setMedianDiskUsagePerQuery_inBytes(ChronixMath.calcMedianFromLong(diskUsages));
                 queryFunctionStatistics.setMaximumDiskUsageRecorded_inBytes(Collections.max(totalDiskUsages));
             } else {
                 queryFunctionStatistics.setMeanDiskUsagePerQuery_inBytes(diskUsagesSum);
@@ -351,7 +351,7 @@ public class TsdbStatisticsAnalyzer {
             if(memoryUsages.size() > 1){
                 queryFunctionStatistics.setMeanMemoryUsagePerQuery_inPercent(memoryUsagesSum / memoryUsages.size());
                 Collections.sort(memoryUsages);
-                queryFunctionStatistics.setMedianMemoryUsagePerQuery_inPercent(memoryUsages.get(memoryUsages.size() / 2));
+                queryFunctionStatistics.setMedianMemoryUsagePerQuery_inPercent(ChronixMath.calcMedianFromDouble(memoryUsages));
             } else {
                 queryFunctionStatistics.setMeanMemoryUsagePerQuery_inPercent(memoryUsagesSum);
                 queryFunctionStatistics.setMedianMemoryUsagePerQuery_inPercent(memoryUsagesSum);
@@ -359,7 +359,7 @@ public class TsdbStatisticsAnalyzer {
             if(memoryTotalUsages.size() > 1){
                 queryFunctionStatistics.setMeanTotalMemoryUsage_inPercent(memoryTotalUsagesSum / memoryTotalUsages.size());
                 Collections.sort(memoryTotalUsages);
-                queryFunctionStatistics.setMedianTotalMemoryUsage_inPercent(memoryTotalUsages.get(memoryTotalUsages.size() / 2));
+                queryFunctionStatistics.setMedianTotalMemoryUsage_inPercent(ChronixMath.calcMedianFromDouble(memoryTotalUsages));
                 queryFunctionStatistics.setMaximumMemoryUsageRecorded_inPercent(memoryTotalUsages.get(memoryTotalUsages.size()-1));
             } else {
                 queryFunctionStatistics.setMeanTotalMemoryUsage_inPercent(memoryTotalUsagesSum);
@@ -371,7 +371,7 @@ public class TsdbStatisticsAnalyzer {
             if(diskWrites.size() > 1){
                 queryFunctionStatistics.setMeanDiskWrite_inBytes(diskWritesSum / diskWrites.size());
                 Collections.sort(diskWrites);
-                queryFunctionStatistics.setMedianDiskWrite_inBytes(diskWrites.get(diskWrites.size() / 2));
+                queryFunctionStatistics.setMedianDiskWrite_inBytes(ChronixMath.calcMedianFromLong(diskWrites));
                 queryFunctionStatistics.setTotalDiskWrite_inBytes(diskWritesSum);
             } else {
                 queryFunctionStatistics.setMeanDiskWrite_inBytes(diskWritesSum);
@@ -383,7 +383,7 @@ public class TsdbStatisticsAnalyzer {
             if(diskReads.size() > 1){
                 queryFunctionStatistics.setMeanDiskRead_inBytes(diskReadsSum / diskReads.size());
                 Collections.sort(diskReads);
-                queryFunctionStatistics.setMedianDiskRead_inBytes(diskReads.get(diskReads.size() / 2));
+                queryFunctionStatistics.setMedianDiskRead_inBytes(ChronixMath.calcMedianFromLong(diskReads));
                 queryFunctionStatistics.setTotalDiskRead_inBytes(diskReadsSum);
             } else {
                 queryFunctionStatistics.setMeanDiskRead_inBytes(diskReadsSum);
@@ -395,7 +395,7 @@ public class TsdbStatisticsAnalyzer {
             if(networkDowns.size() > 1){
                 queryFunctionStatistics.setMeanNetworkDownload_inBytes(networkDownsSum / networkDowns.size());
                 Collections.sort(networkDowns);
-                queryFunctionStatistics.setMedianNetworkDownload_inBytes(networkDowns.get(networkDowns.size() / 2));
+                queryFunctionStatistics.setMedianNetworkDownload_inBytes(ChronixMath.calcMedianFromLong(networkDowns));
                 queryFunctionStatistics.setTotalNetworkDownload_inBytes(networkDownsSum);
             } else {
                 queryFunctionStatistics.setMeanNetworkDownload_inBytes(networkDownsSum);
@@ -407,7 +407,7 @@ public class TsdbStatisticsAnalyzer {
             if(networkUps.size() > 1){
                 queryFunctionStatistics.setMeanNetworkUpload_inBytes(networkUpsSum / networkUps.size());
                 Collections.sort(networkUps);
-                queryFunctionStatistics.setMedianNetworkUpload_inBytes(networkUps.get(networkUps.size() / 2));
+                queryFunctionStatistics.setMedianNetworkUpload_inBytes(ChronixMath.calcMedianFromLong(networkUps));
                 queryFunctionStatistics.setTotalNetworkUpload_inBytes(networkUpsSum);
             } else {
                 queryFunctionStatistics.setMeanNetworkUpload_inBytes(networkUpsSum);
@@ -419,7 +419,7 @@ public class TsdbStatisticsAnalyzer {
             if(latencies.size() > 1){
                 queryFunctionStatistics.setMeanLatency_inMilliseconds(latenciesSum / latencies.size());
                 Collections.sort(latencies);
-                queryFunctionStatistics.setMedianLatency_inMilliseconds(latencies.get(latencies.size() / 2));
+                queryFunctionStatistics.setMedianLatency_inMilliseconds(ChronixMath.calcMedianFromLong(latencies));
             } else {
                 queryFunctionStatistics.setMeanLatency_inMilliseconds(latenciesSum);
                 queryFunctionStatistics.setMedianLatency_inMilliseconds(latenciesSum);

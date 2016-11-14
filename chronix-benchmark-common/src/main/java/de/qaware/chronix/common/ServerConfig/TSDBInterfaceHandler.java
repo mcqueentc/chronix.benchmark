@@ -1,4 +1,4 @@
-package de.qaware.chronix.shared.ServerConfig;
+package de.qaware.chronix.common.ServerConfig;
 
 import de.qaware.chronix.database.BenchmarkDataSource;
 import org.apache.commons.compress.utils.IOUtils;

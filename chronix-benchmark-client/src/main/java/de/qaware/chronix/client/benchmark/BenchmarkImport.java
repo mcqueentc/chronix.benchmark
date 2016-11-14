@@ -3,18 +3,12 @@ package de.qaware.chronix.client.benchmark;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.client.benchmark.benchmarkrunner.BenchmarkRunner;
-import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.shared.DataModels.BenchmarkSetupVariables;
-import de.qaware.chronix.shared.QueryUtil.JsonTimeSeriesHandler;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
-import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
+import de.qaware.chronix.common.DataModels.BenchmarkSetupVariables;
+import de.qaware.chronix.common.QueryUtil.JsonTimeSeriesHandler;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 

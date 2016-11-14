@@ -1,6 +1,6 @@
 package Client.data;
 
-import de.qaware.chronix.shared.QueryUtil.CsvImporter;
+import de.qaware.chronix.common.QueryUtil.CsvImporter;
 
 import java.io.File;
 import java.util.ArrayList;

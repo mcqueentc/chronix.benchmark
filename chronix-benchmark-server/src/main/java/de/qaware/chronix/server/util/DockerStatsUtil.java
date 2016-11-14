@@ -1,13 +1,9 @@
 package de.qaware.chronix.server.util;
 
-import com.sun.management.OperatingSystemMXBean;
-import de.qaware.chronix.shared.DataModels.Pair;
-import de.qaware.chronix.shared.DataModels.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.awt.OSInfo;
 
-import java.lang.management.ManagementFactory;
 import java.util.LinkedList;
 import java.util.List;
 

@@ -2,9 +2,9 @@ package Server;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
 import de.qaware.chronix.database.BenchmarkDataSource;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
-import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.common.ServerConfig.TSDBInterfaceHandler;
 
 import java.io.File;
 import java.util.HashMap;

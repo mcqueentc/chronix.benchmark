@@ -1,6 +1,6 @@
 package de.qaware.chronix.client.benchmark.util;
 
-import de.qaware.chronix.shared.QueryUtil.CsvImporter;
+import de.qaware.chronix.common.QueryUtil.CsvImporter;
 
 import java.io.File;
 import java.util.LinkedList;

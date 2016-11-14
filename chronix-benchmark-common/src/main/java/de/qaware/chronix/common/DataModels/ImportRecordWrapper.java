@@ -1,8 +1,8 @@
-package de.qaware.chronix.shared.DataModels;
+package de.qaware.chronix.common.DataModels;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.qaware.chronix.database.TimeSeries;
-import de.qaware.chronix.shared.QueryUtil.ImportRecord;
+import de.qaware.chronix.common.QueryUtil.ImportRecord;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;

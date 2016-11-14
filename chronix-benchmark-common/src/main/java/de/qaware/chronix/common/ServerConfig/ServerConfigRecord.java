@@ -1,9 +1,9 @@
-package de.qaware.chronix.shared.ServerConfig;
+package de.qaware.chronix.common.ServerConfig;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
-import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
+import de.qaware.chronix.common.dockerUtil.DockerBuildOptions;
+import de.qaware.chronix.common.dockerUtil.DockerRunOptions;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package de.qaware.chronix.shared.QueryUtil;
+package de.qaware.chronix.common.QueryUtil;
 
 import com.sun.management.OperatingSystemMXBean;
 import de.qaware.chronix.database.TimeSeries;

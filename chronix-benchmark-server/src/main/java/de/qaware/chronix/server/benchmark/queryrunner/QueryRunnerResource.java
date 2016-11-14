@@ -10,18 +10,14 @@ import de.qaware.chronix.server.util.DockerCommandLineUtil;
 import de.qaware.chronix.server.util.DockerStatsRecord;
 import de.qaware.chronix.server.util.DockerStatsUtil;
 import de.qaware.chronix.server.util.ServerSystemUtil;
-import de.qaware.chronix.shared.DataModels.ImportRecordWrapper;
-import de.qaware.chronix.shared.DataModels.Tuple;
-import de.qaware.chronix.shared.QueryUtil.*;
-import de.qaware.chronix.shared.ServerConfig.TSDBInterfaceHandler;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import de.qaware.chronix.common.DataModels.ImportRecordWrapper;
+import de.qaware.chronix.common.QueryUtil.*;
+import de.qaware.chronix.common.ServerConfig.TSDBInterfaceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
@@ -31,7 +27,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.InputStream;
 import java.util.*;
 
 /**

@@ -1,22 +1,16 @@
 package de.qaware.chronix.server.benchmark.collector;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 import com.codahale.metrics.annotation.Timed;
-import de.qaware.chronix.server.benchmark.configurator.BenchmarkConfiguratorResource;
-import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.common.QueryUtil.BenchmarkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

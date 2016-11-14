@@ -2,9 +2,9 @@ package de.qaware.chronix.client.benchmark.util;
 
 import de.qaware.chronix.client.ClientMenu;
 import de.qaware.chronix.client.benchmark.queryhandler.QueryHandler;
-import de.qaware.chronix.shared.QueryUtil.CleanCommand;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.common.QueryUtil.CleanCommand;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
 
 import java.util.LinkedList;
 import java.util.List;

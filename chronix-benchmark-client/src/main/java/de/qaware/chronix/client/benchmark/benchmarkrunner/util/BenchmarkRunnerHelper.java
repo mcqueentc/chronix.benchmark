@@ -4,10 +4,10 @@ import de.qaware.chronix.database.BenchmarkDataSource.QueryFunction;
 import de.qaware.chronix.database.BenchmarkQuery;
 import de.qaware.chronix.database.TimeSeries;
 import de.qaware.chronix.database.TimeSeriesMetaData;
-import de.qaware.chronix.shared.QueryUtil.ImportRecord;
-import de.qaware.chronix.shared.QueryUtil.QueryRecord;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.common.QueryUtil.ImportRecord;
+import de.qaware.chronix.common.QueryUtil.QueryRecord;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package de.qaware.chronix.shared.dockerUtil;
+package de.qaware.chronix.common.dockerUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

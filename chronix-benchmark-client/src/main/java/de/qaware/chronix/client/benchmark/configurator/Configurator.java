@@ -1,10 +1,10 @@
 package de.qaware.chronix.client.benchmark.configurator;
 
 import de.qaware.chronix.client.benchmark.configurator.util.Uploader;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
-import de.qaware.chronix.shared.dockerUtil.DockerBuildOptions;
-import de.qaware.chronix.shared.dockerUtil.DockerRunOptions;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
+import de.qaware.chronix.common.ServerConfig.ServerConfigRecord;
+import de.qaware.chronix.common.dockerUtil.DockerBuildOptions;
+import de.qaware.chronix.common.dockerUtil.DockerRunOptions;
+import de.qaware.chronix.common.ServerConfig.ServerConfigAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

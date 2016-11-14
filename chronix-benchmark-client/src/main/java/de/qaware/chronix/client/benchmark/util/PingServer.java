@@ -1,8 +1,6 @@
 package de.qaware.chronix.client.benchmark.util;
 
 import de.qaware.chronix.client.benchmark.configurator.Configurator;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigAccessor;
-import de.qaware.chronix.shared.ServerConfig.ServerConfigRecord;
 
 /**
  * Created by mcqueen666 on 07.10.16.

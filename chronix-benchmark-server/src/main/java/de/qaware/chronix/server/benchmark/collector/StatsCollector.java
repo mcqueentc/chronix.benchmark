@@ -1,14 +1,12 @@
 package de.qaware.chronix.server.benchmark.collector;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.qaware.chronix.server.util.DockerStatsRecord;
-import de.qaware.chronix.shared.DataModels.Pair;
-import de.qaware.chronix.shared.DataModels.Tuple;
-import de.qaware.chronix.shared.QueryUtil.BenchmarkRecord;
-import de.qaware.chronix.shared.QueryUtil.IgnoreTimesSeriesForJSON;
-import de.qaware.chronix.shared.QueryUtil.ImportRecord;
-import de.qaware.chronix.shared.QueryUtil.QueryRecord;
+import de.qaware.chronix.common.DataModels.Pair;
+import de.qaware.chronix.common.QueryUtil.BenchmarkRecord;
+import de.qaware.chronix.common.QueryUtil.IgnoreTimesSeriesForJSON;
+import de.qaware.chronix.common.QueryUtil.ImportRecord;
+import de.qaware.chronix.common.QueryUtil.QueryRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
