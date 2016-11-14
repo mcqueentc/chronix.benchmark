@@ -31,6 +31,8 @@ public class TimeSeriesStatistics {
     private double meanValueChangeRateOfAllTimeSeries;
     private double meanMeasurementDurationOfAllTimeSeries_inSeconds;
     private double meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
+    private double medianMeasurementDurationOfAllTimeSeries_inSeconds;
+    private double medianSamplingIntervalOfAllTimeSeries_inMilliseconds;
 
 
     public TimeSeriesStatistics(){
@@ -187,5 +189,21 @@ public class TimeSeriesStatistics {
 
     public void setMeanSamplingIntervalOfAllTimeSeries_inMilliseconds(double meanSamplingIntervalOfAllTimeSeries_inMilliseconds) {
         this.meanSamplingIntervalOfAllTimeSeries_inMilliseconds = meanSamplingIntervalOfAllTimeSeries_inMilliseconds;
+    }
+
+    public double getMedianMeasurementDurationOfAllTimeSeries_inSeconds() {
+        return medianMeasurementDurationOfAllTimeSeries_inSeconds;
+    }
+
+    public void setMedianMeasurementDurationOfAllTimeSeries_inSeconds(double medianMeasurementDurationOfAllTimeSeries_inSeconds) {
+        this.medianMeasurementDurationOfAllTimeSeries_inSeconds = medianMeasurementDurationOfAllTimeSeries_inSeconds;
+    }
+
+    public double getMedianSamplingIntervalOfAllTimeSeries_inMilliseconds() {
+        return medianSamplingIntervalOfAllTimeSeries_inMilliseconds;
+    }
+
+    public void setMedianSamplingIntervalOfAllTimeSeries_inMilliseconds(double medianSamplingIntervalOfAllTimeSeries_inMilliseconds) {
+        this.medianSamplingIntervalOfAllTimeSeries_inMilliseconds = medianSamplingIntervalOfAllTimeSeries_inMilliseconds;
     }
 }
