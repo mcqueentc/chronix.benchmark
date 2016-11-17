@@ -90,7 +90,8 @@ public class BenchmarkImport {
             for (File directory : importDirectories) {
                 JsonTimeSeriesHandler.getInstance().deleteTimeSeriesMetaDataJsonFile(directory.getName());
                 System.out.println("\nImporting directory: " + directory);
-                benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
+                //benchmarkRunner.importTimeSeriesFromDirectory(server, directory, batchSize, fromFile, tsdbImportList);
+                benchmarkRunner.importTimesSeriesWithUploadedFiles(server, directory, batchSize, fromFile, tsdbImportList);
             }
 
             if(benchmarkRunner.getBenchmarkRecordsFromServer(server)){
