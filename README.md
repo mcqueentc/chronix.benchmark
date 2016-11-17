@@ -25,7 +25,7 @@ A benchmark for Chronix and other time series databases (TSDB)
 - Download the benchmark server part(link) to your server.
 - Unzip the downloaded file to a folder of your liking.
 - In terminal go to that folder and start the server:  
-`java -Xmx8g -jar server.jar DropWizardServer.yaml`  
+`java -Xmx8g -jar server.jar server DropWizardServer.yaml`  
 
 #####Client:  
 
