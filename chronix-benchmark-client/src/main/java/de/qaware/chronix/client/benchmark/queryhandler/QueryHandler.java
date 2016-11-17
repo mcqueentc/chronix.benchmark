@@ -85,6 +85,12 @@ public class QueryHandler {
         return new String[]{"Server error"};
     }
 
+    /**
+     * Imports time series on given server.
+     * @param serverAddress the server
+     * @param importRecordWrapper the wrapped import record
+     * @return the answers from the server
+     */
     public String[] doImportOnServer(String serverAddress, ImportRecordWrapper importRecordWrapper) {
         try {
             final Client client = ClientBuilder.newBuilder().build();
@@ -113,6 +119,12 @@ public class QueryHandler {
         return new String[]{"Server error"};
     }
 
+    /**
+     * Uploads time series and wrapped import record as multipart to server for import.
+     * @param serverAddress server address
+     * @param multiPart the multipart containing the time series and the wrapped import record as json file
+     * @return the server answer
+     */
     public String[] doImportOnServerWithUploadedFiles(String serverAddress, FormDataMultiPart multiPart){
         try {
             final Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
@@ -134,6 +146,12 @@ public class QueryHandler {
         return new String[]{"Server error"};
     }
 
+    /**
+     * Transmits the tsdb clean commands to the server.
+     * @param serverAddress server address.
+     * @param cleanCommandList the tsdb specific clean command.
+     * @return the server answer
+     */
     public String[] cleanDatabasesOnServer(String serverAddress, List<CleanCommand> cleanCommandList){
         try {
             final Client client = ClientBuilder.newBuilder().build();

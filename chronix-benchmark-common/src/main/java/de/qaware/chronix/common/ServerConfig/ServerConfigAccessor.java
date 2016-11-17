@@ -99,9 +99,9 @@ public class ServerConfigAccessor {
     /**
      * Returns the host port on given server where given tsdb is available.
      *
-     * @param serverAddress
-     * @param tsdbName
-     * @return
+     * @param serverAddress the server address
+     * @param tsdbName the tsdb
+     * @return the port
      */
     public String getHostPortForTSDB(String serverAddress, String tsdbName){
         LinkedList<ServerConfigRecord> records = getServerConfigRecords();

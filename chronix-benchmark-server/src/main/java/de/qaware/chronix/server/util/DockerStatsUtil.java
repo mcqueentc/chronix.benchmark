@@ -81,6 +81,7 @@ public class DockerStatsUtil {
      *
      * @param containerName the name of the docker container
      * @param storageDirectoryPath the path to the storage directory.
+     * @param external true if storage size should be measured outside the docker container.
      * @return the size of the storage directory mapped from container to host in bytes.
      */
     public Long estimateStorageSize(String containerName, String storageDirectoryPath, boolean external){
