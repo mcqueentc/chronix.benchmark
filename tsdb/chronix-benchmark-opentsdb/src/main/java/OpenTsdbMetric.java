@@ -21,8 +21,8 @@ import java.util.Map;
 
 
 /**
- * @author Sean Scanlon <sean.scanlon@gmail.com>
- *         <p/>
+ * @author Sean Scanlon sean.scanlon@gmail.com
+ *
  *         Representation of a metric.
  */
 public class OpenTsdbMetric {

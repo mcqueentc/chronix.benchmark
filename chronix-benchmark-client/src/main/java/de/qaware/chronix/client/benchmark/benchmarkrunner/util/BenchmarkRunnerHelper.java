@@ -79,6 +79,7 @@ public class BenchmarkRunnerHelper {
      * @param serverAddress the server address or ip on which the queries should be done.
      * @param function the query function which should be performed.
      * @param p the percentile value (if needed, null if not).
+     * @param tsdbImportList the tsdbNames to which should be imported.
      * @return list of QueryRecords.
      */
     public List<QueryRecord> getQueryRecordForTimeSeriesMetaData(List<TimeSeriesMetaData> timeSeriesMetaDataList,

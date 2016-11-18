@@ -21,7 +21,7 @@ public class BenchmarkQuery {
      *
      *
      * @param timeSeriesMetaData the time series meta data.
-     * @param percentile the percentile to be calculated. (Example: percentile == 5.0 -> 5th percentile)
+     * @param percentile the percentile to be calculated. (Example: percentile == 5.0 eq. 5th percentile)
      *                   (ignore if not function.PERCENTILE)
      * @param function the query function which to perform.
      */

@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * OpenTSDB 2.0 jersey based REST client
  *
- * @author Sean Scanlon <sean.scanlon@gmail.com>
+ * @author Sean Scanlon sean.scanlon@gmail.com
  */
 public class OpenTsdb {
 
@@ -89,8 +89,8 @@ public class OpenTsdb {
     /**
      * Initiate a client Builder with the provided base opentsdb server url.
      *
-     * @param baseUrl
-     * @return
+     * @param baseUrl server url
+     * @return service builder
      */
     public static Builder forService(String baseUrl) {
         return new Builder(baseUrl);
@@ -99,8 +99,8 @@ public class OpenTsdb {
     /**
      * create a client by providing the underlying WebResource
      *
-     * @param apiResource
-     * @return
+     * @param apiResource webtarget
+     * @return client
      */
     public static OpenTsdb create(WebTarget apiResource) {
         return new OpenTsdb(apiResource);
@@ -334,7 +334,8 @@ public class OpenTsdb {
     /**
      * Send a metric to opentsdb
      *
-     * @param metric
+     * @param metric metric
+     * @return success
      */
     public boolean send(OpenTsdbMetric metric) {
         return send(Collections.singleton(metric));
@@ -343,7 +344,8 @@ public class OpenTsdb {
     /**
      * send a set of metrics to opentsdb
      *
-     * @param metrics
+     * @param metrics metric
+     * @return success
      */
     public boolean send(Set<OpenTsdbMetric> metrics) {
         // we set the patch size because of existing issue in opentsdb where large batch of metrics failed

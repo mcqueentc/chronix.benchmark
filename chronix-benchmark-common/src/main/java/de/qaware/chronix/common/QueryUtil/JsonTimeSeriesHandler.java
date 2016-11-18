@@ -194,7 +194,8 @@ public class JsonTimeSeriesHandler {
     /**
      * Writes a list of TimeSeriesMetaData to timeseries_metadata_records.json file
      *
-     * @param timeSeriesList the list of TimeSeriesMetaData
+     * @param timeSeriesList the list of TimeSeries
+     * @return list of TimeSeriesMetaData
      */
     public List<TimeSeriesMetaData> writeTimeSeriesMetaDataJson(List<TimeSeries> timeSeriesList){
         List<TimeSeriesMetaData> timeSeriesMetaDataList = new ArrayList<>();

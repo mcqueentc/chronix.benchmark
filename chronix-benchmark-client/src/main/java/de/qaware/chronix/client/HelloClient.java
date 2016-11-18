@@ -2,6 +2,7 @@ package de.qaware.chronix.client;
 
 
 /**
+ * DUMMY TEST CLASS
  * Created by mcqueen666 on 14.06.16.
  */
 public class HelloClient {

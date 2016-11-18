@@ -102,7 +102,7 @@ public class BenchmarkRunner {
      * Downloads the benchmark records from the given server.
      *
      * @param serverAddress the server address or ip
-     * @return
+     * @return true if successful.
      */
     public boolean getBenchmarkRecordsFromServer(String serverAddress){
         try {
@@ -127,6 +127,11 @@ public class BenchmarkRunner {
         return false;
     }
 
+    /**
+     * Deletes the benchmark records on given server.
+     * @param serverAddress the server address.
+     * @return true if successful.
+     */
     public boolean deleteBenchmarkRecordsOnServer(String serverAddress){
         boolean isDeleted = false;
         try {
@@ -157,7 +162,8 @@ public class BenchmarkRunner {
      * @param server the server address or ip on which to import.
      * @param directory the directory containing gzipped times series files.
      * @param batchSize the batch size of how many time series should be imported per call on the server.
-     * @return list of answers from the server.
+     * @param fromFile file number to start from
+     * @param tsdbImportList list of tsdbNames to which the data should be imported
      */
     public void importTimeSeriesFromDirectory(String server, File directory, int batchSize, int fromFile, List<String> tsdbImportList){
         if(directory != null && directory.exists() && directory.isDirectory()) {
@@ -270,9 +276,11 @@ public class BenchmarkRunner {
      * Performs queries with given meta data and function on all tsdbs on given server.
      *
      * @param server the server address or ip
+     * @param queryID the unique queryID
      * @param metaDataList the meta data on which the queries should be performed.
      * @param function the query function that should be performed.
      * @param p the percentile value (if needed, null if not).
+     * @param tsdbQueryList list of tsdbNames which should be queried.
      * @return list of answers from the server.
      */
     public List<String> queryWithFunction(String server, String queryID, List<TimeSeriesMetaData> metaDataList, QueryFunction function, Float p, List<String> tsdbQueryList) {
@@ -349,7 +357,15 @@ public class BenchmarkRunner {
     }
 
 
-
+    /**
+     * Imports time series to all tsdbs on given server. only uploads the zipped time series.
+     *
+     * @param server the server address or ip on which to import.
+     * @param directory the directory containing gzipped times series files.
+     * @param batchSize the batch size of how many time series should be imported per call on the server.
+     * @param fromFile file number to start from
+     * @param tsdbImportList list of tsdbNames to which the data should be imported
+     */
     public void importTimesSeriesWithUploadedFiles(String server, File directory, int batchSize, int fromFile, List<String> tsdbImportList){
         if(directory != null && directory.exists() && directory.isDirectory()) {
             try {
