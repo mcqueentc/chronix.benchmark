@@ -22,14 +22,14 @@ A benchmark for Chronix and other time series databases (TSDB)
 ## Installation  
 #####Server:  
  
-- Download the benchmark server part(link) to your server.
+- Download the benchmark [server part](https://github.com/mcqueentc/chronix.benchmark/releases/download/v1.0/server.zip) to your server.
 - Unzip the downloaded file to a folder of your liking.
 - In terminal go to that folder and start the server:  
 `java -Xmx8g -jar server.jar server DropWizardServer.yaml`  
 
 #####Client:  
 
-- Download the benchmark client part(link)
+- Download the benchmark [client part](https://github.com/mcqueentc/chronix.benchmark/releases/download/v1.0/client.zip)
 - Unzip the downloaded file to a folder of your liking.
 - In terminal go to that folder and setup the client:
 	- Add a TSDB to the benchmark:  
@@ -41,7 +41,7 @@ A benchmark for Chronix and other time series databases (TSDB)
 
 ## Integrating your own TSDB  
 - Create a [Dockerfile](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/) which provides the environment for your TSDB and also give instructions to the Dockerfile to install and start the TSDB. (Examples can be found [here](https://github.com/mcqueentc/docker))
-- Add DatabaseInterface.jar(link) to a Project and implement the BenchmarkDataSource interface with a class for your TSDB. (example for chronix can be found [here](https://github.com/mcqueentc/chronix.benchmark/blob/master/TSDB_Chronix_Interface/src/main/java/Chronix.java))
+- Add [chronix-benchmark-interface.jar](https://github.com/mcqueentc/chronix.benchmark/releases/download/v1.0/chronix-benchmark-interface.zip) to a Project and implement the BenchmarkDataSource interface with a class for your TSDB. (example for chronix can be found [here](https://github.com/mcqueentc/chronix.benchmark/blob/master/TSDB_Chronix_Interface/src/main/java/Chronix.java)), some precompiled archives can be found [here](https://github.com/mcqueentc/chronix.benchmark/releases/download/v1.0/TSDBs.zip)
 - Build a fat jar of your BenchmarkDataSource interface implementation, for example with [shadowjar](https://github.com/johnrengelman/shadow).
 - Provide the necessary docker files and the fat jar of your TSDB to the client: see "Installation Client"  
 
